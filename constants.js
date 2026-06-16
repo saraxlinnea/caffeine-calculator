@@ -21,8 +21,11 @@ const CAFFEINE_SOURCES = {
   
   const HALFLIFE_MODIFIERS = {
     male: 1.0,
-    female: 1.0,             // Inherent sex difference modest/inconsistent without OCP (see caveat)
-    female_contraceptives: 1.70, // +70% — OCP studies show 8–11 hr vs ~5–6 hr controls (PMID 7359014, 4029248)
+    female: 1.0,
+    unspecified: 1.0,        // Same baseline as male when sex not provided
+    female_contraceptives: 1.70,
+    smoking: 0.5,            // ~50% faster clearance (CYP1A2 induction)
+    pregnancy: 2.0,          // ~2× longer half-life (simplified; trimester varies)
   };
   
   // METABOLIZER TYPE (CYP1A2 genetics)
@@ -99,10 +102,14 @@ const CAFFEINE_SOURCES = {
     }
   };
   
+  // Baur et al. 2024 (PMID 38221756): EEG delta-power association in controlled sleep study.
+  // Endpoint-specific reference — not a universal personal sleep cutoff.
+  const BAUR_DELTA_POWER_THRESHOLD = 1.4;
+
   // SLEEP ZONE THRESHOLDS (for quick lookup)
   const SAFE_THRESHOLD = 0.5;         // Green zone max
   const CAUTION_THRESHOLD = 1.0;      // Yellow zone max
-  const WARNING_THRESHOLD = 1.4;      // Orange zone max (from Baur et al.)
+  const WARNING_THRESHOLD = 1.4;      // Orange zone max (aligns with Baur delta-power reference)
   const DANGER_THRESHOLD = 2.5;       // Red zone max
 
   // ============================================
@@ -136,23 +143,62 @@ const ZONE_COLORS_BORDER = {
 
 // Factor explainer content
 const FACTOR_EXPLAINERS = {
-    sex: {
-        title: '👥 How Sex and Hormones Affect Caffeine',
+    ocp: {
+        title: '💊 Oral Contraceptives & Caffeine Clearance',
         content: `
-            <strong>The Science:</strong> The main hormonal factor is oral contraceptive use. Estrogen in combined OCPs inhibits CYP1A2, the liver enzyme that clears caffeine, substantially extending how long it stays in your system. Evidence for an inherent sex difference (without OCPs) is mixed and modest.
+            <strong>The Science:</strong> Estrogen in combined oral contraceptives inhibits CYP1A2, the liver enzyme that clears most caffeine. That can substantially extend how long caffeine stays in your system. This is the main hormonal factor modeled here—not an inherent sex difference without OCP use.
             
-            <strong>Your Status:</strong> You selected <span id="sexStatus">male</span>
+            <strong>Your Status:</strong> <span id="ocpStatus">Not on oral contraceptives</span>
             
             <strong>What This Means:</strong>
             <ul>
-                <li><strong>Males:</strong> Baseline half-life ~5.0 hours</li>
-                <li><strong>Females (no OCP):</strong> Similar to male baseline in this model</li>
-                <li><strong>On oral contraceptives:</strong> Roughly 70% longer half-life (~8–9 hours) based on multiple studies</li>
+                <li><strong>Not on OCP:</strong> Baseline half-life in this model (~4.4–6.9 h depending on metabolizer type)</li>
+                <li><strong>On oral contraceptives:</strong> Roughly 70% longer half-life (~8–9 h at average metabolizer) based on multiple studies</li>
             </ul>
             
-            <strong>Impact on Your Results:</strong> Your caffeine will stay in your system <span id="sexImpact">at baseline rates</span>.
+            <strong>Impact on Your Results:</strong> Your caffeine clearance is <span id="ocpImpact">at baseline rates</span>.
             
-            <strong>Sources:</strong> Patwardhan et al. (1980) PMID 7359014; Abernethy &amp; Todd (1985) PMID 4029248
+            <strong>Sources:</strong> Patwardhan et al. (1980) PMID 7359014; Abernethy &amp; Todd (1985) PMID 4029248;
+            <a href="https://www.ncbi.nlm.nih.gov/books/NBK223808/" target="_blank" rel="noopener">NCBI Bookshelf NBK223808</a>
+        `
+    },
+    smoking: {
+        title: '🚬 Smoking & Caffeine Clearance',
+        content: `
+            <strong>The Science:</strong> Cigarette smoke induces CYP1A2, the main enzyme that metabolizes caffeine. Smokers often clear caffeine faster than non-smokers, with half-life roughly halved in many studies.
+            
+            <strong>Your Status:</strong> <span id="smokingStatus">Not selected</span>
+            
+            <strong>What This Means:</strong>
+            <ul>
+                <li><strong>Non-smoker (default):</strong> No smoking adjustment in this model</li>
+                <li><strong>Smoker:</strong> Half-life multiplied by ~0.5 (~50% faster clearance) as a simplified estimate</li>
+            </ul>
+            
+            <strong>Impact on Your Results:</strong> <span id="smokingImpact">No smoking adjustment applied</span>.
+            
+            <strong>Sources:</strong> Parsons &amp; Neims (1978) PMID 659762;
+            <a href="https://www.ncbi.nlm.nih.gov/books/NBK223808/" target="_blank" rel="noopener">NCBI Bookshelf NBK223808</a>
+        `
+    },
+    pregnancy: {
+        title: '🤰 Pregnancy & Caffeine Clearance',
+        content: `
+            <strong>The Science:</strong> Pregnancy slows caffeine metabolism, especially in later trimesters. Reported half-life increases are often 50–100% or more above baseline. This model uses a simplified ~2× multiplier.
+            
+            <strong>Your Status:</strong> <span id="pregnancyStatus">Not selected</span>
+            
+            <strong>What This Means:</strong>
+            <ul>
+                <li><strong>Not pregnant (default):</strong> No pregnancy adjustment</li>
+                <li><strong>Pregnant:</strong> Half-life multiplied by ~2.0 in this model</li>
+            </ul>
+            
+            <strong>Impact on Your Results:</strong> <span id="pregnancyImpact">No pregnancy adjustment applied</span>.
+            
+            <strong>Caution:</strong> Smoking during pregnancy carries serious health risks for the baby. This tool does not provide medical advice—discuss caffeine and smoking with a healthcare provider.
+            
+            <strong>Sources:</strong> Knutti et al. (1982) PMID 6954898; pregnancy pharmacokinetics reviews (PMC5564294).
         `
     },
     weight: {
@@ -236,6 +282,27 @@ const FACTOR_EXPLAINERS = {
         `
     }
 };
+
+// Inline citation keys for Overview guides (number maps to Science tab anchors).
+const CITATION_INDEX = {
+    baur2024:     { pmid: '38221756', num: 1, short: 'Baur et al. 2024' },
+    gardiner2023: { pmid: '36870101', num: 2, short: 'Gardiner et al. 2023' },
+    drake2013:    { pmid: '24235903', num: 3, short: 'Drake et al. 2013' },
+    clark2017:    { pmid: '26899133', num: 4, short: 'Clark & Landolt 2017' },
+    burke2015:    { pmid: '26378246', num: 5, short: 'Burke et al. 2015' }
+};
+
+/**
+ * Return superscript inline citation link to Science tab reference.
+ *
+ * @param {string} key - Key in CITATION_INDEX
+ * @returns {string} HTML snippet
+ */
+function cite(key) {
+    const c = CITATION_INDEX[key];
+    if (!c) return '';
+    return `<sup class="cite-ref"><a href="#ref-${c.pmid}" title="${c.short}">[${c.num}]</a></sup>`;
+}
 
 // Full references (Vancouver-style fields). Rendered in index.html via renderCitations().
 const CITATION_GROUPS = [
@@ -381,6 +448,77 @@ const CITATION_GROUPS = [
         ]
     },
     {
+        title: 'Smoking & Pregnancy',
+        items: [
+            {
+                authors: 'Parsons WD, Neims AH',
+                title: 'Effect of smoking on caffeine clearance',
+                journal: 'Clin Pharmacol Ther',
+                year: 1978,
+                volume: '24',
+                issue: '1',
+                pages: '40-5',
+                pmid: '659762',
+                usedFor: 'Smoking induces CYP1A2 and speeds caffeine clearance; supports ~50% shorter half-life modifier.'
+            },
+            {
+                authors: 'Knutti R, Rothweiler H, Schlatter C',
+                title: 'The effect of pregnancy on the pharmacokinetics of caffeine',
+                journal: 'Arch Toxicol',
+                year: 1982,
+                volume: '51',
+                pages: '55-9',
+                pmid: '6954898',
+                usedFor: 'Pregnancy prolongs caffeine half-life; supports ~2× half-life modifier in this model.'
+            },
+            {
+                authors: 'Salem F, Johnson TN, Abduljalil K, Jamei M, Rostami-Hodjegan A',
+                title: 'Pregnancy-Induced Changes in the Pharmacokinetics of Caffeine and Its Metabolites',
+                journal: 'J Clin Pharmacol',
+                year: 2017,
+                volume: '57',
+                issue: '9',
+                pages: '1175-1185',
+                pmcid: 'PMC5564294',
+                pmid: '28419521',
+                usedFor: 'Review of pregnancy-related changes in caffeine pharmacokinetics; trimester-dependent variation.'
+            },
+            {
+                authors: 'Institute of Medicine (US) Committee on Military Nutrition Research',
+                title: 'Pharmacology of caffeine',
+                bookTitle: 'Caffeine for the Sustainment of Mental Task Performance: Formulations for Military Operations',
+                publisher: 'National Academies Press (US)',
+                year: 2001,
+                url: 'https://www.ncbi.nlm.nih.gov/books/NBK223808/',
+                usedFor: 'CYP1A2 induction by smoking and general caffeine pharmacokinetics (NCBI Bookshelf).'
+            }
+        ]
+    },
+    {
+        title: 'Safety Guidance (FDA / EFSA)',
+        items: [
+            {
+                authors: 'U.S. Food and Drug Administration',
+                title: 'Spilling the Beans: How Much Caffeine is Too Much?',
+                year: 2023,
+                url: 'https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much',
+                usedFor: 'Consumer guidance on daily caffeine limits. Not personalized medical advice.'
+            },
+            {
+                authors: 'European Food Safety Authority',
+                title: 'Scientific Opinion on the safety of caffeine',
+                journal: 'EFSA Journal',
+                year: 2015,
+                volume: '13',
+                issue: '5',
+                pages: '4102',
+                doi: '10.2903/j.efsa.2015.4102',
+                url: 'https://www.efsa.europa.eu/en/efsajournal/pub/4102',
+                usedFor: 'Population guidance (~400 mg/day habitual intake for healthy adults; lower in pregnancy).'
+            }
+        ]
+    },
+    {
         title: 'Genetics (CYP1A2)',
         items: [
             {
@@ -441,6 +579,7 @@ const CITATION_GROUPS = [
       CAUTION_THRESHOLD,
       WARNING_THRESHOLD,
       DANGER_THRESHOLD,
+      BAUR_DELTA_POWER_THRESHOLD,
       CITATION_GROUPS
     };
   }

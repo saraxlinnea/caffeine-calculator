@@ -60,21 +60,63 @@ function getTimeToMaxConcentration(foodStatus) {
  * Female modifier (no OCP): 1.0 — inherent sex difference is modest without OCP use.
  * OCP modifier: 1.70 — oral contraceptives roughly double caffeine half-life
  *   (Abernethy & Todd 1985; Patwardhan et al. 1980).
+ * Smoking modifier: 0.5 — ~50% faster clearance (CYP1A2 induction).
+ * Pregnancy modifier: 2.0 — ~2× longer half-life (simplified; Knutti et al. 1982).
  *
  * @param {string}  sex              - "male" | "female"
  * @param {boolean} onContraceptives - Whether the user is on oral contraceptives
  * @param {string}  metabolizerType  - "fast" | "intermediate" | "slow"
+ * @param {boolean} [smoking=false]  - Whether the user smokes (faster clearance)
+ * @param {boolean} [pregnancy=false] - Whether the user is pregnant (slower clearance)
  * @returns {number} Adjusted half-life (hours)
  */
-function calculateHalfLife(sex, onContraceptives = false, metabolizerType = "intermediate") {
-    let baseFactor = HALFLIFE_MODIFIERS[sex] || HALFLIFE_MODIFIERS.male;
-
-    if (sex === "female" && onContraceptives) {
-        baseFactor = HALFLIFE_MODIFIERS.female_contraceptives;
-    }
+function calculateHalfLife(sex, onContraceptives = false, metabolizerType = "intermediate", smoking = false, pregnancy = false) {
+    let baseFactor = onContraceptives
+        ? HALFLIFE_MODIFIERS.female_contraceptives
+        : (HALFLIFE_MODIFIERS[sex || 'unspecified'] || HALFLIFE_MODIFIERS.unspecified);
 
     const metabolizerFactor = METABOLIZER_FACTORS[metabolizerType] || METABOLIZER_FACTORS.intermediate;
+    if (smoking) baseFactor *= HALFLIFE_MODIFIERS.smoking;
+    if (pregnancy) baseFactor *= HALFLIFE_MODIFIERS.pregnancy;
+
     return HALFLIFE_BASE_MALE * baseFactor * metabolizerFactor;
+}
+
+/**
+ * Summarize PK modifier count and uncertainty messaging for combined lifestyle/hormonal factors.
+ *
+ * @param {object} opts
+ * @param {boolean} opts.onContraceptives
+ * @param {boolean} opts.smoking
+ * @param {boolean} opts.pregnancy
+ * @returns {object}
+ */
+function getPkUncertaintyInfo({ onContraceptives, smoking, pregnancy }) {
+    const active = [];
+    if (onContraceptives) active.push('oral contraceptives');
+    if (smoking) active.push('smoking');
+    if (pregnancy) active.push('pregnancy');
+
+    const count = active.length;
+    const showCombinedUncertainty = count >= 2;
+    const showHealthRiskModal = onContraceptives && smoking && pregnancy;
+
+    let uncertaintyMessage = null;
+    if (smoking && pregnancy) {
+        uncertaintyMessage =
+            'Smoking and pregnancy have opposing effects on caffeine clearance in this simplified model, and their real-world interaction is complex and less studied. Your half-life estimate is less precise—discuss with a healthcare provider.';
+    } else if (count >= 2) {
+        uncertaintyMessage =
+            `Multiple clearance factors selected (${active.join(', ')}). Combined effects are less predictable in this simplified model; treat the half-life as an approximate planning estimate.`;
+    }
+
+    return {
+        activeFactors: active,
+        factorCount: count,
+        showCombinedUncertainty,
+        showHealthRiskModal,
+        uncertaintyMessage
+    };
 }
 
 /**
@@ -171,7 +213,13 @@ function totalConcentrationAt(wallClockHour, intakes, params, options = {}) {
         useBedtimeElapsed = false
     } = options;
 
-    const halfLife = calculateHalfLife(params.sex, params.onContraceptives, metabolizerType);
+    const halfLife = calculateHalfLife(
+        params.sex,
+        params.onContraceptives,
+        metabolizerType,
+        params.smoking,
+        params.pregnancy
+    );
     const k = calculateK(halfLife);
     const defaultFood = params.foodStatus || 'fasting';
 
@@ -243,7 +291,13 @@ function calculateMaxAdditionalDoseNow(intakes, params, concentrationAtBedtime) 
 
     if (hoursNowToBedtime <= tmaxHours) return 0;
 
-    const halfLife = calculateHalfLife(params.sex, params.onContraceptives, params.metabolizerType);
+    const halfLife = calculateHalfLife(
+        params.sex,
+        params.onContraceptives,
+        params.metabolizerType,
+        params.smoking,
+        params.pregnancy
+    );
     const k = calculateK(halfLife);
     const timePeakToBedtime = hoursNowToBedtime - tmaxHours;
     const roomAtBedtime = Math.max(0, SAFE_THRESHOLD - concentrationAtBedtime);
@@ -265,6 +319,8 @@ function calculateMaxAdditionalDoseNow(intakes, params, concentrationAtBedtime) 
  * @param {string}  params.sex
  * @param {string}  params.foodStatus       - Default absorption context for intakes
  * @param {boolean} params.onContraceptives
+ * @param {boolean} [params.smoking]
+ * @param {boolean} [params.pregnancy]
  * @param {string}  params.metabolizerType
  * @param {number}  params.nowHour
  * @param {number}  params.bedtimeHour
@@ -276,6 +332,8 @@ function generateCaffeineCurve(params) {
         sex,
         foodStatus,
         onContraceptives,
+        smoking = false,
+        pregnancy = false,
         metabolizerType,
         nowHour,
         bedtimeHour
@@ -293,9 +351,13 @@ function generateCaffeineCurve(params) {
         intakes.push({ amountMg: 0, hour: nowHour, foodStatus });
     }
 
-    const pkParams = { bodyWeight, sex, foodStatus, onContraceptives, metabolizerType, nowHour, bedtimeHour };
+    const pkParams = {
+        bodyWeight, sex, foodStatus, onContraceptives, smoking, pregnancy,
+        metabolizerType, nowHour, bedtimeHour
+    };
 
-    const halfLife = calculateHalfLife(sex, onContraceptives, metabolizerType);
+    const halfLife = calculateHalfLife(sex, onContraceptives, metabolizerType, smoking, pregnancy);
+    const pkUncertainty = getPkUncertaintyInfo({ onContraceptives, smoking, pregnancy });
     const k = calculateK(halfLife);
     const tmax_minutes = getTimeToMaxConcentration(foodStatus);
     const tmax_hours = tmax_minutes / 60;
@@ -349,7 +411,12 @@ function generateCaffeineCurve(params) {
         dose: totalMg,
         bodyWeight,
         sex,
+        onContraceptives,
+        smoking,
+        pregnancy,
+        metabolizerType,
         halfLife,
+        pkUncertainty,
         k,
         c_max,
         peakConcentration,
@@ -419,7 +486,7 @@ function generateRecommendation(zone, opts) {
 
     if (hasFutureIntakes && !alreadyConsumed) {
         if (consumptionTooLate) {
-            let msg = `Your planned ${totalMg} mg (${intakeLabel}) may leave levels above the low-risk band at bedtime.`;
+            let msg = `Your planned ${totalMg} mg (${intakeLabel}) may leave levels above the lower concentration band at bedtime.`;
             if (maxDoseNow > 0) {
                 msg += ` You could reduce planned doses or limit additional intake to about ${maxDoseNow} mg from now.`;
             }
@@ -455,6 +522,74 @@ function generateRecommendation(zone, opts) {
 // ============================================
 // CHART CONFIGURATION & HELPER FUNCTIONS
 // ============================================
+
+/**
+ * Plain-language bedtime interpretation tied to cited research.
+ * No synthetic scores; no exact REM/deep-sleep predictions.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {object} Panel content fields
+ */
+function getBedtimeOutcome(result) {
+    const conc = result.concentrationAtBedtime;
+    const low = result.concentrationAtBedtimeLow;
+    const high = result.concentrationAtBedtimeHigh;
+    const zone = result.zoneAtBedtime;
+
+    let interpretation;
+    if (conc < SAFE_THRESHOLD) {
+        interpretation = 'Sleep disruption is less likely at this estimated level. Individual sensitivity still varies.';
+    } else if (conc < CAUTION_THRESHOLD) {
+        interpretation = 'Small sleep effects are possible; sensitive individuals may notice changes.';
+    } else if (conc < WARNING_THRESHOLD) {
+        interpretation = 'Measurable sleep effects become more common in research at this level.';
+    } else if (conc < DANGER_THRESHOLD) {
+        interpretation = 'Greater likelihood of sleep disruption in population averages at this level.';
+    } else {
+        interpretation = 'Higher likelihood of substantial sleep disruption in population averages.';
+    }
+
+    return {
+        concentration: conc,
+        rangeLow: low,
+        rangeHigh: high,
+        zoneLabel: zone.label.replace(' estimated level', ''),
+        interpretation
+    };
+}
+
+/**
+ * Build percent-remaining curve points for a given half-life.
+ *
+ * @param {number} halfLife - Half-life in hours
+ * @param {number} [maxHours=12]
+ * @returns {{ hours: number[], percentages: number[] }}
+ */
+function buildClearanceCurve(halfLife, maxHours = 12) {
+    const k = calculateK(halfLife);
+    const hours = [];
+    const percentages = [];
+    for (let h = 0; h <= maxHours; h++) {
+        hours.push(h);
+        percentages.push(Math.exp(-k * h) * 100);
+    }
+    return { hours, percentages };
+}
+
+/**
+ * Percent caffeine remaining at 4, 8, and 12 hours after a hypothetical peak.
+ *
+ * @param {number} halfLife - Half-life in hours
+ * @returns {{ h4: number, h8: number, h12: number }}
+ */
+function getRemainingAfterPeak(halfLife) {
+    const { percentages } = buildClearanceCurve(halfLife);
+    return {
+        h4: percentages[4],
+        h8: percentages[8],
+        h12: percentages[12]
+    };
+}
 
 /**
  * Build the Chart.js plugin that draws colored zone bands behind a chart.
@@ -653,14 +788,18 @@ function getTimelineChartConfig(result) {
     const concentrations = offsets.map(h => result.curve[h]);
     const curveLow       = offsets.map(h => result.curveLow[h]);
     const curveHigh      = offsets.map(h => result.curveHigh[h]);
-    const yMax           = Math.ceil(Math.max(...curveHigh, result.peakConcentration) * 1.15);
+    const baurThreshold = typeof BAUR_DELTA_POWER_THRESHOLD !== 'undefined'
+        ? BAUR_DELTA_POWER_THRESHOLD
+        : WARNING_THRESHOLD;
+    const yMax = Math.ceil(Math.max(...curveHigh, result.peakConcentration, baurThreshold) * 1.15);
+    const baurLinePoints = [{ x: 0, y: baurThreshold }, { x: 24, y: baurThreshold }];
 
     return {
         type: 'line',
         data: {
             datasets: [
                 {
-                    label: 'Upper bound',
+                    label: 'Uncertainty range',
                     data: toPoints(curveHigh),
                     borderColor: 'transparent',
                     backgroundColor: 'rgba(212, 165, 116, 0.22)',
@@ -668,7 +807,7 @@ function getTimelineChartConfig(result) {
                     fill: '+1',
                     tension: 0.4,
                     pointRadius: 0,
-                    order: 3
+                    order: 4
                 },
                 {
                     label: 'Lower bound',
@@ -679,7 +818,7 @@ function getTimelineChartConfig(result) {
                     fill: false,
                     tension: 0.4,
                     pointRadius: 0,
-                    order: 2
+                    order: 3
                 },
                 {
                     label: 'Estimated concentration',
@@ -692,6 +831,18 @@ function getTimelineChartConfig(result) {
                     pointRadius: 0,
                     pointHoverRadius: 6,
                     pointBackgroundColor: '#d4a574',
+                    order: 2
+                },
+                {
+                    label: 'Baur line (~1.4 µg/mL)',
+                    data: baurLinePoints,
+                    borderColor: '#a87070',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1.5,
+                    borderDash: [8, 4],
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
                     order: 1
                 }
             ]
@@ -714,21 +865,30 @@ function getTimelineChartConfig(result) {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        filter: item => item.text === 'Estimated concentration',
-                        boxWidth: 12
+                        filter: item => !item.text.includes('Lower bound'),
+                        boxWidth: 12,
+                        usePointStyle: true
                     }
                 },
                 tooltip: {
+                    filter: item => item.dataset.label !== 'Baur line (~1.4 µg/mL)',
                     callbacks: {
                         title(items) {
                             const offset = items[0].parsed.x;
                             return formatWallClock(result.curveStartHour + offset);
                         },
+                        label(item) {
+                            if (item.dataset.label === 'Baur line (~1.4 µg/mL)') {
+                                return null;
+                            }
+                            const y = item.parsed.y;
+                            return `Estimated: ${y.toFixed(2)} µg/mL`;
+                        },
                         afterBody(items) {
                             const idx = items[0].dataIndex;
                             const low = curveLow[idx].toFixed(2);
                             const high = curveHigh[idx].toFixed(2);
-                            return `Range: ${low}–${high} µg/mL`;
+                            return `Uncertainty range: ${low}–${high} µg/mL`;
                         }
                     }
                 }
@@ -861,105 +1021,60 @@ function getWeightChartConfig(result, unit) {
 }
 
 /**
- * Build the Chart.js config for the clearance rate vs sleep risk chart.
- * Left axis: caffeine remaining as a percentage of peak (%).
- * Right axis: estimated sleep disruption risk (0–100 scale).
- * X-axis ticks show both wall-clock time and hours-after-consumption.
+ * Shared Chart.js options for static clearance reference charts.
  *
- * @param {object} result - Output of generateCaffeineCurve
- * @returns {object} Chart.js config object
+ * @param {string} title
+ * @param {string} subtitle
+ * @returns {object}
  */
-function getClearanceChartConfig(result) {
-    const offsets        = Object.keys(result.curve).map(Number).sort((a, b) => a - b);
-    const concentrations = offsets.map(h => result.curve[h]);
-    const sleepRisks     = concentrations.map(c => calculateSleepRisk(c));
-    const peakConc       = result.peakConcentration || 1;
-    const percentages    = concentrations.map(c => (c / peakConc) * 100);
-    const toPoints       = (values) => offsets.map((offset, i) => ({ x: offset, y: values[i] }));
-
+function getClearanceChartOptions(title, subtitle) {
     return {
-        type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: 'Relative Level (% of daily peak)',
-                    data: toPoints(percentages),
-                    borderColor: '#7a9b8e',
-                    backgroundColor: 'rgba(122, 155, 142, 0.05)',
-                    borderWidth: 2.5,
-                    fill: false,
-                    tension: 0.4,
-                    pointRadius: 0,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Sleep Disruption Risk (%)',
-                    data: toPoints(sleepRisks),
-                    borderColor: '#d4a574',
-                    backgroundColor: 'rgba(212, 165, 116, 0.05)',
-                    borderWidth: 2.5,
-                    fill: false,
-                    tension: 0.4,
-                    pointRadius: 0,
-                    yAxisID: 'y1',
-                    borderDash: [5, 5]
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            title: {
+                display: true,
+                text: title,
+                font: { size: 16, weight: '600' },
+                padding: 20,
+                color: '#2c2c2c'
+            },
+            subtitle: {
+                display: true,
+                text: subtitle
+            },
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: { boxWidth: 12, usePointStyle: true }
+            },
+            tooltip: {
+                callbacks: {
+                    label(item) {
+                        return `${item.dataset.label}: ${item.parsed.y.toFixed(1)}%`;
+                    }
                 }
-            ]
+            }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            parsing: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
                 title: {
                     display: true,
-                    text: 'Caffeine Clearance Rate vs Sleep Risk',
-                    font: { size: 16, weight: '600' },
-                    padding: 20,
-                    color: '#2c2c2c'
+                    text: 'Caffeine remaining in body (%)',
+                    font: { size: 12, weight: '500' },
+                    color: '#7a9b8e'
                 },
-                subtitle: {
-                    display: true,
-                    text: 'How caffeine remaining correlates with estimated sleep disruption risk'
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
+                ticks: { callback: value => value + '%' }
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Relative Level (% of peak)',
-                        font: { size: 12, weight: '500' },
-                        color: '#7a9b8e'
-                    }
-                },
-                y1: {
-                    beginAtZero: true,
-                    max: 100,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Sleep Risk (%)',
-                        font: { size: 12, weight: '500' },
-                        color: '#d4a574'
-                    },
-                    grid: { drawOnChartArea: false }
-                },
-                x: {
-                    type: 'linear',
-                    min: 0,
-                    max: 24,
-                    ticks: {
-                        maxTicksLimit: 13,
-                        callback: value => formatWallClock(result.curveStartHour + value)
-                    }
+            x: {
+                title: {
+                    display: true,
+                    text: 'Hours since peak',
+                    font: { size: 12, weight: '500' },
+                    color: '#2c2c2c'
                 }
             }
         }
@@ -967,19 +1082,287 @@ function getClearanceChartConfig(result) {
 }
 
 /**
- * EQUATION 4.1: Map plasma concentration to an estimated sleep disruption risk score
- * Piecewise linear mapping: 0 (no risk) → 100 (maximum estimated risk).
- * Breakpoints correspond to SLEEP_ZONES thresholds.
+ * Static reference: fast, average, and slow metabolizer clearance curves.
  *
- * @param {number} concentration - Caffeine plasma concentration (µg/mL)
- * @returns {number} Risk score 0–100
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {object} Chart.js config object
  */
-function calculateSleepRisk(concentration) {
-    if (concentration < 0.5)  return 0;
-    if (concentration < 1.0)  return Math.min(25, (concentration - 0.5) * 50);
-    if (concentration < 1.4)  return Math.min(50, 25 + (concentration - 1.0) * 83);
-    if (concentration < 2.5)  return Math.min(80, 50 + (concentration - 1.4) * 61);
-    return 100;
+function getMetabolizerClearanceChartConfig(result) {
+    const types = [
+        { key: 'fast', label: 'Fast (AA)', color: '#7a9b8e' },
+        { key: 'intermediate', label: 'Average (AC)', color: '#2c2c2c' },
+        { key: 'slow', label: 'Slow (CC)', color: '#a87070' }
+    ];
+
+    const selected = result.metabolizerType || 'intermediate';
+    const onOcp = result.onContraceptives;
+    const refNote = buildClearanceReferenceNote(result);
+    let labels = null;
+
+    const datasets = types.map(({ key, label, color }) => {
+        const hl = calculateHalfLife(result.sex || 'unspecified', false, key);
+        const { hours, percentages } = buildClearanceCurve(hl);
+        if (!labels) labels = hours.map(h => h + ' h');
+        const isSelected = !onOcp && key === selected;
+        return {
+            label: `${label} (~${hl.toFixed(1)} h)`,
+            data: percentages,
+            borderColor: color,
+            backgroundColor: 'transparent',
+            borderWidth: isSelected ? 3.5 : 1.5,
+            borderDash: isSelected ? [] : [4, 3],
+            fill: false,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 4
+        };
+    });
+
+    const subtitle = (onOcp
+        ? 'Reference curves without oral contraceptives. See OCP chart below for contraceptive effect.'
+        : 'Bold line = your selected metabolizer type.') + refNote;
+
+    return {
+        type: 'line',
+        data: { labels, datasets },
+        options: getClearanceChartOptions(
+            'Clearance by Metabolizer Type',
+            subtitle
+        )
+    };
+}
+
+/**
+ * Note when reference clearance charts omit smoking/pregnancy modifiers.
+ *
+ * @param {object} result
+ * @returns {string}
+ */
+function buildClearanceReferenceNote(result) {
+    const omitted = [];
+    if (result.smoking) omitted.push('smoking');
+    if (result.pregnancy) omitted.push('pregnancy');
+    if (!omitted.length) return '';
+    return ` Reference curves do not include ${omitted.join(' or ')}; your half-life above combines all selected factors.`;
+}
+
+/**
+ * Static reference: average metabolizer with and without oral contraceptives.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {object} Chart.js config object
+ */
+function getOcpClearanceChartConfig(result) {
+    const noOcpHl = calculateHalfLife(result.sex || 'unspecified', false, 'intermediate');
+    const ocpHl = calculateHalfLife(result.sex || 'unspecified', true, 'intermediate');
+    const noOcp = buildClearanceCurve(noOcpHl);
+    const withOcp = buildClearanceCurve(ocpHl);
+    const labels = noOcp.hours.map(h => h + ' h');
+    const onOcp = result.onContraceptives;
+
+    return {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: `No oral contraceptives (~${noOcpHl.toFixed(1)} h)`,
+                    data: noOcp.percentages,
+                    borderColor: '#2c2c2c',
+                    backgroundColor: 'transparent',
+                    borderWidth: onOcp ? 1.5 : 3.5,
+                    borderDash: onOcp ? [4, 3] : [],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                },
+                {
+                    label: `On oral contraceptives (~${ocpHl.toFixed(1)} h)`,
+                    data: withOcp.percentages,
+                    borderColor: '#9b8bb5',
+                    backgroundColor: 'transparent',
+                    borderWidth: onOcp ? 3.5 : 1.5,
+                    borderDash: onOcp ? [] : [4, 3],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: getClearanceChartOptions(
+            'Clearance: Oral Contraceptive Effect',
+            (onOcp ? 'Bold line = on oral contraceptives (your selection).' : 'Reference at average metabolizer speed.') +
+            buildClearanceReferenceNote(result)
+        )
+    };
+}
+
+/**
+ * Shared Chart.js options for static Sleep-tab educational charts (not personalized).
+ *
+ * @param {string} yLabel
+ * @param {string} [xLabel]
+ * @returns {object}
+ */
+function getSleepEducationalChartOptions(yLabel, xLabel) {
+    const xScale = {
+        grid: { display: false },
+        ticks: { font: { size: 10 }, color: '#666' }
+    };
+    if (xLabel) {
+        xScale.title = {
+            display: true,
+            text: xLabel,
+            font: { size: 11, weight: '500' },
+            color: '#2c2c2c'
+        };
+    }
+
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    boxWidth: 12,
+                    font: { size: 11 },
+                    color: '#2c2c2c'
+                }
+            },
+            title: {
+                display: false
+            },
+            tooltip: {
+                enabled: false
+            }
+        },
+        scales: {
+            x: xScale,
+            y: {
+                min: 0,
+                max: 100,
+                title: {
+                    display: true,
+                    text: yLabel,
+                    font: { size: 11, weight: '500' },
+                    color: '#2c2c2c'
+                },
+                grid: { color: 'rgba(0,0,0,0.06)' },
+                ticks: {
+                    stepSize: 50,
+                    font: { size: 10, color: '#666' },
+                    callback(value) {
+                        if (value === 0) return 'Low';
+                        if (value === 50) return 'Moderate';
+                        if (value === 100) return 'High';
+                        return '';
+                    }
+                }
+            }
+        }
+    };
+}
+
+/** Illustrative sleep pressure build through a typical wake day. */
+function getSleepPressureChartConfig() {
+    const labels = ['6 am', '8 am', '10 am', '12 pm', '2 pm', '4 pm', '6 pm', '8 pm', '10 pm'];
+    const pressure = [8, 22, 36, 48, 56, 64, 72, 82, 92];
+
+    return {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Sleep drive (illustrative)',
+                data: pressure,
+                borderColor: '#7a9b8e',
+                backgroundColor: 'rgba(122, 155, 142, 0.12)',
+                fill: true,
+                tension: 0.35,
+                pointRadius: 2,
+                borderWidth: 2
+            }]
+        },
+        options: getSleepEducationalChartOptions('Sleep drive (illustrative)')
+    };
+}
+
+/** Conceptual masking: true sleep pressure vs temporarily reduced felt sleepiness. */
+function getCaffeineMaskingChartConfig() {
+    const labels = ['6 am', '8 am', '10 am', '12 pm', '2 pm', '4 pm', '6 pm', '8 pm', '10 pm'];
+    const truePressure = [8, 22, 36, 48, 56, 64, 72, 82, 92];
+    const feltSleepiness = [8, 22, 36, 48, 50, 52, 58, 68, 88];
+
+    return {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'True sleep pressure (still building)',
+                    data: truePressure,
+                    borderColor: '#7a9b8e',
+                    borderDash: [6, 4],
+                    backgroundColor: 'transparent',
+                    tension: 0.35,
+                    pointRadius: 0,
+                    borderWidth: 2
+                },
+                {
+                    label: 'How sleepy you feel (with afternoon caffeine)',
+                    data: feltSleepiness,
+                    borderColor: '#2c2c2c',
+                    backgroundColor: 'transparent',
+                    tension: 0.35,
+                    pointRadius: 0,
+                    borderWidth: 2.5
+                }
+            ]
+        },
+        options: getSleepEducationalChartOptions('Sleepiness (illustrative — schematic)')
+    };
+}
+
+/** Illustrative melatonin rise; dashed line = delayed timing after evening caffeine (Burke et al. 2015). */
+function getMelatoninChartConfig() {
+    const labels = ['6 pm', '8 pm', '10 pm', '12 am', '2 am', '4 am'];
+    const typical = [5, 18, 48, 82, 72, 42];
+    const delayed = [5, 12, 28, 58, 78, 48];
+
+    return {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Typical melatonin signal',
+                    data: typical,
+                    borderColor: '#9b8bb5',
+                    backgroundColor: 'rgba(155, 139, 181, 0.15)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 2,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Delayed after evening caffeine (illustrative)',
+                    data: delayed,
+                    borderColor: '#c9a570',
+                    borderDash: [6, 4],
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    pointRadius: 0,
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: getSleepEducationalChartOptions(
+            'Night signal strength (schematic)',
+            'Clock time'
+        )
+    };
 }
 
 // Export for Node.js environments (not used in the browser)
@@ -990,6 +1373,8 @@ if (typeof module !== 'undefined' && module.exports) {
         calculatePeakConcentration,
         getTimeToMaxConcentration,
         calculateHalfLife,
+        getPkUncertaintyInfo,
+        buildClearanceReferenceNote,
         timeToTargetLevel,
         classifyZone,
         concentrationFromSingleIntake,
@@ -997,9 +1382,15 @@ if (typeof module !== 'undefined' && module.exports) {
         generateCaffeineCurve,
         generateRecommendation,
         getZoneBackgroundPlugin,
-        calculateSleepRisk,
+        getBedtimeOutcome,
+        buildClearanceCurve,
+        getRemainingAfterPeak,
         getTimelineChartConfig,
         getWeightChartConfig,
-        getClearanceChartConfig
+        getMetabolizerClearanceChartConfig,
+        getOcpClearanceChartConfig,
+        getSleepPressureChartConfig,
+        getCaffeineMaskingChartConfig,
+        getMelatoninChartConfig
     };
 }

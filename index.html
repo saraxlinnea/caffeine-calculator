@@ -239,6 +239,160 @@
             border-radius: 4px;
         }
 
+        .chart-container.timeline-chart {
+            height: 480px;
+            margin-top: 0;
+        }
+
+        .chart-container.clearance-chart {
+            height: 480px;
+        }
+
+        .clearance-remaining-stats {
+            padding: 20px 24px;
+            margin: 0 0 28px 0;
+        }
+
+        .clearance-remaining-stats h3 {
+            font-size: 0.92em;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+
+        .clearance-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+
+        .clearance-stats-table th,
+        .clearance-stats-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .clearance-stats-table th {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.92em;
+        }
+
+        .clearance-stats-table tr.highlight-row {
+            background: rgba(212, 165, 116, 0.14);
+        }
+
+        .clearance-stats-table tr.highlight-row td {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .clearance-stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cite-ref {
+            font-size: 0.85em;
+            margin-left: 1px;
+        }
+
+        .cite-ref a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .cite-ref a:hover {
+            text-decoration: underline;
+        }
+
+        .citation-item:target {
+            background: rgba(212, 165, 116, 0.1);
+            border-radius: 4px;
+        }
+
+        .overview-cross-links {
+            font-size: 0.88em;
+            margin: 20px 0 0;
+            color: var(--secondary);
+        }
+
+        .overview-cross-links a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .overview-cross-links a:hover {
+            text-decoration: underline;
+        }
+
+        .ocp-input-note {
+            margin-top: 8px;
+        }
+
+        .ocp-input-note a {
+            color: var(--accent);
+        }
+
+        @media (max-width: 640px) {
+            .results-tab {
+                font-size: 0.78em;
+                padding: 10px 8px;
+            }
+        }
+
+        .chart-reading-guide,
+        .chart-zone-guide {
+            font-size: 0.88em;
+            line-height: 1.65;
+            color: var(--primary);
+            margin: 24px 0 0;
+        }
+
+        .chart-reading-guide h4,
+        .chart-zone-guide h4 {
+            font-size: 0.92em;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: var(--primary);
+        }
+
+        .chart-reading-guide ul,
+        .chart-zone-guide ul {
+            margin: 0;
+            padding-left: 1.2em;
+        }
+
+        .chart-reading-guide li,
+        .chart-zone-guide li {
+            margin-bottom: 6px;
+        }
+
+        .chart-reading-guide li:last-child,
+        .chart-zone-guide li:last-child {
+            margin-bottom: 0;
+        }
+
+        .chart-zone-guide {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .chart-zone-guide li strong {
+            font-weight: 600;
+        }
+
+        .overview-timeline-section {
+            margin-top: 28px;
+            margin-bottom: 40px;
+        }
+
+        .overview-timeline-section .baur-explainer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
         /* RECOMMENDATION */
         .recommendation {
             padding: 24px;
@@ -729,10 +883,442 @@
             line-height: 1.4;
         }
 
+        .clearance-factor-item {
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .clearance-factor-item:last-of-type {
+            border-bottom: none;
+            margin-bottom: 8px;
+            padding-bottom: 0;
+        }
+
+        .clearance-factor-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .clearance-factor-title {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--primary);
+            letter-spacing: 0.3px;
+        }
+
+        .clearance-factor-header input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            flex-shrink: 0;
+            accent-color: var(--accent);
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+
+        .clearance-factor-note {
+            margin: 0 0 0 28px;
+        }
+
+        .sleep-education-intro {
+            font-size: 0.88em;
+            color: var(--secondary);
+            line-height: 1.55;
+            margin: 0 0 20px;
+        }
+
+        .receptor-diagram-wrap {
+            margin-bottom: 28px;
+        }
+
+        .receptor-diagram-wrap h4 {
+            font-size: 0.95em;
+            margin: 0 0 12px;
+            color: var(--primary);
+        }
+
+        .receptor-diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .receptor-panel {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .receptor-panel-title {
+            font-size: 0.78em;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .receptor-diagram-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .receptor-caption {
+            font-size: 0.78em;
+            color: var(--secondary);
+            line-height: 1.45;
+            margin: 10px 0 0;
+        }
+
+        .sleep-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .sleep-chart-card {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .sleep-chart-card h4 {
+            font-size: 0.92em;
+            margin: 0 0 4px;
+            color: var(--primary);
+        }
+
+        .sleep-chart-card p {
+            font-size: 0.78em;
+            color: var(--secondary);
+            line-height: 1.45;
+            margin: 0 0 12px;
+        }
+
+        .chart-container.sleep-education-chart {
+            height: 300px;
+            padding: 12px;
+            background: white;
+            border-radius: 4px;
+        }
+
         .total-dose-badge {
             font-size: 0.82em;
             color: var(--secondary);
             margin-top: 6px;
+        }
+
+        .bedtime-outcome-panel {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 20px 22px;
+            margin-top: 16px;
+        }
+
+        .bedtime-outcome-panel h3 {
+            font-size: 1em;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: var(--primary);
+        }
+
+        .bedtime-outcome-conc {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .bedtime-outcome-text {
+            font-size: 0.9em;
+            line-height: 1.65;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .bedtime-outcome-meta {
+            font-size: 0.82em;
+            color: var(--secondary);
+            line-height: 1.55;
+        }
+
+        .bedtime-outcome-meta a {
+            color: var(--accent);
+        }
+
+        .baur-explainer {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .baur-explainer summary {
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .baur-explainer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .baur-explainer summary::before {
+            content: '▸ ';
+            color: var(--accent);
+        }
+
+        .baur-explainer[open] summary::before {
+            content: '▾ ';
+        }
+
+        .baur-explainer .bedtime-outcome-text:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .bedtime-outcome-zone {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        /* RESULT TABS */
+        .results-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+
+        .results-tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: color 0.15s, border-color 0.15s;
+            margin-bottom: -1px;
+        }
+
+        .results-tab:hover {
+            color: var(--primary);
+        }
+
+        .results-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+
+        .results-tab-panel {
+            display: none;
+        }
+
+        .results-tab-panel.active {
+            display: block;
+        }
+
+        /* COLLAPSIBLE INPUT PANEL */
+        .input-panel-wrapper {
+            position: relative;
+        }
+
+        .input-panel-collapsed-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--light-bg);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+            color: var(--secondary);
+        }
+
+        .main-content.inputs-collapsed .input-panel-collapsed-bar {
+            display: flex;
+        }
+
+        .main-content.inputs-collapsed .input-panel-full {
+            display: none;
+        }
+
+        .main-content.inputs-collapsed {
+            grid-template-columns: 1fr;
+        }
+
+        .main-content.inputs-collapsed .input-panel-wrapper {
+            order: 2;
+        }
+
+        .main-content.inputs-collapsed .results-panel {
+            order: 1;
+        }
+
+        @media (min-width: 1025px) {
+            .main-content.inputs-collapsed .input-panel-wrapper {
+                position: sticky;
+                top: 0;
+                z-index: 20;
+                order: 0;
+                grid-column: 1 / -1;
+            }
+
+            .main-content.inputs-collapsed .results-panel {
+                order: 1;
+            }
+        }
+
+        .btn-edit-inputs {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 8px 14px;
+            font-size: 0.82em;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-edit-inputs:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .input-section-label {
+            font-size: 0.78em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--secondary);
+            margin: 28px 0 14px 0;
+        }
+
+        .advanced-factors {
+            margin-top: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: white;
+        }
+
+        .advanced-factors summary {
+            padding: 12px 14px;
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .advanced-factors summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .advanced-factors summary::before {
+            content: '▸ ';
+            color: var(--accent);
+        }
+
+        .advanced-factors[open] summary::before {
+            content: '▾ ';
+        }
+
+        .advanced-factors-body {
+            padding: 0 14px 14px 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .advanced-factors-body .form-group {
+            margin-bottom: 18px;
+        }
+
+        .advanced-factors-body .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* COLLAPSIBLE SECTIONS */
+        .collapsible-section {
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: white;
+        }
+
+        .factor-explainer-details {
+            margin-bottom: 12px;
+        }
+
+        .factor-explainer-details .factor-explainer-content {
+            font-size: 0.88em;
+            line-height: 1.65;
+            color: var(--primary);
+        }
+
+        .factor-explainer-details .factor-explainer-content ul {
+            margin: 8px 0;
+            padding-left: 1.2em;
+        }
+
+        .factor-explainer-details .factor-explainer-content li {
+            margin-bottom: 4px;
+        }
+
+        .factor-explainer-details .factor-explainer-content a {
+            color: var(--accent);
+        }
+
+        .factor-explainer-details .factor-explainer-content strong {
+            color: var(--primary);
+        }
+
+        .collapsible-section summary {
+            padding: 14px 18px;
+            font-size: 0.92em;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .collapsible-section summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .collapsible-section-body {
+            padding: 0 18px 18px 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .zone-compact-list {
+            list-style: none;
+            font-size: 0.88em;
+            line-height: 1.8;
+            color: var(--primary);
+        }
+
+        .zone-compact-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .zone-compact-list li:last-child {
+            border-bottom: none;
         }
 
         /* ERROR */
@@ -747,10 +1333,93 @@
             font-size: 0.9em;
         }
 
+        .pk-warning {
+            background: rgba(201, 165, 112, 0.12);
+            border: 1px solid var(--warning);
+            color: var(--primary);
+            padding: 16px;
+            border-radius: 4px;
+            margin: 0 0 20px;
+            display: none;
+            font-size: 0.88em;
+            line-height: 1.5;
+        }
+
+        .pk-warning strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(44, 44, 44, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal-overlay[hidden] {
+            display: none;
+        }
+
+        .modal-dialog {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            max-width: 520px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .modal-dialog h3 {
+            margin: 0 0 12px;
+            font-size: 1.05em;
+        }
+
+        .modal-dialog p {
+            font-size: 0.9em;
+            line-height: 1.55;
+            color: var(--secondary);
+            margin: 0 0 12px;
+        }
+
+        .modal-dialog ul {
+            font-size: 0.88em;
+            line-height: 1.5;
+            color: var(--secondary);
+            margin: 0 0 16px;
+            padding-left: 1.2em;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-modal-dismiss {
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-size: 0.88em;
+            cursor: pointer;
+        }
+
+        .btn-modal-dismiss:hover {
+            opacity: 0.9;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 1024px) {
             .main-content {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
             }
 
             .input-panel {
@@ -799,6 +1468,18 @@
                 height: 300px;
                 padding: 20px;
             }
+
+            .chart-container.timeline-chart {
+                height: 400px;
+            }
+
+            .chart-container.clearance-chart {
+                height: 400px;
+            }
+
+            .receptor-diagram {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* SCROLLBAR STYLING */
@@ -827,10 +1508,17 @@
             <p>Know your caffeine. Protect your sleep.</p>
         </div>
 
-        <div class="main-content">
-            <!-- LEFT PANEL: INPUT FORM (sticky) -->
-            <div class="input-panel">
+        <div class="main-content" id="mainContent">
+            <div class="input-panel-wrapper">
+                <div class="input-panel-collapsed-bar" id="inputCollapsedBar">
+                    <span id="inputCollapsedSummary">—</span>
+                    <button type="button" class="btn-edit-inputs" onclick="expandInputPanel()">Edit inputs</button>
+                </div>
+
+                <div class="input-panel input-panel-full" id="inputPanelFull">
                 <h3>Your Information</h3>
+
+                <div class="input-section-label">Caffeine &amp; timing</div>
 
                 <div class="form-group">
                     <div class="dose-list-header">
@@ -843,33 +1531,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Body Weight</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="number" id="weight" placeholder="170" value="170"
-                               min="66" max="440" style="flex: 1;">
-                        <select id="weightUnit" style="width: 72px;"
-                                onchange="handleWeightUnitChange()">
-                            <option value="lbs">lbs</option>
-                            <option value="kg">kg</option>
-                        </select>
-                    </div>
+                    <label>Current Time</label>
+                    <input type="time" id="nowTime" value="14:00">
                 </div>
 
                 <div class="form-group">
-                    <label>Sex</label>
-                    <select id="sex">
-                        <option value="female">Female</option>
-                        <option value="male">Male</option>
-                    </select>
+                    <label>Target Bedtime</label>
+                    <input type="time" id="bedtime" value="23:00">
                 </div>
 
-                <div class="form-group">
-                    <label>On Oral Contraceptives?</label>
-                    <select id="contraceptives">
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                    </select>
-                </div>
+                <input type="hidden" id="sex" value="">
+
+                <div class="input-section-label">Clearance factors</div>
 
                 <div class="form-group">
                     <label>Metabolizer Type</label>
@@ -880,288 +1553,487 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>Eaten Recently? (default for all intakes)</label>
-                    <select id="food">
-                        <option value="fasting">Fasting / Empty stomach</option>
-                        <option value="light_meal">Light meal</option>
-                        <option value="moderate_meal">Moderate meal</option>
-                        <option value="heavy_meal">Heavy meal</option>
-                    </select>
+                <div class="clearance-factor-list">
+                    <div class="clearance-factor-item">
+                        <label class="clearance-factor-header" for="contraceptives">
+                            <input type="checkbox" id="contraceptives" name="contraceptives">
+                            <span class="clearance-factor-title">Oral Contraceptives</span>
+                        </label>
+                        <p class="dose-list-note clearance-factor-note">
+                            Can extend caffeine half-life by roughly 70% in this model (~8–9 h vs ~5 h for many people).
+                            <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#ref-7359014">See sources</a>
+                        </p>
+                    </div>
+
+                    <div class="clearance-factor-item">
+                        <label class="clearance-factor-header" for="pregnancy">
+                            <input type="checkbox" id="pregnancy" name="pregnancy">
+                            <span class="clearance-factor-title">Pregnant</span>
+                        </label>
+                        <p class="dose-list-note clearance-factor-note">
+                            Model assumes ~2× longer caffeine half-life. Real values vary by trimester.
+                            <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#ref-6954898">See sources</a>
+                        </p>
+                    </div>
+
+                    <div class="clearance-factor-item">
+                        <label class="clearance-factor-header" for="smoking">
+                            <input type="checkbox" id="smoking" name="smoking">
+                            <span class="clearance-factor-title">Cigarette Smoker</span>
+                        </label>
+                        <p class="dose-list-note clearance-factor-note">
+                            Model assumes ~50% faster caffeine clearance (shorter half-life) via CYP1A2 induction.
+                            <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#ref-659762">See sources</a>
+                        </p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Current Time</label>
-                    <input type="time" id="nowTime" value="14:00">
-                </div>
+                <details class="advanced-factors">
+                    <summary>More factors (optional)</summary>
+                    <div class="advanced-factors-body">
+                        <div class="form-group">
+                            <label>Body Weight</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="number" id="weight" placeholder="154" value="154"
+                                       min="66" max="440" style="flex: 1;">
+                                <select id="weightUnit" style="width: 72px;"
+                                        onchange="handleWeightUnitChange()">
+                                    <option value="lbs">lbs</option>
+                                    <option value="kg">kg</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label>Target Bedtime</label>
-                    <input type="time" id="bedtime" value="23:00">
-                </div>
+                        <div class="form-group">
+                            <label>Eaten Recently? (default for all intakes)</label>
+                            <select id="food">
+                                <option value="fasting">Fasting / Empty stomach</option>
+                                <option value="light_meal">Light meal</option>
+                                <option value="moderate_meal">Moderate meal</option>
+                                <option value="heavy_meal">Heavy meal</option>
+                            </select>
+                        </div>
+                    </div>
+                </details>
 
                 <div class="button-group">
                     <button class="btn-calculate" onclick="calculateCaffeine()">Calculate</button>
                     <button class="btn-reset" onclick="resetForm()">Reset</button>
                 </div>
+                </div>
             </div>
 
-            <!-- RIGHT PANEL: RESULTS (scrolls with page) -->
+            <!-- RIGHT PANEL: RESULTS -->
             <div class="results-panel">
                 <div id="errorBox" class="error"></div>
+                <div id="pkWarningBox" class="pk-warning" role="status" aria-live="polite"></div>
 
-                <!-- 1. RESULT SUMMARY -->
-                <div class="results-section">
-                    <div class="result-summary">
-                        <h3>Your Caffeine Profile</h3>
-                        <div class="result-row">
-                            <span class="result-label">Total Today</span>
-                            <span class="result-value" id="totalTodayValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Daily Peak (stacked)</span>
-                            <span class="result-value" id="peakValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Time to Peak</span>
-                            <span class="result-value" id="tmaxValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Half-life</span>
-                            <span class="result-value" id="halflifeValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Concentration Now</span>
-                            <span class="result-value" id="nowValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">At Bedtime</span>
-                            <span class="result-value" id="bedtimeValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Max Additional Now</span>
-                            <span class="result-value" id="maxDoseValue">—</span>
+                <div class="results-tabs" role="tablist" aria-label="Results sections">
+                    <button type="button" class="results-tab active" role="tab" aria-selected="true"
+                            data-tab="overview" onclick="switchResultTab('overview')">Overview</button>
+                    <button type="button" class="results-tab" role="tab" aria-selected="false"
+                            data-tab="curve" onclick="switchResultTab('curve')">Caffeine curve</button>
+                    <button type="button" class="results-tab" role="tab" aria-selected="false"
+                            data-tab="sleep" onclick="switchResultTab('sleep')">Sleep</button>
+                    <button type="button" class="results-tab" role="tab" aria-selected="false"
+                            data-tab="evidence" onclick="switchResultTab('evidence')">Evidence</button>
+                </div>
+
+                <!-- TAB: OVERVIEW -->
+                <div id="tab-overview" class="results-tab-panel active" role="tabpanel">
+                    <div class="bedtime-outcome-panel" id="bedtimeOutcomePanel">
+                        <h3>Bedtime outcome (estimated)</h3>
+                        <div id="bedtimeOutcomeContent">
+                            <p class="bedtime-outcome-text">Press Calculate to see your estimated level at bedtime.</p>
                         </div>
                     </div>
 
                     <div class="recommendation" id="mainRecommendation">
                         Press Calculate to see your results.
                     </div>
-                </div>
 
-                <!-- 2. TIMELINE CHART -->
-                <div class="results-section">
-                    <div class="chart-container">
-                        <canvas id="timelineChart"></canvas>
-                    </div>
-                    <div class="info-box">
-                        <strong>What you're seeing:</strong> Estimated stacked caffeine from all logged intakes over 24 hours. The shaded band shows uncertainty from dose content (±20%) and fast vs slow metabolizer bounds. Colored bands group average sleep-impact levels. Green line = now; tan dashed = bedtime; dotted markers = intakes.
-                    </div>
-
-                    <!-- Sleep systems pathway (Option A: animated schematic) -->
-                    <div class="pathway-section">
-                        <h2 class="section-heading">How Caffeine Affects Sleep Systems</h2>
-                        <p class="pathway-disclaimer">
-                            Educational overview of research-backed mechanisms. This diagram is not personalized from your inputs. The chart above estimates blood caffeine only.
-                        </p>
-
-                        <div class="pathway-diagram" aria-label="Schematic diagram of three sleep-related pathways affected by caffeine">
-                            <div class="pathway-hub">
-                                <span class="pathway-hub-dot" aria-hidden="true"></span>
-                                Caffeine
+                    <div class="results-section">
+                        <div class="result-summary">
+                            <h3>At a glance</h3>
+                            <div class="result-row">
+                                <span class="result-label">Total Today</span>
+                                <span class="result-value" id="totalTodayValue">—</span>
                             </div>
-
-                            <svg class="pathway-svg" viewBox="0 0 720 72" aria-hidden="true" focusable="false">
-                                <!-- Static base lines -->
-                                <path class="pathway-line" d="M 360 4 L 360 28 L 120 28 L 120 68"/>
-                                <path class="pathway-line" d="M 360 4 L 360 68"/>
-                                <path class="pathway-line" d="M 360 4 L 360 28 L 600 28 L 600 68"/>
-                                <!-- Animated flow lines -->
-                                <path class="pathway-line-flow adenosine" d="M 360 4 L 360 28 L 120 28 L 120 68"/>
-                                <path class="pathway-line-flow melatonin" d="M 360 4 L 360 68"/>
-                                <path class="pathway-line-flow cortisol" d="M 360 4 L 360 28 L 600 28 L 600 68"/>
-                                <!-- Traveling dots -->
-                                <circle class="pathway-flow-dot adenosine" r="4" fill="#7a9b8e">
-                                    <animateMotion dur="3.2s" repeatCount="indefinite" path="M 360 4 L 360 28 L 120 28 L 120 68"/>
-                                </circle>
-                                <circle class="pathway-flow-dot melatonin" r="4" fill="#9b8bb5">
-                                    <animateMotion dur="2.4s" repeatCount="indefinite" begin="0.8s" path="M 360 4 L 360 68"/>
-                                </circle>
-                                <circle class="pathway-flow-dot cortisol" r="4" fill="#c9a570">
-                                    <animateMotion dur="3.2s" repeatCount="indefinite" begin="1.6s" path="M 360 4 L 360 28 L 600 28 L 600 68"/>
-                                </circle>
-                            </svg>
-
-                            <div class="pathway-cards">
-                                <div class="pathway-card adenosine">
-                                    <div class="pathway-card-icon" aria-hidden="true">🧠</div>
-                                    <div class="pathway-card-title">Adenosine blockade</div>
-                                    <p class="pathway-card-body">
-                                        During wakefulness, adenosine builds and pushes sleep drive. Caffeine competes at the same receptors, so you feel alert even when tired. This is the best-studied short-term mechanism.
-                                    </p>
-                                    <span class="pathway-card-tag">Main alertness pathway</span>
-                                </div>
-
-                                <div class="pathway-card melatonin">
-                                    <div class="pathway-card-icon" aria-hidden="true">🌙</div>
-                                    <div class="pathway-card-title">Melatonin timing</div>
-                                    <p class="pathway-card-body">
-                                        Melatonin marks your body&apos;s night signal on a ~24-hour clock. Evening caffeine can shift that clock later, delaying when melatonin would normally rise. This is separate from simply feeling wired.
-                                    </p>
-                                    <span class="pathway-card-tag">Circadian pathway</span>
-                                </div>
-
-                                <div class="pathway-card cortisol">
-                                    <div class="pathway-card-icon" aria-hidden="true">⚡</div>
-                                    <div class="pathway-card-title">Cortisol / stress axis</div>
-                                    <p class="pathway-card-body">
-                                        Caffeine can activate the HPA axis and raise cortisol, especially with acute or morning doses. Regular users often adapt partially, but stress sensitivity may remain.
-                                    </p>
-                                    <span class="pathway-card-tag">Alert / stress pathway</span>
-                                </div>
+                            <div class="result-row">
+                                <span class="result-label">Concentration Now</span>
+                                <span class="result-value" id="nowValue">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Bedtime Concentration</span>
+                                <span class="result-value" id="bedtimeGlanceValue">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Bedtime Zone</span>
+                                <span class="result-value" id="bedtimeZoneGlanceValue">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Half-life (your inputs)</span>
+                                <span class="result-value" id="halflifeValue">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Max Additional Now</span>
+                                <span class="result-value" id="maxDoseValue">—</span>
                             </div>
                         </div>
-
-                        <div class="info-box pathway-relation">
-                            <strong>How these relate:</strong>
-                            <ul>
-                                <li><strong>Adenosine</strong> explains why higher estimated blood caffeine often tracks with feeling less sleepy tonight.</li>
-                                <li><strong>Melatonin timing</strong> explains why late caffeine can push your whole sleep window later, even after alertness fades.</li>
-                                <li><strong>Cortisol</strong> adds an alert/stress signal, especially in the morning or under pressure. It is not the same as blood caffeine level.</li>
-                            </ul>
-                            This calculator models estimated blood caffeine and average sleep-impact bands. It does not measure melatonin, cortisol, or receptor occupancy in your body.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. WEIGHT COMPARISON CHART -->
-                <div class="results-section">
-                    <div class="info-box">
-                        <strong>How body weight matters:</strong> The same caffeine dose creates different peak concentrations depending on body weight. Heavier bodies dilute caffeine into a larger volume.
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="weightChart"></canvas>
-                    </div>
-                    <div class="result-summary">
-                        <h3>Your Weight Position</h3>
-                        <div class="result-row">
-                            <span class="result-label">Your Weight</span>
-                            <span class="result-value" id="yourWeight">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Your Peak</span>
-                            <span class="result-value" id="yourPeakValue">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Caffeine Sensitivity</span>
-                            <span class="result-value" id="sensitivityValue">—</span>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <strong>Key insight:</strong> Weight affects peak concentration but not how fast caffeine clears. A 110 lb and 220  person metabolize caffeine at the same rate. The lighter person simply hits higher peaks with the same dose.
-                    </div>
-                </div>
-
-                <!-- 4. CLEARANCE RATE + SLEEP RISK CHART -->
-                <div class="results-section">
-                    <div class="result-summary">
-                        <h3>Your Metabolism</h3>
-                        <div class="result-row">
-                            <span class="result-label">Your Half-life</span>
-                            <span class="result-value" id="yourHalflife">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">Metabolizer Type</span>
-                            <span class="result-value" id="metabolizerLabel">—</span>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <strong>How your body clears caffeine:</strong> Your genetics and hormonal factors are the main drivers of your half-life. The dashed line shows how estimated sleep disruption risk tracks with remaining caffeine.
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="clearanceChart"></canvas>
-                    </div>
-                    <div class="result-summary">
-                        <h3>Remaining Caffeine</h3>
-                        <div class="result-row">
-                            <span class="result-label">After 4 hours</span>
-                            <span class="result-value" id="remaining4h">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">After 8 hours</span>
-                            <span class="result-value" id="remaining8h">—</span>
-                        </div>
-                        <div class="result-row">
-                            <span class="result-label">After 12 hours</span>
-                            <span class="result-value" id="remaining12h">—</span>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <strong>Key insight:</strong> You can't change your genetics, but knowing your approximate half-life helps you pick a realistic caffeine cutoff time.
-                    </div>
-                </div>
-
-                <!-- 5. SLEEP ZONES -->
-                <div class="results-section">
-                    <h2 class="section-heading">Sleep Disruption Zones</h2>
-                    <div class="info-box">
-                        <strong>About these zones:</strong> Thresholds are derived from pharmacokinetic and sleep research and represent approximate population averages. Individual sensitivity varies considerably. The zones reflect estimated probability of sleep impact, not guarantees. All concentrations are plasma estimates using a one-compartment model.
                     </div>
 
-                    <div class="zone-card green">
-                        <div class="zone-title">🟢 Low estimated level</div>
-                        <div class="zone-range">< 0.5 µg/mL</div>
-                        <div class="zone-description">
-                            Adenosine receptors likely unoccupied. Sleep onset and architecture unlikely to be meaningfully affected.
-                        </div>
-                    </div>
-
-                    <div class="zone-card yellow">
-                        <div class="zone-title">🟡 Moderate estimated level</div>
-                        <div class="zone-range">0.5–1.0 µg/mL</div>
-                        <div class="zone-description">
-                            Some adenosine receptor blockade may persist. Sleep onset may be mildly delayed for sensitive individuals.
-                        </div>
-                    </div>
-
-                    <div class="zone-card orange">
-                        <div class="zone-title">🟠 Elevated estimated level</div>
-                        <div class="zone-range">1.0–1.4 µg/mL</div>
-                        <div class="zone-description">
-                            Significant receptor blockade likely. Research suggests measurable average effects on sleep onset and quality at this level, though individual responses vary.
-                        </div>
-                    </div>
-
-                    <div class="zone-card red">
-                        <div class="zone-title">🔴 High estimated level</div>
-                        <div class="zone-range">1.4–2.5 µg/mL</div>
-                        <div class="zone-description">
-                            High estimated caffeine level. Likely to delay sleep onset and reduce sleep quality based on timing and dose research.                        </div>
-                    </div>
-
-                    <div class="zone-card dark-red">
-                        <div class="zone-title">⛔ Very high estimated level</div>
-                        <div class="zone-range">> 2.5 µg/mL</div>
-                        <div class="zone-description">
-                            Very high levels are likely to delay sleep onset and reduce total sleep time. Individual variation is real, but research consistently shows effects across this concentration range.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. FACTOR EXPLAINERS -->
-                <div class="results-section">
-                    <h2 class="section-heading">Understanding Your Factors</h2>
-                    <div id="factorExplainersContainer"></div>
-                </div>
-
-                <!-- 7. FULL CITATIONS & SOURCES -->
-                <div class="results-section">
-                    <h2 class="section-heading">Full Citations & Sources</h2>
-                    <p style="font-size: 0.88em; color: var(--secondary); margin-bottom: 20px;">
-                        References below use Vancouver-style formatting (authors, title, journal, year, volume, pages). Each entry includes how it is used in this calculator.
+                    <p class="overview-cross-links">
+                        <a href="#" class="tab-jump-link" data-tab="curve">Full caffeine curve →</a>
+                        ·
+                        <a href="#" class="tab-jump-link" data-tab="sleep">Why sleep zones? →</a>
                     </p>
-                    <div id="citationsContainer"></div>
                 </div>
+
+                <!-- TAB: CAFFEINE CURVE -->
+                <div id="tab-curve" class="results-tab-panel" role="tabpanel">
+                    <div class="results-section overview-timeline-section">
+                        <div class="chart-container timeline-chart">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+
+                        <div class="chart-reading-guide" id="chartReadingGuide">
+                            <h4>How to read this chart</h4>
+                            <ul>
+                                <li><strong>Black line</strong> — estimated caffeine concentration over time from your logged intakes.</li>
+                                <li><strong>Shaded band</strong> — uncertainty range (dose content ±20% and fast vs slow metabolizer bounds).</li>
+                                <li><strong>Vertical bedtime marker</strong> — your selected bedtime.</li>
+                                <li><strong>Dashed Baur line</strong> — published research reference from Baur et al. (2024)<span data-cite="baur2024"></span>, not a personal sleep cutoff.</li>
+                            </ul>
+                        </div>
+
+                        <div class="chart-zone-guide" id="chartZoneGuide">
+                            <h4>Colored zones (pharmacokinetic bands)</h4>
+                            <ul>
+                                <li><strong>Low (&lt;0.5 µg/mL)</strong> — Lower estimated residual caffeine.</li>
+                                <li><strong>Lower (0.5–1.0 µg/mL)</strong> — Small effects possible in sensitive individuals<span data-cite="gardiner2023"></span>.</li>
+                                <li><strong>Elevated (1.0–1.4 µg/mL)</strong> — Measurable sleep effects more common in research<span data-cite="gardiner2023"></span>.</li>
+                                <li><strong>High (1.4–2.5 µg/mL)</strong> — Includes approximate Baur delta-power reference region<span data-cite="baur2024"></span>.</li>
+                                <li><strong>Very high (&gt;2.5 µg/mL)</strong> — Higher likelihood of substantial sleep disruption<span data-cite="drake2013"></span>.</li>
+                            </ul>
+                            <p class="overview-cross-links" style="margin-top:12px;">
+                                <a href="#" class="tab-jump-link" data-tab="sleep">Sleep zone details →</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="results-section">
+                        <div class="info-box">
+                            <strong>How body weight matters:</strong> The same caffeine dose creates different peak concentrations depending on body weight. Heavier bodies dilute caffeine into a larger volume.
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                        <div class="result-summary">
+                            <h3>Your Weight Position</h3>
+                            <div class="result-row">
+                                <span class="result-label">Your Weight</span>
+                                <span class="result-value" id="yourWeight">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Daily Peak (stacked)</span>
+                                <span class="result-value" id="yourPeakValue">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Caffeine Sensitivity</span>
+                                <span class="result-value" id="sensitivityValue">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Time to Peak</span>
+                                <span class="result-value" id="tmaxValue">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-section">
+                        <div class="result-summary">
+                            <h3>Your Metabolism</h3>
+                            <div class="result-row">
+                                <span class="result-label">Your Half-life</span>
+                                <span class="result-value" id="yourHalflife">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Metabolizer Type</span>
+                                <span class="result-value" id="metabolizerLabel">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">After 4 hours (your inputs)</span>
+                                <span class="result-value" id="yourRemaining4h">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">After 8 hours (your inputs)</span>
+                                <span class="result-value" id="yourRemaining8h">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">After 12 hours (your inputs)</span>
+                                <span class="result-value" id="yourRemaining12h">—</span>
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <strong>Reference curves:</strong> Percent remaining after a hypothetical peak. Charts show typical metabolizer and oral-contraceptive ranges; tables below each chart match those lines. Your rows above combine all selected inputs.
+                        </div>
+                        <div class="chart-container clearance-chart">
+                            <canvas id="metabolizerClearanceChart"></canvas>
+                        </div>
+                        <div class="result-summary clearance-remaining-stats">
+                            <h3>Remaining after peak — by metabolizer type</h3>
+                            <div id="metabolizerRemainingTable"></div>
+                        </div>
+                        <div class="chart-container clearance-chart">
+                            <canvas id="ocpClearanceChart"></canvas>
+                        </div>
+                        <div class="result-summary clearance-remaining-stats">
+                            <h3>Remaining after peak — oral contraceptive effect</h3>
+                            <div id="ocpRemainingTable"></div>
+                        </div>
+                    </div>
+
+                    <div class="results-section">
+                        <h2 class="section-heading">What affects your curve?</h2>
+                        <div id="factorExplainersContainer"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: SLEEP -->
+                <div id="tab-sleep" class="results-tab-panel" role="tabpanel">
+                    <details class="collapsible-section" id="sleepEducationalSection" open>
+                        <summary>How caffeine interacts with sleep (educational)</summary>
+                        <div class="collapsible-section-body">
+                            <p class="sleep-education-intro pathway-disclaimer">
+                                <strong>Schematic only — not personalized.</strong> These diagrams illustrate general sleep science concepts. Your estimated blood caffeine level comes from the Caffeine curve tab.
+                            </p>
+
+                            <div class="receptor-diagram-wrap">
+                                <h4>Adenosine receptors &amp; caffeine blockade</h4>
+                                <div class="receptor-diagram" aria-label="Schematic showing adenosine binding versus caffeine blocking the receptor">
+                                    <div class="receptor-panel">
+                                        <div class="receptor-panel-title">Without caffeine</div>
+                                        <svg class="receptor-diagram-svg" viewBox="0 0 280 160" aria-hidden="true" focusable="false">
+                                            <rect x="90" y="20" width="100" height="28" rx="14" fill="#e8e4df" stroke="#ccc" stroke-width="1"/>
+                                            <text x="140" y="38" text-anchor="middle" font-size="11" fill="#666">Neuron membrane</text>
+                                            <path d="M 118 48 L 118 72 L 98 92 L 118 112 L 138 92 L 118 72 Z" fill="#f5f0ea" stroke="#7a9b8e" stroke-width="2"/>
+                                            <text x="140" y="132" text-anchor="middle" font-size="10" fill="#7a9b8e">Adenosine receptor</text>
+                                            <circle cx="118" cy="78" r="14" fill="#7a9b8e" opacity="0.85"/>
+                                            <text x="118" y="82" text-anchor="middle" font-size="9" fill="#fff" font-weight="600">A</text>
+                                            <text x="168" y="76" font-size="10" fill="#7a9b8e">Adenosine</text>
+                                            <line x1="134" y1="78" x2="158" y2="78" stroke="#7a9b8e" stroke-width="1.5" marker-end="url(#arrowGreenLeft)"/>
+                                            <defs>
+                                                <marker id="arrowGreenLeft" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                                    <path d="M0,0 L6,3 L0,6 Z" fill="#7a9b8e"/>
+                                                </marker>
+                                            </defs>
+                                            <text x="140" y="152" text-anchor="middle" font-size="9" fill="#666">Sleep-drive signal</text>
+                                        </svg>
+                                    </div>
+                                    <div class="receptor-panel">
+                                        <div class="receptor-panel-title">With caffeine</div>
+                                        <svg class="receptor-diagram-svg" viewBox="0 0 280 160" aria-hidden="true" focusable="false">
+                                            <rect x="90" y="20" width="100" height="28" rx="14" fill="#e8e4df" stroke="#ccc" stroke-width="1"/>
+                                            <text x="140" y="38" text-anchor="middle" font-size="11" fill="#666">Neuron membrane</text>
+                                            <path d="M 118 48 L 118 72 L 98 92 L 118 112 L 138 92 L 118 72 Z" fill="#f5f0ea" stroke="#7a9b8e" stroke-width="2"/>
+                                            <text x="140" y="132" text-anchor="middle" font-size="10" fill="#7a9b8e">Adenosine receptor</text>
+                                            <circle cx="118" cy="78" r="14" fill="#2c2c2c" opacity="0.9"/>
+                                            <text x="118" y="82" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">caf</text>
+                                            <circle cx="168" cy="78" r="12" fill="#7a9b8e" opacity="0.35"/>
+                                            <text x="168" y="82" text-anchor="middle" font-size="9" fill="#5a7a6e">A</text>
+                                            <line x1="152" y1="78" x2="134" y2="78" stroke="#a87070" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                            <text x="140" y="152" text-anchor="middle" font-size="9" fill="#666">Blocked — signal reduced</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="receptor-caption">
+                                    Caffeine competes with adenosine at receptors (competitive antagonism). Adenosine still accumulates during wakefulness; caffeine reduces how strongly that pressure is felt<span data-cite="clark2017"></span>.
+                                </p>
+                            </div>
+
+                            <div class="sleep-charts-grid">
+                                <div class="sleep-chart-card">
+                                    <h4>Sleep drive builds while you&apos;re awake</h4>
+                                    <p>Schematic — not personalized from your inputs. Illustrative homeostatic sleep drive building from wake-up toward bedtime. <strong>Higher on the chart = stronger urge to sleep.</strong></p>
+                                    <div class="chart-container sleep-education-chart">
+                                        <canvas id="sleepPressureChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="sleep-chart-card">
+                                    <h4>Caffeine can hide sleepiness temporarily</h4>
+                                    <p>Schematic — not personalized. True sleep pressure keeps building (dashed). What you feel (solid) can lag behind while caffeine is active. <strong>When the solid line sits below the dashed line, caffeine is masking sleepiness you still accumulate.</strong></p>
+                                    <div class="chart-container sleep-education-chart">
+                                        <canvas id="caffeineMaskingChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="sleep-chart-card">
+                                    <h4>Body clock &quot;night signal&quot; (melatonin)</h4>
+                                    <p>Schematic — not personalized. Illustrative nighttime melatonin rise. Evening caffeine may delay circadian timing<span data-cite="burke2015"></span> — dashed line shows a shifted pattern, not a personal prediction.</p>
+                                    <div class="chart-container sleep-education-chart">
+                                        <canvas id="melatoninChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="collapsible-section" id="zoneReferenceSection" open>
+                        <summary>Sleep disruption zone reference</summary>
+                        <div class="collapsible-section-body">
+                            <div class="info-box" style="margin-top:0;">
+                                <strong>About these zones:</strong> Thresholds are derived from pharmacokinetic and sleep research and represent approximate population averages. Individual sensitivity varies considerably. The zones reflect estimated probability of sleep impact, not guarantees. All concentrations are plasma estimates using a one-compartment model.
+                            </div>
+
+                            <div class="zone-card green">
+                                <div class="zone-title">🟢 Low estimated level</div>
+                                <div class="zone-range">&lt; 0.5 µg/mL</div>
+                                <div class="zone-description">
+                                    Adenosine receptors likely unoccupied. In Baur et al. (2024), minimal EEG delta-power changes were reported at lower plasma levels. Sleep onset and architecture are unlikely to be meaningfully affected for most people.
+                                </div>
+                            </div>
+
+                            <div class="zone-card yellow">
+                                <div class="zone-title">🟡 Moderate estimated level</div>
+                                <div class="zone-range">0.5–1.0 µg/mL</div>
+                                <div class="zone-description">
+                                    Some adenosine receptor blockade may persist. Population studies (e.g. Gardiner et al. 2023 meta-analysis) report average dose-dependent effects on sleep latency and total sleep time; sensitive individuals may notice milder sleep onset.
+                                </div>
+                            </div>
+
+                            <div class="zone-card orange">
+                                <div class="zone-title">🟠 Elevated estimated level</div>
+                                <div class="zone-range">1.0–1.4 µg/mL</div>
+                                <div class="zone-description">
+                                    Significant receptor blockade likely. Research suggests measurable average effects on sleep onset and quality at this level, approaching the Baur delta-power reference. Individual responses vary.
+                                </div>
+                            </div>
+
+                            <div class="zone-card red">
+                                <div class="zone-title">🔴 High estimated level</div>
+                                <div class="zone-range">1.4–2.5 µg/mL (at/above Baur delta-power reference ~1.4 µg/mL)</div>
+                                <div class="zone-description">
+                                    High estimated caffeine level. Baur et al. (2024) associated concentrations around and above ~1.4 µg/mL with reduced EEG delta power in their controlled protocol. Group averages also suggest delayed sleep onset and reduced sleep quality when caffeine is taken closer to bed.
+                                </div>
+                            </div>
+
+                            <div class="zone-card dark-red">
+                                <div class="zone-title">⛔ Very high estimated level</div>
+                                <div class="zone-range">&gt; 2.5 µg/mL</div>
+                                <div class="zone-description">
+                                    Very high levels are likely to delay sleep onset and reduce total sleep time in population averages. Individual variation is real, but research consistently shows stronger average effects on sleep architecture across this concentration range.
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="collapsible-section" open>
+                        <summary>How caffeine affects sleep systems (educational)</summary>
+                        <div class="collapsible-section-body pathway-section" style="margin:0;padding-top:16px;">
+                            <p class="pathway-disclaimer">
+                                Not personalized from your inputs. The Caffeine curve tab estimates blood caffeine from your doses; this diagram shows general sleep-related pathways.
+                            </p>
+                            <div class="pathway-diagram" aria-label="Schematic diagram of three sleep-related pathways affected by caffeine">
+                                <div class="pathway-hub">
+                                    <span class="pathway-hub-dot" aria-hidden="true"></span>
+                                    Caffeine
+                                </div>
+                                <svg class="pathway-svg" viewBox="0 0 720 72" aria-hidden="true" focusable="false">
+                                    <path class="pathway-line" d="M 360 4 L 360 28 L 120 28 L 120 68"/>
+                                    <path class="pathway-line" d="M 360 4 L 360 68"/>
+                                    <path class="pathway-line" d="M 360 4 L 360 28 L 600 28 L 600 68"/>
+                                    <path class="pathway-line-flow adenosine" d="M 360 4 L 360 28 L 120 28 L 120 68"/>
+                                    <path class="pathway-line-flow melatonin" d="M 360 4 L 360 68"/>
+                                    <path class="pathway-line-flow cortisol" d="M 360 4 L 360 28 L 600 28 L 600 68"/>
+                                    <circle class="pathway-flow-dot adenosine" r="4" fill="#7a9b8e">
+                                        <animateMotion dur="3.2s" repeatCount="indefinite" path="M 360 4 L 360 28 L 120 28 L 120 68"/>
+                                    </circle>
+                                    <circle class="pathway-flow-dot melatonin" r="4" fill="#9b8bb5">
+                                        <animateMotion dur="2.4s" repeatCount="indefinite" begin="0.8s" path="M 360 4 L 360 68"/>
+                                    </circle>
+                                    <circle class="pathway-flow-dot cortisol" r="4" fill="#c9a570">
+                                        <animateMotion dur="3.2s" repeatCount="indefinite" begin="1.6s" path="M 360 4 L 360 28 L 600 28 L 600 68"/>
+                                    </circle>
+                                </svg>
+                                <div class="pathway-cards">
+                                    <div class="pathway-card adenosine">
+                                        <div class="pathway-card-icon" aria-hidden="true">🧠</div>
+                                        <div class="pathway-card-title">Adenosine blockade</div>
+                                        <p class="pathway-card-body">Caffeine competes at adenosine receptors, reducing sleep drive signaling.</p>
+                                    </div>
+                                    <div class="pathway-card melatonin">
+                                        <div class="pathway-card-icon" aria-hidden="true">🌙</div>
+                                        <div class="pathway-card-title">Melatonin timing</div>
+                                        <p class="pathway-card-body">Evening caffeine may delay circadian melatonin timing<span data-cite="burke2015"></span>.</p>
+                                    </div>
+                                    <div class="pathway-card cortisol">
+                                        <div class="pathway-card-icon" aria-hidden="true">⚡</div>
+                                        <div class="pathway-card-title">Cortisol / stress axis</div>
+                                        <p class="pathway-card-body">Acute caffeine can raise cortisol; separate from blood caffeine level.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="baur-explainer">
+                        <summary>What is the Baur line?</summary>
+                        <p class="bedtime-outcome-text">
+                            In Baur et al. (2024)<span data-cite="baur2024"></span>, researchers measured plasma caffeine and EEG during controlled sleep recordings. Around ~1.4 µg/mL, they reported measurable reduction in delta power—a marker of deep slow-wave sleep intensity in that lab protocol.
+                        </p>
+                        <p class="bedtime-outcome-text">
+                            The dashed line on the caffeine curve marks that study finding. Broader dose–timing effects on sleep are supported by other studies<span data-cite="gardiner2023"></span><span data-cite="drake2013"></span>, which do not use the same plasma threshold. It is not a rule for whether you personally will sleep well tonight.
+                        </p>
+                        <p class="bedtime-outcome-meta">
+                            <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#ref-38221756">Full citation in Evidence tab</a>
+                        </p>
+                    </details>
+                </div>
+
+                <!-- TAB: EVIDENCE -->
+                <div id="tab-evidence" class="results-tab-panel" role="tabpanel">
+                    <div class="info-box">
+                        <strong>Model limitations:</strong> This calculator uses a one-compartment pharmacokinetic model with simplified half-life modifiers for CYP1A2 metabolizer type, oral contraceptives (~70% longer), smoking (~50% shorter), and pregnancy (~2× longer). When multiple modifiers are selected, estimates are less precise. It does not account for tolerance, trimester-specific pregnancy changes, individual EEG, or circadian phase. Output is for educational planning—not medical advice or a guarantee of how you will sleep tonight.
+                    </div>
+
+                    <div class="info-box">
+                        <strong>What changes half-life in this model:</strong>
+                        <ul style="margin: 10px 0 0; padding-left: 1.2em; font-size: 0.9em; line-height: 1.55; color: var(--secondary);">
+                            <li><strong>CYP1A2 metabolizer type</strong> — fast (~−12.5%), average, or slow (~+37.5%)</li>
+                            <li><strong>Oral contraceptives</strong> — ~70% longer half-life (×1.70)</li>
+                            <li><strong>Smoking</strong> — ~50% faster clearance (×0.5 on half-life)</li>
+                            <li><strong>Pregnancy</strong> — ~2× longer half-life (simplified; real values vary by trimester)</li>
+                            <li><strong>Body weight &amp; food</strong> — affect peak timing/height, not half-life</li>
+                        </ul>
+                        <p style="font-size: 0.85em; color: var(--secondary); margin: 12px 0 0;">
+                            <strong>Uncertainty:</strong> Two or more hormonal/lifestyle factors together (especially smoking + pregnancy, or all three with oral contraceptives) produce less predictable clearance. Discuss caffeine use with a healthcare provider if any apply.
+                        </p>
+                    </div>
+
+                    <div class="results-section">
+                        <h2 class="section-heading">Full Citations &amp; Sources</h2>
+                        <p style="font-size: 0.88em; color: var(--secondary); margin-bottom: 20px;">
+                            Vancouver-style references. Each entry notes how it is used in this calculator.
+                        </p>
+                        <div id="citationsContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="healthRiskModal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="healthRiskModalTitle">
+        <div class="modal-dialog">
+            <h3 id="healthRiskModalTitle">Important health considerations</h3>
+            <p>
+                You selected smoking, pregnancy, and oral contraceptives. This tool provides approximate caffeine clearance estimates only—it is <strong>not medical advice</strong>.
+            </p>
+            <ul>
+                <li>Smoking while using oral contraceptives is associated with increased cardiovascular risk.</li>
+                <li>Smoking during pregnancy is harmful to the baby.</li>
+                <li>Combined effects on caffeine metabolism are complex and less studied; half-life estimates here are less precise.</li>
+            </ul>
+            <p>Please discuss caffeine intake, smoking, and contraception with a qualified healthcare provider.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-dismiss" onclick="dismissHealthRiskModal()">I understand</button>
             </div>
         </div>
     </div>
@@ -1173,13 +2045,17 @@
         let currentResult = null;
         let timelineChart = null;
         let weightChart = null;
-        let clearanceChart = null;
+        let metabolizerClearanceChart = null;
+        let ocpClearanceChart = null;
+        let sleepPressureChart = null;
+        let caffeineMaskingChart = null;
+        let melatoninChart = null;
         let doseRowCounter = 0;
 
         const DOSE_SOURCE_OPTIONS = [
             { value: '', label: 'Custom' },
             { value: 'espresso', label: 'Espresso (63 mg)' },
-            { value: 'coffee_8oz', label: 'Coffee 8oz (95 mg)' },
+            { value: 'coffee_8oz', label: 'Coffee 8 oz / ~95 mg' },
             { value: 'coffee_12oz', label: 'Coffee 12oz (143 mg)' },
             { value: 'black_tea', label: 'Black tea (40 mg)' },
             { value: 'green_tea', label: 'Green tea (30 mg)' },
@@ -1205,9 +2081,152 @@
             ).join('');
         }
 
+        function switchResultTab(tabId) {
+            document.querySelectorAll('.results-tab').forEach(tab => {
+                const isActive = tab.dataset.tab === tabId;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            document.querySelectorAll('.results-tab-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === `tab-${tabId}`);
+            });
+
+            requestAnimationFrame(() => {
+                if (tabId === 'curve') ensureCurveCharts();
+                if (tabId === 'sleep') ensureSleepCharts();
+            });
+        }
+
+        function ensureSleepCharts() {
+            if (typeof getSleepPressureChartConfig !== 'function') return;
+
+            const pressureCtx = document.getElementById('sleepPressureChart');
+            if (pressureCtx) {
+                if (sleepPressureChart) sleepPressureChart.destroy();
+                sleepPressureChart = new Chart(pressureCtx.getContext('2d'), getSleepPressureChartConfig());
+            }
+
+            const maskingCtx = document.getElementById('caffeineMaskingChart');
+            if (maskingCtx) {
+                if (caffeineMaskingChart) caffeineMaskingChart.destroy();
+                caffeineMaskingChart = new Chart(maskingCtx.getContext('2d'), getCaffeineMaskingChartConfig());
+            }
+
+            const melatoninCtx = document.getElementById('melatoninChart');
+            if (melatoninCtx) {
+                if (melatoninChart) melatoninChart.destroy();
+                melatoninChart = new Chart(melatoninCtx.getContext('2d'), getMelatoninChartConfig());
+            }
+
+            requestAnimationFrame(() => {
+                if (sleepPressureChart) sleepPressureChart.resize();
+                if (caffeineMaskingChart) caffeineMaskingChart.resize();
+                if (melatoninChart) melatoninChart.resize();
+            });
+        }
+
+        function ensureCurveCharts() {
+            if (!currentResult) return;
+            if (timelineChart) timelineChart.resize();
+            drawWeightChart(currentResult);
+            drawMetabolizerClearanceChart(currentResult);
+            drawOcpClearanceChart(currentResult);
+            updateWeightPanel(currentResult);
+            updateClearancePanel(currentResult);
+            requestAnimationFrame(() => {
+                if (timelineChart) timelineChart.resize();
+                if (weightChart) weightChart.resize();
+                if (metabolizerClearanceChart) metabolizerClearanceChart.resize();
+                if (ocpClearanceChart) ocpClearanceChart.resize();
+            });
+        }
+
+        function collapseInputPanel() {
+            document.getElementById('mainContent').classList.add('inputs-collapsed');
+            updateInputCollapsedSummary();
+        }
+
+        function expandInputPanel() {
+            document.getElementById('mainContent').classList.remove('inputs-collapsed');
+            document.getElementById('inputPanelFull').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function updateInputCollapsedSummary() {
+            const data = getFormData();
+            const total = data.intakes.reduce((sum, i) => sum + i.amountMg, 0);
+            const unit = document.getElementById('weightUnit').value;
+            const wVal = document.getElementById('weight').value || (unit === 'lbs' ? '154' : '70');
+            const weightLabel = unit === 'lbs' ? `${wVal} lbs` : `${wVal} kg`;
+            const bedStr = typeof formatWallClock === 'function'
+                ? formatWallClock(data.bedtimeHour)
+                : document.getElementById('bedtime').value;
+            const ocpSuffix = data.onContraceptives ? ' · OCP' : '';
+            const smokingSuffix = data.smoking ? ' · Smoker' : '';
+            const pregnancySuffix = data.pregnancy ? ' · Pregnant' : '';
+            document.getElementById('inputCollapsedSummary').textContent =
+                `${total} mg · ${weightLabel}${ocpSuffix}${smokingSuffix}${pregnancySuffix} · Bed ${bedStr}`;
+        }
+
+        function dismissHealthRiskModal() {
+            const modal = document.getElementById('healthRiskModal');
+            if (modal) modal.hidden = true;
+        }
+
+        function updatePkWarnings(result) {
+            const warningBox = document.getElementById('pkWarningBox');
+            if (!warningBox || !result.pkUncertainty) {
+                if (warningBox) warningBox.style.display = 'none';
+                return;
+            }
+
+            const { uncertaintyMessage, showHealthRiskModal } = result.pkUncertainty;
+
+            if (showHealthRiskModal) {
+                const modal = document.getElementById('healthRiskModal');
+                if (modal) modal.hidden = false;
+            }
+
+            if (uncertaintyMessage) {
+                warningBox.innerHTML = `<strong>Clearance estimate uncertainty</strong>${uncertaintyMessage}`;
+                warningBox.style.display = 'block';
+            } else {
+                warningBox.style.display = 'none';
+                warningBox.innerHTML = '';
+            }
+        }
+
+        function setupTabJumpLinks() {
+            document.querySelector('.results-panel')?.addEventListener('click', e => {
+                const jumpLink = e.target.closest('.tab-jump-link');
+                if (jumpLink) {
+                    e.preventDefault();
+                    const tabId = jumpLink.dataset.tab;
+                    if (tabId) switchResultTab(tabId);
+                    const scrollSel = jumpLink.dataset.scroll;
+                    if (scrollSel) {
+                        requestAnimationFrame(() => {
+                            document.querySelector(scrollSel)
+                                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        });
+                    }
+                    return;
+                }
+                const citeLink = e.target.closest('.cite-ref a');
+                if (!citeLink) return;
+                e.preventDefault();
+                switchResultTab('evidence');
+                requestAnimationFrame(() => {
+                    document.querySelector(citeLink.getAttribute('href'))
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+        }
+
         function addDoseRow(preset = {}) {
             const container = document.getElementById('doseList');
             const rowId = ++doseRowCounter;
+            const source = preset.source ?? 'coffee_8oz';
+            const amountMg = preset.amountMg ?? (CAFFEINE_SOURCES.coffee_8oz ? CAFFEINE_SOURCES.coffee_8oz.mg : 95);
             const defaultTime = preset.time || formatTimeInputValue(
                 parseTimeInputValue(document.getElementById('nowTime').value)
             );
@@ -1216,25 +2235,14 @@
             row.dataset.rowId = rowId;
             row.innerHTML = `
                 <select class="dose-source" onchange="handleDoseSourceChange(this)">
-                    ${buildSourceSelectOptions(preset.source || '')}
+                    ${buildSourceSelectOptions(source)}
                 </select>
-                <input type="number" class="dose-mg" placeholder="mg" value="${preset.amountMg ?? 200}"
+                <input type="number" class="dose-mg" placeholder="mg" value="${amountMg}"
                        min="0" max="1000" oninput="updateTotalDoseBadge()">
                 <input type="time" class="dose-time" value="${defaultTime}">
                 <button type="button" class="btn-remove-dose" onclick="removeDoseRow(this)" title="Remove">×</button>
             `;
             container.appendChild(row);
-
-            if (preset.source && CAFFEINE_SOURCES[preset.source]) {
-                row.querySelector('.dose-mg').value = CAFFEINE_SOURCES[preset.source].mg;
-            }
-
-            row.querySelector('.dose-mg').addEventListener('input', () => {
-                updateTotalDoseBadge();
-                calculateCaffeine();
-            });
-            row.querySelector('.dose-time').addEventListener('change', calculateCaffeine);
-
             updateTotalDoseBadge();
         }
 
@@ -1243,7 +2251,6 @@
             if (container.children.length <= 1) return;
             btn.closest('.dose-row').remove();
             updateTotalDoseBadge();
-            calculateCaffeine();
         }
 
         function handleDoseSourceChange(selectEl) {
@@ -1252,7 +2259,6 @@
                 selectEl.closest('.dose-row').querySelector('.dose-mg').value = CAFFEINE_SOURCES[source].mg;
             }
             updateTotalDoseBadge();
-            calculateCaffeine();
         }
 
         function updateTotalDoseBadge() {
@@ -1268,6 +2274,33 @@
             })).filter(i => i.amountMg > 0);
         }
 
+        function updateBedtimeOutcomePanel(result) {
+            const container = document.getElementById('bedtimeOutcomeContent');
+            if (!container || typeof getBedtimeOutcome !== 'function') return;
+
+            const outcome = getBedtimeOutcome(result);
+            container.innerHTML = `
+                <div class="bedtime-outcome-conc">
+                    ${outcome.concentration.toFixed(2)} µg/mL
+                    <span style="font-weight:400;font-size:0.85em;color:var(--secondary);">
+                        (range ${outcome.rangeLow.toFixed(2)}–${outcome.rangeHigh.toFixed(2)})
+                    </span>
+                </div>
+                <div class="bedtime-outcome-zone">${outcome.zoneLabel}</div>
+                <p class="bedtime-outcome-text">${outcome.interpretation}</p>
+            `;
+
+            const bedtimeGlance = document.getElementById('bedtimeGlanceValue');
+            if (bedtimeGlance) {
+                bedtimeGlance.textContent =
+                    `${outcome.concentration.toFixed(2)} µg/mL (${outcome.rangeLow.toFixed(2)}–${outcome.rangeHigh.toFixed(2)})`;
+            }
+            const bedtimeZoneGlance = document.getElementById('bedtimeZoneGlanceValue');
+            if (bedtimeZoneGlance) {
+                bedtimeZoneGlance.textContent = outcome.zoneLabel;
+            }
+        }
+
         function handleWeightUnitChange() {
         const unit = document.getElementById('weightUnit').value;
         const input = document.getElementById('weight');
@@ -1275,7 +2308,7 @@
         if (!val) return;
         if (unit === 'lbs') {
             input.value = Math.round(val * 2.20462);
-            input.placeholder = '170';
+            input.placeholder = '154';
             input.min = 66; input.max = 440;
         } else {
             input.value = Math.round(val / 2.20462);
@@ -1291,12 +2324,14 @@
             return {
                 intakes: getIntakesFromForm(),
                 bodyWeight: (() => {
-                    const val = parseFloat(document.getElementById('weight').value) || 170;
+                    const val = parseFloat(document.getElementById('weight').value) || 154;
                     return weightUnit === 'lbs' ? val / 2.20462 : val;
                 })(),
                 weightUnit,
-                sex: document.getElementById('sex').value,
-                onContraceptives: document.getElementById('contraceptives').value === 'yes',
+                sex: document.getElementById('sex').value || 'unspecified',
+                onContraceptives: document.getElementById('contraceptives').checked,
+                smoking: document.getElementById('smoking').checked,
+                pregnancy: document.getElementById('pregnancy').checked,
                 metabolizerType: document.getElementById('metabolizer').value,
                 foodStatus: document.getElementById('food').value,
                 nowHour: parseTime('nowTime'),
@@ -1322,7 +2357,7 @@
                 document.getElementById('totalTodayValue').textContent =
                     currentResult.totalMg + ' mg (' + currentResult.intakes.length + ' intake' +
                     (currentResult.intakes.length === 1 ? '' : 's') + ')';
-                document.getElementById('peakValue').textContent =
+                document.getElementById('yourPeakValue').textContent =
                     currentResult.peakConcentration.toFixed(2) + ' µg/mL';
                 document.getElementById('tmaxValue').textContent =
                     currentResult.tmax_minutes + ' min';
@@ -1335,13 +2370,6 @@
                         currentResult.concentrationNowHigh,
                         currentResult.zoneNow.label
                     );
-                document.getElementById('bedtimeValue').textContent =
-                    formatConcentrationWithRange(
-                        currentResult.concentrationAtBedtime,
-                        currentResult.concentrationAtBedtimeLow,
-                        currentResult.concentrationAtBedtimeHigh,
-                        currentResult.zoneAtBedtime.label
-                    );
                 document.getElementById('maxDoseValue').textContent =
                     currentResult.maxDoseNow > 0
                         ? currentResult.maxDoseNow + ' mg more'
@@ -1351,12 +2379,22 @@
                 recBox.textContent = currentResult.recommendation;
                 recBox.className = 'recommendation ' + getZoneClass(currentResult.zoneAtBedtime);
 
+                if (weightChart) { weightChart.destroy(); weightChart = null; }
+                if (metabolizerClearanceChart) { metabolizerClearanceChart.destroy(); metabolizerClearanceChart = null; }
+                if (ocpClearanceChart) { ocpClearanceChart.destroy(); ocpClearanceChart = null; }
+
                 drawTimelineChart(currentResult);
-                drawWeightChart(currentResult);
-                drawClearanceChart(currentResult);
                 updateWeightPanel(currentResult);
                 updateClearancePanel(currentResult);
+                if (document.getElementById('tab-curve').classList.contains('active')) {
+                    ensureCurveCharts();
+                }
+
+                updateBedtimeOutcomePanel(currentResult);
                 updateFactorExplainerValues(currentResult, data);
+                updatePkWarnings(currentResult);
+                updateInputCollapsedSummary();
+                collapseInputPanel();
 
                 document.getElementById('errorBox').style.display = 'none';
             } catch (error) {
@@ -1371,6 +2409,9 @@
             if (timelineChart) timelineChart.destroy();
             const config = getTimelineChartConfig(result);
             timelineChart = new Chart(ctx, config);
+            requestAnimationFrame(() => {
+                if (timelineChart) timelineChart.resize();
+            });
         }
 
         function drawWeightChart(result) {
@@ -1381,11 +2422,16 @@
             weightChart = new Chart(ctx, config);
         }
 
-        function drawClearanceChart(result) {
-            const ctx = document.getElementById('clearanceChart').getContext('2d');
-            if (clearanceChart) clearanceChart.destroy();
-            const config = getClearanceChartConfig(result);
-            clearanceChart = new Chart(ctx, config);
+        function drawMetabolizerClearanceChart(result) {
+            const ctx = document.getElementById('metabolizerClearanceChart').getContext('2d');
+            if (metabolizerClearanceChart) metabolizerClearanceChart.destroy();
+            metabolizerClearanceChart = new Chart(ctx, getMetabolizerClearanceChartConfig(result));
+        }
+
+        function drawOcpClearanceChart(result) {
+            const ctx = document.getElementById('ocpClearanceChart').getContext('2d');
+            if (ocpClearanceChart) ocpClearanceChart.destroy();
+            ocpClearanceChart = new Chart(ctx, getOcpClearanceChartConfig(result));
         }
 
         function updateWeightPanel(result) {
@@ -1406,28 +2452,145 @@
                 Math.abs(percentDiff) + '% ' + (percentDiff > 0 ? 'above' : 'below') + ' a ' + refLabel + ' reference';
         }
 
+        function applyInlineCitations(root) {
+            if (!root || typeof cite !== 'function') return;
+            root.querySelectorAll('[data-cite]').forEach(el => {
+                el.innerHTML = cite(el.dataset.cite);
+            });
+        }
+
+        function buildClearanceStatsTable(rows) {
+            const body = rows.map(row => `
+                <tr class="${row.highlight ? 'highlight-row' : ''}">
+                    <td>${row.label}</td>
+                    <td>${row.h4.toFixed(1)}%</td>
+                    <td>${row.h8.toFixed(1)}%</td>
+                    <td>${row.h12.toFixed(1)}%</td>
+                </tr>
+            `).join('');
+            return `
+                <table class="clearance-stats-table">
+                    <thead>
+                        <tr>
+                            <th>Curve</th>
+                            <th>4 h</th>
+                            <th>8 h</th>
+                            <th>12 h</th>
+                        </tr>
+                    </thead>
+                    <tbody>${body}</tbody>
+                </table>
+            `;
+        }
+
         function updateClearancePanel(result) {
             document.getElementById('yourHalflife').textContent = result.halfLife.toFixed(1) + ' hrs';
 
-            const metabolizer = document.getElementById('metabolizer').value;
             const labels = {
                 fast: 'Fast metabolizer',
                 intermediate: 'Average metabolizer',
                 slow: 'Slow metabolizer'
             };
-            document.getElementById('metabolizerLabel').textContent = labels[metabolizer];
+            let metabolizerText = labels[result.metabolizerType] || labels.intermediate;
+            if (result.onContraceptives) {
+                metabolizerText += ' · on oral contraceptives';
+            }
+            if (result.smoking) {
+                metabolizerText += ' · smoker';
+            }
+            if (result.pregnancy) {
+                metabolizerText += ' · pregnant';
+            }
+            document.getElementById('metabolizerLabel').textContent = metabolizerText;
 
-            document.getElementById('remaining4h').textContent =
-                (Math.exp(-result.k * 4) * 100).toFixed(1) + '%';
-            document.getElementById('remaining8h').textContent =
-                (Math.exp(-result.k * 8) * 100).toFixed(1) + '%';
-            document.getElementById('remaining12h').textContent =
-                (Math.exp(-result.k * 12) * 100).toFixed(1) + '%';
+            const yours = getRemainingAfterPeak(result.halfLife);
+            document.getElementById('yourRemaining4h').textContent = yours.h4.toFixed(1) + '%';
+            document.getElementById('yourRemaining8h').textContent = yours.h8.toFixed(1) + '%';
+            document.getElementById('yourRemaining12h').textContent = yours.h12.toFixed(1) + '%';
+
+            const sex = result.sex || 'unspecified';
+            const selected = result.metabolizerType || 'intermediate';
+            const onOcp = result.onContraceptives;
+
+            const metabolizerRows = [
+                { key: 'fast', label: 'Fast (AA)' },
+                { key: 'intermediate', label: 'Average (AC)' },
+                { key: 'slow', label: 'Slow (CC)' }
+            ].map(({ key, label }) => {
+                const hl = calculateHalfLife(sex, false, key);
+                const rem = getRemainingAfterPeak(hl);
+                return {
+                    label: `${label} (~${hl.toFixed(1)} h)`,
+                    ...rem,
+                    highlight: !onOcp && key === selected
+                };
+            });
+
+            const noOcpHl = calculateHalfLife(sex, false, 'intermediate');
+            const ocpHl = calculateHalfLife(sex, true, 'intermediate');
+            const ocpRows = [
+                {
+                    label: `No oral contraceptives (~${noOcpHl.toFixed(1)} h)`,
+                    ...getRemainingAfterPeak(noOcpHl),
+                    highlight: !onOcp
+                },
+                {
+                    label: `On oral contraceptives (~${ocpHl.toFixed(1)} h)`,
+                    ...getRemainingAfterPeak(ocpHl),
+                    highlight: onOcp
+                }
+            ];
+
+            document.getElementById('metabolizerRemainingTable').innerHTML =
+                buildClearanceStatsTable(metabolizerRows);
+            document.getElementById('ocpRemainingTable').innerHTML =
+                buildClearanceStatsTable(ocpRows);
         }
 
         function updateFactorExplainerValues(result, data) {
-            const sexEl = document.getElementById('sexStatus');
-            if (sexEl) sexEl.textContent = data.sex;
+            const ocpStatusEl = document.getElementById('ocpStatus');
+            if (ocpStatusEl) {
+                ocpStatusEl.textContent = data.onContraceptives
+                    ? 'On oral contraceptives'
+                    : 'Not on oral contraceptives';
+            }
+
+            const ocpImpactEl = document.getElementById('ocpImpact');
+            if (ocpImpactEl) {
+                if (data.onContraceptives) {
+                    ocpImpactEl.textContent =
+                        'roughly 70% longer than without OCP (your modeled half-life: ' +
+                        result.halfLife.toFixed(1) + ' h with all selected factors)';
+                } else {
+                    ocpImpactEl.textContent =
+                        'at baseline clearance rates (your modeled half-life: ' +
+                        result.halfLife.toFixed(1) + ' h with all selected factors)';
+                }
+            }
+
+            const smokingStatusEl = document.getElementById('smokingStatus');
+            if (smokingStatusEl) {
+                smokingStatusEl.textContent = data.smoking ? 'Smoker selected' : 'Not selected';
+            }
+
+            const smokingImpactEl = document.getElementById('smokingImpact');
+            if (smokingImpactEl) {
+                smokingImpactEl.textContent = data.smoking
+                    ? 'Half-life reduced by ~50% in this model (your modeled half-life: ' + result.halfLife.toFixed(1) + ' h with all selected factors)'
+                    : 'No smoking adjustment applied (your modeled half-life: ' + result.halfLife.toFixed(1) + ' h)';
+            }
+
+            const pregnancyStatusEl = document.getElementById('pregnancyStatus');
+            if (pregnancyStatusEl) {
+                pregnancyStatusEl.textContent = data.pregnancy ? 'Pregnant selected' : 'Not selected';
+            }
+
+            const pregnancyImpactEl = document.getElementById('pregnancyImpact');
+            if (pregnancyImpactEl) {
+                pregnancyImpactEl.textContent = data.pregnancy
+                    ? 'Half-life multiplied by ~2 in this model (your modeled half-life: ' + result.halfLife.toFixed(1) + ' h with all selected factors)'
+                    : 'No pregnancy adjustment applied (your modeled half-life: ' + result.halfLife.toFixed(1) + ' h)';
+            }
 
             const weightEl = document.getElementById('weightStatus');
             if (weightEl) {
@@ -1462,17 +2625,6 @@
                     heavy_meal: 'a heavy meal'
                 };
                 foodImpactEl.textContent = labels[data.foodStatus] || data.foodStatus;
-            }
-
-            const sexImpactEl = document.getElementById('sexImpact');
-            if (sexImpactEl) {
-                if (data.sex === 'female' && data.onContraceptives) {
-                    sexImpactEl.textContent = 'roughly 70% longer than baseline (oral contraceptives)';
-                } else if (data.sex === 'female') {
-                    sexImpactEl.textContent = 'similar to male baseline (no significant inherent difference modeled)';
-                } else {
-                    sexImpactEl.textContent = 'at male baseline rates';
-                }
             }
 
             const weightImpactEl = document.getElementById('weightImpact');
@@ -1547,7 +2699,7 @@
                 <div class="citation-group">
                     <div class="citation-group-title">${group.title}</div>
                     ${group.items.map(c => `
-                        <div class="citation-item">
+                        <div class="citation-item"${c.pmid ? ` id="ref-${c.pmid}"` : ''}>
                             ${formatVancouverCitation(c)}
                             <span class="citation-used"><strong>Used in this calculator:</strong> ${c.usedFor}</span>
                             ${formatCitationLinks(c)}
@@ -1562,19 +2714,22 @@
             if (!container || typeof FACTOR_EXPLAINERS === 'undefined') return;
 
             container.innerHTML = Object.values(FACTOR_EXPLAINERS).map(explainer => `
-                <div class="factor-explainer">
-                    <h4>${explainer.title}</h4>
-                    <div class="factor-explainer-content">${explainer.content}</div>
-                </div>
+                <details class="collapsible-section factor-explainer-details">
+                    <summary>${explainer.title}</summary>
+                    <div class="collapsible-section-body factor-explainer-content">${explainer.content}</div>
+                </details>
             `).join('');
         }
 
         function resetForm() {
+            document.getElementById('mainContent').classList.remove('inputs-collapsed');
             document.getElementById('doseList').innerHTML = '';
-            document.getElementById('weight').value = '170';
+            document.getElementById('weight').value = '154';
             document.getElementById('weightUnit').value = 'lbs';
-            document.getElementById('sex').value = 'female';
-            document.getElementById('contraceptives').value = 'no';
+            document.getElementById('sex').value = '';
+            document.getElementById('contraceptives').checked = false;
+            document.getElementById('smoking').checked = false;
+            document.getElementById('pregnancy').checked = false;
             document.getElementById('metabolizer').value = 'intermediate';
             document.getElementById('food').value = 'fasting';
             document.getElementById('bedtime').value = '23:00';
@@ -1582,20 +2737,31 @@
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             document.getElementById('nowTime').value = timeStr;
-            addDoseRow({ amountMg: 200, time: timeStr });
+            addDoseRow({ source: 'coffee_8oz', amountMg: 95, time: timeStr });
+            switchResultTab('overview');
+            dismissHealthRiskModal();
+            const pkWarningBox = document.getElementById('pkWarningBox');
+            if (pkWarningBox) {
+                pkWarningBox.style.display = 'none';
+                pkWarningBox.innerHTML = '';
+            }
             calculateCaffeine();
         }
 
         window.addEventListener('load', () => {
             renderFactorExplainers();
             renderCitations();
+            applyInlineCitations(document.getElementById('tab-curve'));
+            applyInlineCitations(document.getElementById('tab-sleep'));
+            ensureSleepCharts();
+            setupTabJumpLinks();
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 document.querySelectorAll('animateMotion').forEach(el => el.remove());
             }
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             document.getElementById('nowTime').value = timeStr;
-            addDoseRow({ amountMg: 200, time: timeStr });
+            addDoseRow({ source: 'coffee_8oz', amountMg: 95, time: timeStr });
             calculateCaffeine();
         });
     </script>
