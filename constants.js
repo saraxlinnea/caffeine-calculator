@@ -266,7 +266,7 @@ const FACTOR_EXPLAINERS = {
     sleep: {
         title: '😴 How Caffeine Affects Sleep',
         content: `
-            <strong>How it works:</strong> Caffeine blocks adenosine receptors in the brain. Adenosine builds up during wakefulness and promotes sleep drive — so blocking it delays how quickly that pressure converts to drowsiness. Separately, evening caffeine has been shown to delay the circadian clock phase, which can shift your natural sleep window later.
+            <strong>How it works:</strong> Caffeine is a non-selective <strong>adenosine receptor antagonist</strong> (mainly A1 and A2A). It competes with adenosine at these receptors. Adenosine builds up during wakefulness and promotes sleep drive — blocking it delays how quickly that pressure converts to drowsiness. Separately, evening caffeine has been shown to delay the circadian clock phase, which can shift your natural sleep window later.
             
             <strong>What the research shows:</strong>
             <ul>

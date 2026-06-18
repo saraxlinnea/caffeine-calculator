@@ -1,77 +1,77 @@
 # ☕ Caffeine Calculator
 
-**An interactive tool to calculate caffeine blood levels and predict sleep impact**
+Interactive tool to estimate caffeine blood levels and sleep impact — runs entirely in your browser.
 
-## What It Does
+**Live site:** [saraxlinnea.github.io/caffeine-calculator](https://saraxlinnea.github.io/caffeine-calculator/)
 
-This calculator helps you understand:
-- ✅ Your peak caffeine concentration (µg/mL)
-- ✅ How long caffeine stays in your system (based on genetics + sex)
-- ✅ When caffeine will disrupt your sleep
-- ✅ Recommended "cutoff time" for your bedtime
+## What it does
 
-## Why It Matters
+- Estimates **concentration now and at bedtime** (µg/mL) from logged drinks
+- **Overview** verdict and at-a-glance stats
+- **Optimal Sleep Planning** — when another drink might fit and how much headroom you have now
+- **Bedtime stacking breakdown** — estimated contribution of each logged dose at bedtime
+- **Sleep zones** tied to research (adenosine A1/A2A blockade)
+- **Evidence** tab with citations and the equations behind your numbers
 
-Caffeine affects everyone differently. This calculator accounts for:
-- **Body weight** (heavier = lower peak concentration)
-- **Sex** (females metabolize slower due to estrogen)
-- **Genetics** (fast vs. slow metabolizers)
-- **Food intake** (delays absorption)
-- **Sleep science** (exact thresholds for REM disruption)
+## Inputs
 
-## Quick Start
+- Multiple caffeine intakes (time + source or mg)
+- Body weight (kg or lbs)
+- Bedtime and current time
+- CYP1A2 metabolizer type (fast / average / slow)
+- Clearance factors: oral contraceptives, smoking, pregnancy
+- Food status (absorption delay)
 
-1. Enter your caffeine dose, body weight, sex, and bedtime
-2. View four interactive dashboards:
-   - **Timeline:** Caffeine levels over 24 hours
-   - **Comparison:** Peak concentration vs. body weight
-   - **Clearance:** How fast you metabolize caffeine
-   - **Sleep Impact:** When you hit sleep-disrupting levels
-3. Get a recommendation on when to stop caffeine
+## Results tabs
 
-## Verified by Science
+| Tab | Purpose |
+|-----|---------|
+| **Overview** | Bedtime outcome, recommendation, quick stats, link to planning |
+| **Caffeine curve** | 24h timeline, optimal sleep planning, stacking, weight and clearance charts |
+| **Sleep** | Zone reference, receptor diagram, pathway education |
+| **Evidence** | Citations, model limitations, personalized math after Calculate |
 
-All calculations based on peer-reviewed studies:
-- Gardiner et al. (2024) - *Sleep*
-- Weibel et al. (2021) - *Journal of Biological Rhythms*
-- Baur et al. (2023) - *medRxiv*
-- Cornelis et al. (2011) - *PLoS Genetics*
+## Sleep zones (research reference)
 
-## How It's Built
+Concentration bands on the chart are tied to average effects in controlled studies — not personal guarantees:
 
-- **Frontend:** HTML/CSS/JavaScript (runs in browser)
-- **Hosting:** GitHub Pages (free)
-- **Graphs:** Chart.js
-- **All math verified** against peer-reviewed data
+- **Below ~0.5 µg/mL:** optimal sleep planning target at bedtime
+- **~0.5–1.4 µg/mL:** may delay sleep onset or reduce sleep quality
+- **Above ~1.4 µg/mL:** stronger disruption risk (e.g. REM suppression in research)
 
----
+See `SLEEP_THRESHOLDS.md` for detail.
 
-## Files Overview
+## Science and documentation
 
-- `CAFFEINE_SCIENCE.md` - Peer-reviewed science + verified citations
-- `EQUATIONS.md` - All mathematical formulas with examples
-- `SLEEP_THRESHOLDS.md` - Sleep disruption data by concentration level
-- `CALCULATOR_ARCHITECTURE.md` - Technical design & multiple curves
-- `index.html` - Main web interface
-- `css/style.css` - Styling
-- `js/calculator.js` - Core math engine
-- `js/charts.js` - Graph generation
+- `CAFFEINE_SCIENCE.md` — literature summary and citations
+- `EQUATIONS.md` — pharmacokinetic formulas with examples
+- `SLEEP_THRESHOLDS.md` — concentration zones and sleep endpoints
+- `CALCULATOR_ARCHITECTURE.md` — technical design (partially predates current tab layout)
 
----
+## Project files
 
-## User Guide
+- `index.html` — UI, styling, and chart wiring
+- `calculator.js` — core math engine and Chart.js configs
+- `constants.js` — coefficients, zones, citations, factor explainers
 
-### **Tab 1: Caffeine Timeline**
-Shows your caffeine concentration over the next 24 hours with color-coded sleep zones:
-- 🟢 **Green (< 0.5 µg/mL):** Safe for sleep
-- 🟡 **Yellow (0.5-1.4 µg/mL):** May delay sleep
-- 🔴 **Red (> 1.4 µg/mL):** Will disrupt REM sleep
+## Run locally
 
-### **Tab 2: Peak vs. Body Weight**
-Compare how your body weight affects peak concentration compared to others. Heavier = lower peak (same dose).
+```bash
+python3 -m http.server 8080
+# open http://localhost:8080
+```
 
-### **Tab 3: Clearance Rate**
-See how your metabolism (half-life) affects how long caffeine stays in your system.
+## Disclaimer
 
-### **Tab 4: Sleep Impact Zones**
-Understand the exact thresholds where sleep disruption occurs based on your concentration level.
+Educational planning only — not medical advice or a guarantee of how you will sleep tonight.
+
+## Built with
+
+HTML · CSS · JavaScript · [Chart.js](https://www.chartjs.org/) · GitHub Pages
+
+## Key references
+
+- Gardiner et al. (2024) — *Sleep*
+- Weibel et al. (2021) — *Journal of Biological Rhythms*
+- Baur et al. (2023) — *medRxiv*
+- Cornelis et al. (2011) — *PLoS Genetics*

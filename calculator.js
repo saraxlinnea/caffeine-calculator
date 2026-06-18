@@ -310,6 +310,435 @@ function calculateMaxAdditionalDoseNow(intakes, params, concentrationAtBedtime) 
 }
 
 /**
+ * Intakes at or before a cutoff wall-clock hour (same-day model).
+ *
+ * @param {Array} intakes
+ * @param {number} cutoffHour
+ * @returns {Array}
+ */
+function intakesAtOrBeforeCutoff(intakes, cutoffHour) {
+    return intakes.filter(i => i.hour <= cutoffHour + 1e-9);
+}
+
+/**
+ * Bedtime concentration if only intakes at or before cutoffHour count.
+ *
+ * @param {Array} intakes
+ * @param {object} pkParams
+ * @param {number} cutoffHour
+ * @returns {number}
+ */
+function bedtimeConcentrationForCutoff(intakes, pkParams, cutoffHour) {
+    const filtered = intakesAtOrBeforeCutoff(intakes, cutoffHour);
+    return totalConcentrationAt(pkParams.bedtimeHour, filtered, pkParams, { useBedtimeElapsed: true });
+}
+
+function bedtimeConcentrationForPastIntakes(intakes, pkParams, referenceHour) {
+    const past = intakes.filter(i => hoursElapsedSameDay(referenceHour, i.hour) >= 0);
+    return totalConcentrationAt(pkParams.bedtimeHour, past, pkParams, { useBedtimeElapsed: true });
+}
+
+function hourToMinutes(h) {
+    return Math.round((((h % 24) + 24) % 24) * 60);
+}
+
+function minutesToHour(m) {
+    const wrapped = ((m % (24 * 60)) + 24 * 60) % (24 * 60);
+    return wrapped / 60;
+}
+
+/**
+ * Latest wall-clock cutoff: no caffeine after this time (logged intakes after cutoff excluded).
+ *
+ * @param {Array} intakes
+ * @param {object} pkParams
+ * @param {number} [targetLevel=SAFE_THRESHOLD]
+ * @returns {object}
+ */
+function calculateLastCaffeineCutoff(intakes, pkParams, targetLevel = SAFE_THRESHOLD) {
+    const { nowHour, bedtimeHour } = pkParams;
+    const stepMin = 15;
+    const nowMin = hourToMinutes(nowHour);
+    const hoursNowToBedtime = (bedtimeHour - nowHour + 24) % 24;
+    const windowMin = hoursNowToBedtime === 0 ? 24 * 60 : Math.round(hoursNowToBedtime * 60);
+
+    const atNowConc = bedtimeConcentrationForPastIntakes(intakes, pkParams, nowHour);
+    const alreadyOverTarget = atNowConc > targetLevel + 1e-9;
+
+    let forwardBestMin = -1;
+    for (let offset = 0; offset <= windowMin; offset += stepMin) {
+        const cutoffMin = (nowMin + offset) % (24 * 60);
+        const cutoffHour = minutesToHour(cutoffMin);
+        const conc = bedtimeConcentrationForCutoff(intakes, pkParams, cutoffHour);
+        if (conc <= targetLevel + 1e-9) {
+            forwardBestMin = cutoffMin;
+        }
+    }
+
+    let globalBestMin = -1;
+    for (let m = 0; m < 24 * 60; m += stepMin) {
+        const cutoffHour = minutesToHour(m);
+        const conc = bedtimeConcentrationForCutoff(intakes, pkParams, cutoffHour);
+        if (conc <= targetLevel + 1e-9) {
+            globalBestMin = m;
+        }
+    }
+
+    const displayMin = forwardBestMin >= 0 ? forwardBestMin : globalBestMin;
+    const planningCutoffHour = displayMin >= 0 ? minutesToHour(displayMin) : nowHour;
+    const pastCutoffHour = globalBestMin >= 0 ? minutesToHour(globalBestMin) : nowHour;
+    const cutoffPassed = !alreadyOverTarget && forwardBestMin < 0 && globalBestMin >= 0 && globalBestMin < nowMin;
+    const cutoffHour = cutoffPassed ? pastCutoffHour : planningCutoffHour;
+    const bedtimeAtCutoff = Math.round(bedtimeConcentrationForCutoff(intakes, pkParams, cutoffHour) * 100) / 100;
+
+    return {
+        cutoffHour,
+        alreadyOverTarget,
+        cutoffPassed,
+        bedtimeAtCutoff,
+        targetLevel
+    };
+}
+
+/**
+ * Intake to use as "another cup like your last one" (most recent logged dose at or before now).
+ *
+ * @param {Array} intakes
+ * @param {number} nowHour
+ * @returns {{ amountMg: number, hour: number, foodStatus?: string }|null}
+ */
+function getReferenceRepeatIntake(intakes, nowHour) {
+    const active = intakes.filter(i => i.amountMg > 0);
+    if (!active.length) return null;
+
+    const past = active.filter(i => hoursElapsedSameDay(nowHour, i.hour) >= 0);
+    const pool = past.length ? past : active;
+
+    return pool.reduce((best, i) => {
+        if (i.hour > best.hour) return i;
+        if (i.hour === best.hour && i.amountMg > best.amountMg) return i;
+        return best;
+    });
+}
+
+/**
+ * Latest wall-clock time to add a repeat dose and still hit target at bedtime.
+ *
+ * @param {Array} intakes
+ * @param {object} pkParams
+ * @param {number} referenceMg
+ * @param {number} [targetLevel=SAFE_THRESHOLD]
+ * @returns {object}
+ */
+function calculateLatestRepeatDoseTime(intakes, pkParams, referenceMg, targetLevel = SAFE_THRESHOLD) {
+    const { nowHour, bedtimeHour, foodStatus } = pkParams;
+    const tmaxHours = getTimeToMaxConcentration(foodStatus) / 60;
+
+    if (referenceMg <= 0) {
+        return {
+            latestHour: null,
+            fitsAtNow: false,
+            bedtimeIfAddedNow: null,
+            neverFits: true,
+            referenceMg: 0
+        };
+    }
+
+    const stepMin = 15;
+    const nowMin = hourToMinutes(nowHour);
+    const hoursNowToBedtime = (bedtimeHour - nowHour + 24) % 24;
+    const windowMin = hoursNowToBedtime === 0 ? 24 * 60 : Math.round(hoursNowToBedtime * 60);
+
+    const hypothetical = { amountMg: referenceMg, hour: nowHour, foodStatus };
+    const bedtimeIfAddedNow = totalConcentrationAt(
+        bedtimeHour,
+        [...intakes, hypothetical],
+        pkParams,
+        { useBedtimeElapsed: true }
+    );
+    const hoursNowIntakeToBed = (bedtimeHour - nowHour + 24) % 24;
+    const fitsAtNow = hoursNowIntakeToBed >= tmaxHours
+        && bedtimeIfAddedNow <= targetLevel + 1e-9;
+
+    let latestMin = -1;
+    for (let offset = 0; offset <= windowMin; offset += stepMin) {
+        const testMin = (nowMin + offset) % (24 * 60);
+        const testHour = minutesToHour(testMin);
+        const hoursIntakeToBed = (bedtimeHour - testHour + 24) % 24;
+        if (hoursIntakeToBed < tmaxHours) continue;
+
+        const testIntake = { amountMg: referenceMg, hour: testHour, foodStatus };
+        const conc = totalConcentrationAt(
+            bedtimeHour,
+            [...intakes, testIntake],
+            pkParams,
+            { useBedtimeElapsed: true }
+        );
+        if (conc <= targetLevel + 1e-9) {
+            latestMin = testMin;
+        }
+    }
+
+    return {
+        latestHour: latestMin >= 0 ? minutesToHour(latestMin) : null,
+        fitsAtNow,
+        bedtimeIfAddedNow: Math.round(bedtimeIfAddedNow * 100) / 100,
+        neverFits: latestMin < 0,
+        referenceMg
+    };
+}
+
+/**
+ * Closest named drink for a caffeine amount (mg).
+ *
+ * @param {number} mg
+ * @returns {string}
+ */
+function getDrinkEquivalentForMg(mg) {
+    if (mg <= 0) return 'none';
+
+    const sources = Object.values(CAFFEINE_SOURCES)
+        .map(s => ({ mg: s.mg, label: s.label }))
+        .sort((a, b) => a.mg - b.mg);
+
+    if (mg < 12) return 'less than a few sips of coffee';
+
+    let closest = sources[0];
+    let minDiff = Math.abs(mg - closest.mg);
+    for (const s of sources) {
+        const diff = Math.abs(mg - s.mg);
+        if (diff < minDiff) {
+            minDiff = diff;
+            closest = s;
+        }
+    }
+
+    if (minDiff <= 12) {
+        return `about one ${closest.label.toLowerCase()}`;
+    }
+
+    const under = sources.filter(s => s.mg <= mg);
+    const underBest = under.length ? under[under.length - 1] : null;
+    if (underBest && mg < underBest.mg * 1.15) {
+        return `roughly ${mg} mg, a bit less than a full ${underBest.label.toLowerCase()}`;
+    }
+
+    return `about ${mg} mg (nearest reference: ${closest.label.toLowerCase()})`;
+}
+
+/**
+ * Human label for a reference repeat dose amount.
+ *
+ * @param {number} referenceMg
+ * @returns {string}
+ */
+function getReferenceDoseLabel(referenceMg) {
+    const drink = getDrinkEquivalentForMg(referenceMg);
+    if (drink.includes('about one')) {
+        return drink.replace('about one ', '');
+    }
+    return `${referenceMg} mg`;
+}
+
+/**
+ * Whether the legacy log-filter cutoff message adds information.
+ *
+ * @param {object|null} cutoffResult
+ * @param {object} pkParams
+ * @param {boolean} hasFutureIntakes
+ * @returns {boolean}
+ */
+function isLegacyCutoffInformative(cutoffResult, pkParams, hasFutureIntakes) {
+    if (!cutoffResult) return false;
+    if (cutoffResult.alreadyOverTarget || cutoffResult.cutoffPassed) return true;
+    if (hasFutureIntakes) return true;
+
+    const hoursCutoffToBed = (pkParams.bedtimeHour - cutoffResult.cutoffHour + 24) % 24;
+    return hoursCutoffToBed > 1.0;
+}
+
+/**
+ * Label for the intake used as a repeat-dose reference (time + size).
+ *
+ * @param {{ hour: number, amountMg: number }} intake
+ * @returns {string}
+ */
+function formatReferenceIntakeLabel(intake) {
+    const timeStr = formatWallClock(intake.hour);
+    const drink = getDrinkEquivalentForMg(intake.amountMg);
+    if (drink.startsWith('about one ')) {
+        const short = drink.replace('about one ', '');
+        return `your ${timeStr} ${short} (${intake.amountMg} mg)`;
+    }
+    return `your ${timeStr} dose (${intake.amountMg} mg)`;
+}
+
+/**
+ * One-line Overview teaser pointing users to the curve tab for full planning.
+ *
+ * @param {object} result
+ * @returns {string|null}
+ */
+function buildPlanningTeaser(result) {
+    if (!result) return null;
+
+    const target = SAFE_THRESHOLD.toFixed(1);
+    const bed = result.concentrationAtBedtime;
+    const { maxDoseNow, latestRepeatDose, referenceRepeatIntake } = result;
+
+    if (bed > SAFE_THRESHOLD + 1e-9) {
+        return `Your current log estimates above ~${target} µg/mL at bedtime. Open your caffeine curve for timing details.`;
+    }
+
+    if (latestRepeatDose && referenceRepeatIntake && latestRepeatDose.referenceMg > 0) {
+        if (latestRepeatDose.neverFits) {
+            if (maxDoseNow > 0) {
+                return `Logged drinks look OK at bedtime; a full second ${referenceRepeatIntake.amountMg} mg would not. Up to ~${maxDoseNow} mg could fit now. See your curve.`;
+            }
+            return `Logged drinks look OK at bedtime; a full second ${referenceRepeatIntake.amountMg} mg would not. See your curve for options.`;
+        }
+        const latestStr = formatWallClock(latestRepeatDose.latestHour);
+        if (maxDoseNow > 0) {
+            return `Another ${referenceRepeatIntake.amountMg} mg drink could work before ${latestStr}; up to ~${maxDoseNow} mg right now. See your curve.`;
+        }
+        return `Another ${referenceRepeatIntake.amountMg} mg drink before ${latestStr} could still fit the optimal sleep target. See your curve.`;
+    }
+
+    if (maxDoseNow > 0) {
+        return `About ${maxDoseNow} mg could still fit before bedtime under ~${target} µg/mL. See your curve for timing.`;
+    }
+
+    return `No extra room below ~${target} µg/mL at bedtime on this plan. See your curve.`;
+}
+
+/**
+ * Planning copy: repeat-dose deadline, max mg now (full detail for Curve tab).
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {{ intro: string, lines: string[] }}
+ */
+function buildCaffeinePlanningContent(result) {
+    const target = SAFE_THRESHOLD.toFixed(1);
+    const intro =
+        `We use about ${target} µg/mL at bedtime as the optimal sleep planning target. In research, that range tends to mean less adenosine receptor blockade on average. It is a planning target, not a promise you will sleep well.`;
+
+    const lines = [];
+    const {
+        latestRepeatDose,
+        referenceRepeatIntake,
+        maxDoseNow,
+        concentrationAtBedtime,
+        hasFutureIntakes
+    } = result;
+
+    if (hasFutureIntakes && latestRepeatDose && referenceRepeatIntake) {
+        lines.push(
+            `You have future doses on your list. The timeline and stacking table below reflect that full plan (${concentrationAtBedtime.toFixed(2)} µg/mL at bedtime).`
+        );
+    } else if (concentrationAtBedtime <= SAFE_THRESHOLD + 1e-9) {
+        lines.push(
+            `Your logged drinks alone estimate about ${concentrationAtBedtime.toFixed(2)} µg/mL at bedtime (under the ~${target} optimal sleep target).`
+        );
+    }
+
+    if (latestRepeatDose && referenceRepeatIntake && latestRepeatDose.referenceMg > 0) {
+        const refLabel = formatReferenceIntakeLabel(referenceRepeatIntake);
+
+        if (latestRepeatDose.neverFits) {
+            lines.push(
+                `A second drink the same size as ${refLabel} would likely push you above ~${target} µg/mL at bedtime.`
+            );
+        } else {
+            const latestStr = formatWallClock(latestRepeatDose.latestHour);
+            if (latestRepeatDose.fitsAtNow) {
+                lines.push(
+                    `To stay near the optimal sleep target, you could have another drink like ${refLabel} as late as about ${latestStr}.`
+                );
+            } else {
+                lines.push(
+                    `To stay near the optimal sleep target, have another drink like ${refLabel} before about ${latestStr}. After that, one more of that size would likely push you above ~${target} µg/mL.`
+                );
+            }
+        }
+    }
+
+    if (maxDoseNow > 0) {
+        const drink = getDrinkEquivalentForMg(maxDoseNow);
+        lines.push(
+            `Right now you could add about ${maxDoseNow} mg and still stay under ~${target} µg/mL at bedtime (${drink}).`
+        );
+    } else {
+        lines.push(
+            `Right now there is no room for more caffeine if you want to stay under ~${target} µg/mL at bedtime.`
+        );
+    }
+
+    return { intro, lines };
+}
+
+/**
+ * Per-intake bedtime concentration contributions (superposition).
+ *
+ * @param {Array} intakes
+ * @param {object} pkParams
+ * @returns {{ rows: Array, totalAtBedtime: number }}
+ */
+function getBedtimeIntakeBreakdown(intakes, pkParams) {
+    const active = intakes.filter(i => i.amountMg > 0);
+    const rows = active.map(intake => {
+        const concentrationAtBedtime = totalConcentrationAt(
+            pkParams.bedtimeHour,
+            [intake],
+            pkParams,
+            { useBedtimeElapsed: true }
+        );
+        return {
+            hour: intake.hour,
+            amountMg: intake.amountMg,
+            concentrationAtBedtime: Math.round(concentrationAtBedtime * 100) / 100
+        };
+    });
+
+    const totalAtBedtime = rows.reduce((sum, r) => sum + r.concentrationAtBedtime, 0);
+    const roundedTotal = Math.round(totalAtBedtime * 100) / 100;
+
+    rows.forEach(row => {
+        row.percentOfTotal = roundedTotal > 0
+            ? Math.round((row.concentrationAtBedtime / roundedTotal) * 1000) / 10
+            : 0;
+    });
+
+    rows.sort((a, b) => b.concentrationAtBedtime - a.concentrationAtBedtime);
+
+    return { rows, totalAtBedtime: roundedTotal };
+}
+
+/**
+ * Plain-language message for last safe caffeine cutoff.
+ *
+ * @param {object} cutoffResult - Output of calculateLastCaffeineCutoff
+ * @param {number} nowHour
+ * @returns {string}
+ */
+function formatLastCaffeineCutoffMessage(cutoffResult, nowHour) {
+    const { alreadyOverTarget, cutoffPassed, cutoffHour, targetLevel } = cutoffResult;
+
+    if (alreadyOverTarget) {
+        return 'Your logged intakes may already exceed the optimal sleep target at bedtime — cutoff not applicable.';
+    }
+
+    const cutoffStr = formatWallClock(cutoffHour);
+    const nowStr = formatWallClock(nowHour);
+    const target = targetLevel.toFixed(1);
+
+    if (cutoffPassed) {
+        return `Safe stop time for additional caffeine was about ${cutoffStr} (now ${nowStr}). Estimated optimal sleep target (~${target} µg/mL at bedtime), not a personal sleep guarantee.`;
+    }
+
+    return `Avoid caffeine after ${cutoffStr} to stay below ~${target} µg/mL at bedtime (estimated optimal sleep target, not a personal sleep guarantee).`;
+}
+
+/**
  * MAIN CALCULATION: Generate the full caffeine curve and all derived outputs.
  * Supports multiple intakes via superposition (EQUATION 5.1).
  *
@@ -400,6 +829,20 @@ function generateCaffeineCurve(params) {
     const cutoffAlreadyPassed = alreadyConsumed && consumptionTooLate;
 
     const maxDoseNow = calculateMaxAdditionalDoseNow(intakes, pkParams, concentrationAtBedtime);
+    const activeIntakes = intakes.filter(i => i.amountMg > 0);
+    const referenceRepeatIntake = activeIntakes.length > 0
+        ? getReferenceRepeatIntake(activeIntakes, nowHour)
+        : null;
+    const referenceRepeatMg = referenceRepeatIntake ? referenceRepeatIntake.amountMg : 0;
+    const latestRepeatDose = referenceRepeatMg > 0
+        ? calculateLatestRepeatDoseTime(activeIntakes, pkParams, referenceRepeatMg, SAFE_THRESHOLD)
+        : null;
+    const lastCaffeineCutoff = activeIntakes.length > 0
+        ? calculateLastCaffeineCutoff(activeIntakes, pkParams, SAFE_THRESHOLD)
+        : null;
+    const bedtimeIntakeBreakdown = activeIntakes.length > 0
+        ? getBedtimeIntakeBreakdown(activeIntakes, pkParams)
+        : { rows: [], totalAtBedtime: 0 };
 
     const largestIntake = intakes.reduce((best, i) => (i.amountMg > best.amountMg ? i : best), intakes[0]);
     const c_max = calculatePeakConcentration(largestIntake.amountMg, bodyWeight);
@@ -439,6 +882,10 @@ function generateCaffeineCurve(params) {
         alreadyConsumed,
         hasFutureIntakes,
         maxDoseNow,
+        lastCaffeineCutoff,
+        referenceRepeatIntake,
+        latestRepeatDose,
+        bedtimeIntakeBreakdown,
         recommendation: generateRecommendation(zoneAtBedtime, {
             alreadyConsumed,
             hasFutureIntakes,
@@ -466,62 +913,68 @@ function generateRecommendation(zone, opts) {
         alreadyConsumed,
         hasFutureIntakes,
         consumptionTooLate,
-        maxDoseNow,
-        concentrationNow,
         totalMg,
         intakeCount
     } = opts;
 
     const intakeLabel = intakeCount === 1 ? '1 intake' : `${intakeCount} intakes`;
 
-    function additionalCaffeineNote() {
-        if (maxDoseNow > 0) {
-            return ` Up to about ${maxDoseNow} mg more could still clear by bedtime.`;
-        }
-        if (alreadyConsumed && concentrationNow > 0) {
-            return ' No additional caffeine is recommended before bedtime.';
-        }
-        return '';
-    }
-
     if (hasFutureIntakes && !alreadyConsumed) {
         if (consumptionTooLate) {
-            let msg = `Your planned ${totalMg} mg (${intakeLabel}) may leave levels above the lower concentration band at bedtime.`;
-            if (maxDoseNow > 0) {
-                msg += ` You could reduce planned doses or limit additional intake to about ${maxDoseNow} mg from now.`;
-            }
-            return msg;
+            return `Your planned ${totalMg} mg (${intakeLabel}) may leave levels above the lower concentration band at bedtime. See your caffeine curve for timing.`;
         }
         if (zone === SLEEP_ZONES.GREEN) {
-            return `Your planned ${totalMg} mg (${intakeLabel}) should clear to low estimated levels by bedtime.${additionalCaffeineNote()}`;
+            return `Your planned ${totalMg} mg (${intakeLabel}) should clear to low estimated levels by bedtime.`;
         }
-        return `Your planned caffeine (${totalMg} mg, ${intakeLabel}) may leave some active at bedtime.${additionalCaffeineNote()}`;
+        return `Your planned caffeine (${totalMg} mg, ${intakeLabel}) may leave some active at bedtime.`;
     }
 
     if (zone === SLEEP_ZONES.GREEN) {
-        return `Your ${totalMg} mg today (${intakeLabel}) should clear before bedtime. Estimated concentration at that time is low.${additionalCaffeineNote()}`;
+        return `Your ${totalMg} mg today (${intakeLabel}) should clear before bedtime. Estimated concentration at that time is low.`;
     }
 
     if (alreadyConsumed && consumptionTooLate) {
-        return `Based on your ${totalMg} mg across ${intakeLabel}, caffeine likely won't fully clear before bedtime.${additionalCaffeineNote()}`;
+        return `Based on your ${totalMg} mg across ${intakeLabel}, caffeine likely will not fully clear before bedtime.`;
     }
 
     if (zone === SLEEP_ZONES.YELLOW) {
-        return `Some caffeine from today's ${intakeLabel} (${totalMg} mg) will still be active at bedtime.${additionalCaffeineNote()}`;
+        return `Some caffeine from today's ${intakeLabel} (${totalMg} mg) will still be active at bedtime. Sensitive people may notice mild effects.`;
     }
     if (zone === SLEEP_ZONES.ORANGE) {
-        return `Caffeine levels will still be noticeable at bedtime from your ${totalMg} mg (${intakeLabel}).${additionalCaffeineNote()}`;
+        return `Caffeine levels will still be noticeable at bedtime from your ${totalMg} mg (${intakeLabel}).`;
     }
     if (zone === SLEEP_ZONES.RED) {
-        return `Caffeine levels will be high at bedtime from today's ${totalMg} mg (${intakeLabel}).${additionalCaffeineNote()}`;
+        return `Caffeine levels will be high at bedtime from today's ${totalMg} mg (${intakeLabel}).`;
     }
-    return `Caffeine levels will be very high at bedtime from your ${totalMg} mg (${intakeLabel}).${additionalCaffeineNote()}`;
+    return `Caffeine levels will be very high at bedtime from your ${totalMg} mg (${intakeLabel}).`;
 }
 
 
 // ============================================
 // CHART CONFIGURATION & HELPER FUNCTIONS
 // ============================================
+
+/**
+ * Adenosine-focused mechanism summary for a plasma concentration zone.
+ *
+ * @param {number} concentration - µg/mL
+ * @returns {string}
+ */
+function getZoneMechanismSummary(concentration) {
+    if (concentration < SAFE_THRESHOLD) {
+        return 'Little adenosine receptor occupancy by caffeine — most A1/A2A sites likely available; sleep-drive signaling largely unopposed.';
+    }
+    if (concentration < CAUTION_THRESHOLD) {
+        return 'Partial adenosine receptor blockade (A1/A2A) — caffeine competes with adenosine; some sleep-pressure signaling may be dampened.';
+    }
+    if (concentration < WARNING_THRESHOLD) {
+        return 'Substantial adenosine receptor blockade (A1/A2A) — felt sleepiness can lag behind true sleep pressure.';
+    }
+    if (concentration < DANGER_THRESHOLD) {
+        return 'Heavy adenosine receptor blockade at this estimated level — arousal pathways less sensitive to rising adenosine.';
+    }
+    return 'Very heavy adenosine receptor blockade — adenosine’s pro-sleep signal largely countered at many A1/A2A sites.';
+}
 
 /**
  * Plain-language bedtime interpretation tied to cited research.
@@ -538,15 +991,15 @@ function getBedtimeOutcome(result) {
 
     let interpretation;
     if (conc < SAFE_THRESHOLD) {
-        interpretation = 'Sleep disruption is less likely at this estimated level. Individual sensitivity still varies.';
+        interpretation = 'Baur et al. reported minimal EEG delta-power changes at lower plasma levels. Sleep onset and architecture are unlikely to be meaningfully affected for most people.';
     } else if (conc < CAUTION_THRESHOLD) {
-        interpretation = 'Small sleep effects are possible; sensitive individuals may notice changes.';
+        interpretation = 'Population studies report average dose-dependent effects on sleep latency and total sleep time; sensitive individuals may notice milder sleep onset.';
     } else if (conc < WARNING_THRESHOLD) {
-        interpretation = 'Measurable sleep effects become more common in research at this level.';
+        interpretation = 'Research suggests measurable average effects on sleep onset and quality at this level, approaching the Baur delta-power reference.';
     } else if (conc < DANGER_THRESHOLD) {
-        interpretation = 'Greater likelihood of sleep disruption in population averages at this level.';
+        interpretation = 'Baur et al. associated concentrations around and above ~1.4 µg/mL with reduced EEG delta power in their controlled protocol. Group averages also suggest delayed sleep onset.';
     } else {
-        interpretation = 'Higher likelihood of substantial sleep disruption in population averages.';
+        interpretation = 'Research consistently shows stronger average effects on sleep architecture, onset, and total sleep time across this concentration range.';
     }
 
     return {
@@ -554,6 +1007,7 @@ function getBedtimeOutcome(result) {
         rangeLow: low,
         rangeHigh: high,
         zoneLabel: zone.label.replace(' estimated level', ''),
+        mechanismSummary: getZoneMechanismSummary(conc),
         interpretation
     };
 }
@@ -774,10 +1228,44 @@ function formatWallClock(decimalHour) {
     return `${display}:${String(m).padStart(2, '0')} ${period}`;
 }
 
+function getRepeatDoseLinePlugin(result) {
+    return {
+        id: 'repeatDoseLine',
+        afterDraw(chart) {
+            const repeat = result.latestRepeatDose;
+            if (!repeat || repeat.neverFits || repeat.latestHour == null) return;
+
+            const xScale = chart.scales.x;
+            const yScale = chart.scales.y;
+            if (!xScale || !yScale) return;
+
+            const offset = repeat.latestHour - result.curveStartHour;
+            if (offset < 0 || offset > 24) return;
+
+            const xPos = xScale.getPixelForValue(offset);
+            if (xPos < xScale.left || xPos > xScale.right) return;
+
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(xPos, yScale.top);
+            ctx.lineTo(xPos, yScale.bottom);
+            ctx.strokeStyle = '#7a9b8e';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 3]);
+            ctx.stroke();
+            ctx.fillStyle = '#7a9b8e';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Latest repeat', xPos, yScale.top + 12);
+            ctx.restore();
+        }
+    };
+}
+
 /**
  * Build the Chart.js config for the 24-hour concentration timeline.
- * X-axis ticks show both wall-clock time and hours-after-consumption.
- * Plugins: zone background bands, bedtime marker, "Now" marker.
+ * Plugins: zone bands, bedtime, now, repeat-dose deadline, intake markers.
  *
  * @param {object} result - Output of generateCaffeineCurve
  * @returns {object} Chart.js config object
@@ -791,8 +1279,10 @@ function getTimelineChartConfig(result) {
     const baurThreshold = typeof BAUR_DELTA_POWER_THRESHOLD !== 'undefined'
         ? BAUR_DELTA_POWER_THRESHOLD
         : WARNING_THRESHOLD;
-    const yMax = Math.ceil(Math.max(...curveHigh, result.peakConcentration, baurThreshold) * 1.15);
+    const greenThreshold = SAFE_THRESHOLD;
+    const yMax = Math.ceil(Math.max(...curveHigh, result.peakConcentration, baurThreshold, greenThreshold) * 1.15);
     const baurLinePoints = [{ x: 0, y: baurThreshold }, { x: 24, y: baurThreshold }];
+    const greenLinePoints = [{ x: 0, y: greenThreshold }, { x: 24, y: greenThreshold }];
 
     return {
         type: 'line',
@@ -834,6 +1324,18 @@ function getTimelineChartConfig(result) {
                     order: 2
                 },
                 {
+                    label: 'Optimal sleep target (~0.5 µg/mL)',
+                    data: greenLinePoints,
+                    borderColor: '#7a9b8e',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1.5,
+                    borderDash: [6, 4],
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    order: 1
+                },
+                {
                     label: 'Baur line (~1.4 µg/mL)',
                     data: baurLinePoints,
                     borderColor: '#a87070',
@@ -871,14 +1373,14 @@ function getTimelineChartConfig(result) {
                     }
                 },
                 tooltip: {
-                    filter: item => item.dataset.label !== 'Baur line (~1.4 µg/mL)',
+                    filter: item => !item.dataset.label.includes('line (~'),
                     callbacks: {
                         title(items) {
                             const offset = items[0].parsed.x;
                             return formatWallClock(result.curveStartHour + offset);
                         },
                         label(item) {
-                            if (item.dataset.label === 'Baur line (~1.4 µg/mL)') {
+                            if (item.dataset.label.includes('line (~')) {
                                 return null;
                             }
                             const y = item.parsed.y;
@@ -926,6 +1428,7 @@ function getTimelineChartConfig(result) {
             getZoneBackgroundPlugin(),
             getBedtimeLinePlugin(result),
             getNowLinePlugin(result),
+            getRepeatDoseLinePlugin(result),
             getIntakeMarkersPlugin(result)
         ]
     };
@@ -1375,7 +1878,21 @@ if (typeof module !== 'undefined' && module.exports) {
         calculateHalfLife,
         getPkUncertaintyInfo,
         buildClearanceReferenceNote,
-        timeToTargetLevel,
+        calculateMaxAdditionalDoseNow,
+        calculateLastCaffeineCutoff,
+        calculateLatestRepeatDoseTime,
+        getReferenceRepeatIntake,
+        getDrinkEquivalentForMg,
+        getReferenceDoseLabel,
+        isLegacyCutoffInformative,
+        buildCaffeinePlanningContent,
+        buildPlanningTeaser,
+        formatReferenceIntakeLabel,
+        getBedtimeIntakeBreakdown,
+        formatLastCaffeineCutoffMessage,
+        intakesAtOrBeforeCutoff,
+        bedtimeConcentrationForCutoff,
+        bedtimeConcentrationForPastIntakes,
         classifyZone,
         concentrationFromSingleIntake,
         totalConcentrationAt,
@@ -1383,6 +1900,7 @@ if (typeof module !== 'undefined' && module.exports) {
         generateRecommendation,
         getZoneBackgroundPlugin,
         getBedtimeOutcome,
+        getZoneMechanismSummary,
         buildClearanceCurve,
         getRemainingAfterPeak,
         getTimelineChartConfig,
