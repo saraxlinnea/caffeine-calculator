@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caffeine Calculator</title>
+    <title>Caffeine Calculator — Estimate blood levels &amp; protect your sleep</title>
+    <meta name="description" content="Free interactive calculator: estimate caffeine in your blood (µg/mL), plan your next drink, and see sleep impact from peer-reviewed research. Runs in your browser.">
+    <meta name="theme-color" content="#fafaf8">
+    <link rel="canonical" href="https://saraxlinnea.github.io/caffeine-calculator/">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="favicon.svg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://saraxlinnea.github.io/caffeine-calculator/">
+    <meta property="og:title" content="Caffeine Calculator">
+    <meta property="og:description" content="Estimate caffeine blood levels, plan optimal sleep timing, and explore the science — all in your browser.">
+    <meta property="og:image" content="https://saraxlinnea.github.io/caffeine-calculator/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Caffeine Calculator">
+    <meta name="twitter:description" content="Estimate caffeine blood levels, plan optimal sleep timing, and explore the science.">
+    <meta name="twitter:image" content="https://saraxlinnea.github.io/caffeine-calculator/og-image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -42,29 +61,116 @@
             min-height: 100vh;
             display: grid;
             grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
         }
 
         /* HEADER */
         .header {
             background: white;
             border-bottom: 1px solid var(--border);
-            padding: 50px 60px;
+            padding: 40px 60px 32px;
             text-align: center;
         }
 
+        .header-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .header-logo {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
         .header h1 {
-            font-size: 2.2em;
-            font-weight: 300;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+            font-size: 2.1em;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 0;
             color: var(--primary);
         }
 
-        .header p {
+        .header-tagline {
             font-size: 0.95em;
             color: var(--secondary);
-            font-weight: 300;
-            letter-spacing: 0.5px;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+            margin: 0 0 28px;
+        }
+
+        .hero-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .hero-card {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 18px;
+        }
+
+        .hero-card h2 {
+            font-size: 0.82em;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0 0 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-card p {
+            font-size: 0.78em;
+            color: var(--secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .hero-card a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .hero-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* EXAMPLE SCENARIOS */
+        .scenario-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .btn-scenario {
+            padding: 7px 12px;
+            font-size: 0.78em;
+            font-weight: 500;
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .btn-scenario:hover {
+            border-color: var(--accent);
+            background: rgba(212, 165, 116, 0.08);
+        }
+
+        .btn-scenario.active {
+            border-color: var(--accent);
+            background: rgba(212, 165, 116, 0.15);
+            color: #6b5a42;
         }
 
         /* MAIN LAYOUT */
@@ -1020,23 +1126,249 @@
             background: var(--light-bg);
             border: 1px solid var(--border);
             border-left: 4px solid var(--accent);
-            border-radius: 6px;
-            padding: 20px 22px;
+            border-radius: 8px;
+            padding: 22px 24px;
             margin-top: 16px;
+            transition: background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .bedtime-outcome-panel.zone-safe {
+            background: rgba(122, 155, 142, 0.1);
+            border-left-color: var(--success);
+        }
+
+        .bedtime-outcome-panel.zone-caution {
+            background: rgba(201, 165, 112, 0.1);
+            border-left-color: var(--warning);
+        }
+
+        .bedtime-outcome-panel.zone-warning {
+            background: rgba(201, 165, 112, 0.14);
+            border-left-color: #c4924a;
+        }
+
+        .bedtime-outcome-panel.zone-danger {
+            background: rgba(168, 112, 112, 0.1);
+            border-left-color: var(--danger);
+        }
+
+        .bedtime-outcome-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .bedtime-outcome-panel h3 {
-            font-size: 1em;
+            font-size: 0.88em;
             font-weight: 600;
-            margin: 0 0 12px 0;
-            color: var(--primary);
+            margin: 0;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
         .bedtime-outcome-conc {
-            font-size: 1.15em;
-            font-weight: 600;
+            font-size: 2.4em;
+            font-weight: 700;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .bedtime-outcome-conc .conc-unit {
+            font-size: 0.42em;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-left: 4px;
+        }
+
+        .bedtime-outcome-conc .conc-range {
+            display: block;
+            font-size: 0.32em;
+            font-weight: 400;
+            color: var(--secondary);
+            margin-top: 6px;
+            letter-spacing: 0;
+        }
+
+        .zone-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .zone-badge-safe {
+            background: rgba(122, 155, 142, 0.2);
+            color: #4a6b60;
+        }
+
+        .zone-badge-caution {
+            background: rgba(201, 165, 112, 0.25);
+            color: #7a6340;
+        }
+
+        .zone-badge-warning {
+            background: rgba(201, 165, 112, 0.35);
+            color: #6b4f20;
+        }
+
+        .zone-badge-danger {
+            background: rgba(168, 112, 112, 0.2);
+            color: #704a4a;
+        }
+
+        .units-primer {
+            font-size: 0.8em;
+            color: var(--secondary);
+            line-height: 1.5;
+            margin: 0 0 16px;
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .overview-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0 8px;
+        }
+
+        .btn-copy-results {
+            padding: 8px 14px;
+            font-size: 0.82em;
+            font-weight: 500;
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-copy-results:hover {
+            border-color: var(--accent);
+        }
+
+        .btn-copy-results.copied {
+            border-color: var(--success);
+            color: #4a6b60;
+        }
+
+        .methods-glance {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .methods-glance-card {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+
+        .methods-glance-card h3 {
+            font-size: 0.88em;
+            font-weight: 600;
+            margin: 0 0 10px;
+            color: var(--primary);
+        }
+
+        .methods-glance-card ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 0.84em;
+            line-height: 1.65;
+            color: var(--primary);
+        }
+
+        .methods-glance-card li {
+            margin-bottom: 4px;
+        }
+
+        .curve-subnav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 5;
+            padding-top: 4px;
+        }
+
+        .curve-subnav a {
+            padding: 6px 14px;
+            font-size: 0.8em;
+            font-weight: 500;
+            color: var(--secondary);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .curve-subnav a:hover {
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 60px 40px;
+            background: var(--light-bg);
+            text-align: center;
+        }
+
+        .site-footer p {
+            font-size: 0.84em;
+            color: var(--secondary);
+            line-height: 1.65;
+            margin: 0 0 8px;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .site-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .site-footer-links {
+            margin-top: 14px;
+            font-size: 0.82em;
+        }
+
+        @keyframes result-fade-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-animate {
+            animation: result-fade-in 0.35s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .result-animate {
+                animation: none;
+            }
         }
 
         .bedtime-outcome-text {
@@ -1666,6 +1998,14 @@
                 flex-direction: column;
             }
 
+            .hero-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .methods-glance {
+                grid-template-columns: 1fr;
+            }
+
             .input-panel {
                 border-right: none;
                 border-bottom: 1px solid var(--border);
@@ -1693,7 +2033,19 @@
             }
 
             .header {
-                padding: 30px 20px;
+                padding: 30px 20px 24px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .bedtime-outcome-conc {
+                font-size: 2em;
+            }
+
+            .site-footer {
+                padding: 28px 20px 32px;
             }
 
             .input-panel {
@@ -1724,6 +2076,14 @@
             .receptor-diagram {
                 grid-template-columns: 1fr;
             }
+
+            .bedtime-outcome-conc {
+                font-size: 2em;
+            }
+
+            .site-footer {
+                padding: 28px 20px 32px;
+            }
         }
 
         /* SCROLLBAR STYLING */
@@ -1748,8 +2108,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Caffeine Calculator</h1>
-            <p>Know your caffeine. Protect your sleep.</p>
+            <div class="header-brand">
+                <img src="favicon.svg" alt="" class="header-logo" width="44" height="44">
+                <h1>Caffeine Calculator</h1>
+            </div>
+            <p class="header-tagline">Know your caffeine. Protect your sleep.</p>
+            <div class="hero-strip">
+                <div class="hero-card">
+                    <h2>Estimate at bedtime</h2>
+                    <p>See your projected blood level (µg/mL) and sleep zone before tonight.</p>
+                </div>
+                <div class="hero-card">
+                    <h2>Plan your next drink</h2>
+                    <p>Find headroom now and when a repeat dose might still fit.</p>
+                </div>
+                <div class="hero-card">
+                    <h2>Explore the science</h2>
+                    <p>Adenosine pathways, zone thresholds, and <a href="#" class="tab-jump-link" data-tab="evidence">peer-reviewed sources</a>.</p>
+                </div>
+            </div>
         </div>
 
         <div class="main-content" id="mainContent">
@@ -1763,6 +2140,15 @@
                 <h3>Your Information</h3>
 
                 <div class="input-section-label">Caffeine &amp; timing</div>
+
+                <div class="form-group">
+                    <label>Try an example</label>
+                    <div class="scenario-buttons" role="group" aria-label="Example scenarios">
+                        <button type="button" class="btn-scenario" data-scenario="morning" onclick="loadScenario('morning')">Morning coffee</button>
+                        <button type="button" class="btn-scenario" data-scenario="double" onclick="loadScenario('double')">Coffee + afternoon latte</button>
+                        <button type="button" class="btn-scenario" data-scenario="late" onclick="loadScenario('late')">Late energy drink</button>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <div class="dose-list-header">
@@ -1885,8 +2271,15 @@
 
                 <!-- TAB: OVERVIEW -->
                 <div id="tab-overview" class="results-tab-panel active" role="tabpanel">
+                    <p class="units-primer">
+                        <strong>µg/mL</strong> = micrograms of caffeine per milliliter of blood. We estimate this from your dose, weight, and clearance — not a lab test.
+                    </p>
+
                     <div class="bedtime-outcome-panel" id="bedtimeOutcomePanel">
-                        <h3>Bedtime outcome (estimated)</h3>
+                        <div class="bedtime-outcome-header">
+                            <h3>Bedtime outcome (estimated)</h3>
+                            <span id="bedtimeZoneBadge" class="zone-badge zone-badge-safe" hidden></span>
+                        </div>
                         <div id="bedtimeOutcomeContent">
                             <p class="bedtime-outcome-text">Press Calculate to see your estimated level at bedtime.</p>
                         </div>
@@ -1894,6 +2287,10 @@
 
                     <div class="recommendation" id="mainRecommendation">
                         Press Calculate to see your results.
+                    </div>
+
+                    <div class="overview-actions">
+                        <button type="button" class="btn-copy-results" id="copyResultsBtn" onclick="copyResultsSummary()" hidden>Copy summary</button>
                     </div>
 
                     <p class="overview-planning-teaser" id="overviewPlanningTeaser" hidden></p>
@@ -1925,7 +2322,14 @@
 
                 <!-- TAB: CAFFEINE CURVE -->
                 <div id="tab-curve" class="results-tab-panel" role="tabpanel">
-                    <div class="results-section overview-timeline-section">
+                    <nav class="curve-subnav" aria-label="Curve sections">
+                        <a href="#curveChartSection">Chart</a>
+                        <a href="#curvePlanningSection">Planning</a>
+                        <a href="#curveStackingSection">Stacking</a>
+                        <a href="#curveFactorsSection">Factors</a>
+                    </nav>
+
+                    <div class="results-section overview-timeline-section" id="curveChartSection">
                         <div class="chart-container timeline-chart">
                             <canvas id="timelineChart"></canvas>
                         </div>
@@ -2036,7 +2440,7 @@
                         </div>
                     </div>
 
-                    <div class="results-section">
+                    <div class="results-section" id="curveFactorsSection">
                         <h2 class="section-heading">What affects your curve?</h2>
                         <div id="factorExplainersContainer"></div>
                     </div>
@@ -2304,6 +2708,27 @@
                         <strong>Model limitations:</strong> This calculator uses a one-compartment pharmacokinetic model with simplified half-life modifiers for CYP1A2 metabolizer type, oral contraceptives (~70% longer), smoking (~50% shorter), and pregnancy (~2× longer). When multiple modifiers are selected, estimates are less precise. It does not account for tolerance, trimester-specific pregnancy changes, individual EEG, or circadian phase. Output is for educational planning, not medical advice or a guarantee of how you will sleep tonight.
                     </div>
 
+                    <div class="methods-glance" id="methodsGlanceSection">
+                        <div class="methods-glance-card">
+                            <h3>What we model</h3>
+                            <ul>
+                                <li>Multiple intakes stacked via superposition</li>
+                                <li>Body weight, food delay, CYP1A2 genotype</li>
+                                <li>Oral contraceptives, smoking, pregnancy clearance</li>
+                                <li>Population sleep zones from cited research</li>
+                            </ul>
+                        </div>
+                        <div class="methods-glance-card">
+                            <h3>What we do not model</h3>
+                            <ul>
+                                <li>Tolerance, chronic use, or withdrawal</li>
+                                <li>Trimester-specific pregnancy pharmacokinetics</li>
+                                <li>Personal EEG, circadian phase, or genetics beyond CYP1A2</li>
+                                <li>Individual sleep guarantees (zones are population averages)</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <details class="collapsible-section" id="evidenceMathSection" open>
                         <summary>How we estimate caffeine in your blood</summary>
                         <div class="collapsible-section-body evidence-math-body">
@@ -2401,6 +2826,18 @@
                 </div>
             </div>
         </div>
+
+        <footer class="site-footer">
+            <p><strong>Educational tool only</strong> — not medical advice and not a guarantee of how you will sleep tonight.</p>
+            <p>All calculations run in your browser. Nothing you enter is stored or sent to a server.</p>
+            <p class="site-footer-links">
+                <a href="https://github.com/saraxlinnea/caffeine-calculator" target="_blank" rel="noopener">Source on GitHub</a>
+                ·
+                <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#methodsGlanceSection">Methods</a>
+                ·
+                Updated June 2025
+            </p>
+        </footer>
     </div>
 
     <div id="healthRiskModal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="healthRiskModalTitle">
@@ -2446,6 +2883,32 @@
             { value: 'cola', label: 'Cola (35 mg)' },
             { value: 'caffeine_pill', label: 'Caffeine pill (100 mg)' }
         ];
+
+        const EXAMPLE_SCENARIOS = {
+            morning: {
+                doses: [{ source: 'coffee_8oz', time: '08:00' }],
+                nowTime: '14:00',
+                bedtime: '23:00'
+            },
+            double: {
+                doses: [
+                    { source: 'coffee_8oz', time: '08:00' },
+                    { source: 'coffee_12oz', time: '14:00' }
+                ],
+                nowTime: '16:00',
+                bedtime: '23:00'
+            },
+            late: {
+                doses: [
+                    { source: 'coffee_8oz', time: '08:00' },
+                    { source: 'energy_drink', time: '16:30' }
+                ],
+                nowTime: '17:00',
+                bedtime: '23:00'
+            }
+        };
+
+        const SITE_BASE_URL = 'https://saraxlinnea.github.io/caffeine-calculator/';
 
         function parseTimeInputValue(value) {
             const parts = value.split(':').map(Number);
@@ -2730,18 +3193,25 @@
 
         function updateBedtimeOutcomePanel(result) {
             const container = document.getElementById('bedtimeOutcomeContent');
-            if (!container || typeof getBedtimeOutcome !== 'function') return;
+            const panel = document.getElementById('bedtimeOutcomePanel');
+            const badge = document.getElementById('bedtimeZoneBadge');
+            if (!container || !panel || typeof getBedtimeOutcome !== 'function') return;
 
             const outcome = getBedtimeOutcome(result);
+            const meta = getZoneBadgeMeta(result.zoneAtBedtime);
+
+            panel.className = `bedtime-outcome-panel ${meta.panelClass}`;
+            if (badge) {
+                badge.textContent = meta.shortLabel;
+                badge.className = meta.badgeClass;
+                badge.hidden = false;
+            }
 
             container.innerHTML = `
                 <div class="bedtime-outcome-conc">
-                    ${outcome.concentration.toFixed(2)} µg/mL
-                    <span style="font-weight:400;font-size:0.85em;color:var(--secondary);">
-                        (range ${outcome.rangeLow.toFixed(2)}–${outcome.rangeHigh.toFixed(2)})
-                    </span>
+                    ${outcome.concentration.toFixed(2)}<span class="conc-unit">µg/mL</span>
+                    <span class="conc-range">Uncertainty range ${outcome.rangeLow.toFixed(2)}–${outcome.rangeHigh.toFixed(2)} µg/mL</span>
                 </div>
-                <div class="bedtime-outcome-zone">${outcome.zoneLabel}</div>
                 <p class="bedtime-outcome-text" style="margin-top:10px;">
                     <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#zoneReferenceSection">What does this zone mean? →</a>
                 </p>
@@ -2864,7 +3334,10 @@
 
                 const recBox = document.getElementById('mainRecommendation');
                 recBox.textContent = currentResult.recommendation;
-                recBox.className = 'recommendation ' + getZoneClass(currentResult.zoneAtBedtime);
+                recBox.className = 'recommendation ' + getZoneClass(currentResult.zoneAtBedtime) + ' result-animate';
+
+                const copyBtn = document.getElementById('copyResultsBtn');
+                if (copyBtn) copyBtn.hidden = false;
 
                 if (weightChart) { weightChart.destroy(); weightChart = null; }
                 if (metabolizerClearanceChart) { metabolizerClearanceChart.destroy(); metabolizerClearanceChart = null; }
@@ -3141,6 +3614,93 @@
             }
         }
 
+        function getZoneBadgeMeta(zone) {
+            const panelClass = getZoneClass(zone);
+            const shortLabel = (zone.label || '')
+                .replace(/[🟢🟡🟠🔴⛔]\s*/g, '')
+                .replace(' estimated level', '')
+                .trim();
+            return {
+                panelClass: `zone-${panelClass}`,
+                badgeClass: `zone-badge zone-badge-${panelClass}`,
+                shortLabel
+            };
+        }
+
+        function setActiveScenarioButton(scenarioId) {
+            document.querySelectorAll('.btn-scenario').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.scenario === scenarioId);
+            });
+        }
+
+        function loadScenario(scenarioId, options = {}) {
+            const scenario = EXAMPLE_SCENARIOS[scenarioId];
+            if (!scenario) return;
+
+            document.getElementById('mainContent').classList.remove('inputs-collapsed');
+            document.getElementById('doseList').innerHTML = '';
+            document.getElementById('contraceptives').checked = false;
+            document.getElementById('smoking').checked = false;
+            document.getElementById('pregnancy').checked = false;
+            document.getElementById('metabolizer').value = 'intermediate';
+            document.getElementById('food').value = 'fasting';
+            document.getElementById('weight').value = '154';
+            document.getElementById('weightUnit').value = 'lbs';
+            document.getElementById('nowTime').value = scenario.nowTime;
+            document.getElementById('bedtime').value = scenario.bedtime;
+
+            scenario.doses.forEach(dose => addDoseRow(dose));
+            setActiveScenarioButton(scenarioId);
+            switchResultTab('overview');
+
+            if (!options.skipUrl) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('scenario', scenarioId);
+                history.replaceState(null, '', url);
+            }
+
+            calculateCaffeine();
+        }
+
+        async function copyResultsSummary() {
+            if (!currentResult) return;
+
+            const bedtimeStr = typeof formatWallClock === 'function'
+                ? formatWallClock(currentResult.bedtimeHour)
+                : 'bedtime';
+            const zoneText = (currentResult.zoneAtBedtime.label || '')
+                .replace(/[🟢🟡🟠🔴⛔]\s*/g, '')
+                .trim();
+            const text = [
+                'Caffeine Calculator estimate',
+                `Bedtime (${bedtimeStr}): ${currentResult.concentrationAtBedtime.toFixed(2)} µg/mL — ${zoneText}`,
+                `Now: ${currentResult.concentrationNow.toFixed(2)} µg/mL`,
+                currentResult.recommendation,
+                '',
+                SITE_BASE_URL
+            ].join('\n');
+
+            const btn = document.getElementById('copyResultsBtn');
+            try {
+                await navigator.clipboard.writeText(text);
+                if (btn) {
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy summary';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                }
+            } catch (err) {
+                if (btn) btn.textContent = 'Copy failed';
+            }
+        }
+
+        function parseScenarioFromUrl() {
+            const scenarioId = new URLSearchParams(window.location.search).get('scenario');
+            return scenarioId && EXAMPLE_SCENARIOS[scenarioId] ? scenarioId : null;
+        }
+
         function getZoneClass(zone) {
             if (zone === SLEEP_ZONES.GREEN) return 'safe';
             if (zone === SLEEP_ZONES.YELLOW) return 'caution';
@@ -3231,6 +3791,10 @@
             addDoseRow({ source: 'coffee_8oz', amountMg: 95, time: timeStr });
             switchResultTab('overview');
             dismissHealthRiskModal();
+            setActiveScenarioButton(null);
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete('scenario');
+            history.replaceState(null, '', cleanUrl.pathname + cleanUrl.hash);
             const pkWarningBox = document.getElementById('pkWarningBox');
             if (pkWarningBox) {
                 pkWarningBox.style.display = 'none';
@@ -3246,9 +3810,26 @@
             applyInlineCitations(document.getElementById('tab-sleep'));
             ensureSleepCharts();
             setupTabJumpLinks();
+            document.querySelectorAll('.curve-subnav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (!document.getElementById('tab-curve').classList.contains('active')) {
+                        e.preventDefault();
+                        switchResultTab('curve');
+                        const target = document.querySelector(link.getAttribute('href'));
+                        requestAnimationFrame(() => target?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                    }
+                });
+            });
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 document.querySelectorAll('animateMotion').forEach(el => el.remove());
             }
+
+            const scenarioId = parseScenarioFromUrl();
+            if (scenarioId) {
+                loadScenario(scenarioId, { skipUrl: true });
+                return;
+            }
+
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             document.getElementById('nowTime').value = timeStr;

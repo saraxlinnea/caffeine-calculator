@@ -4,6 +4,8 @@ Interactive tool to estimate caffeine blood levels and sleep impact — runs ent
 
 **Live site:** [saraxlinnea.github.io/caffeine-calculator](https://saraxlinnea.github.io/caffeine-calculator/)
 
+Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=late`
+
 ## What it does
 
 - Estimates **concentration now and at bedtime** (µg/mL) from logged drinks
@@ -53,6 +55,7 @@ See `SLEEP_THRESHOLDS.md` for detail.
 - `index.html` — UI, styling, and chart wiring
 - `calculator.js` — core math engine and Chart.js configs
 - `constants.js` — coefficients, zones, citations, factor explainers
+- `favicon.svg` / `og-image.png` — site icon and social preview image
 
 ## Run locally
 
