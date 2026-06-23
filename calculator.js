@@ -104,7 +104,7 @@ function getPkUncertaintyInfo({ onContraceptives, smoking, pregnancy }) {
     let uncertaintyMessage = null;
     if (smoking && pregnancy) {
         uncertaintyMessage =
-            'Smoking and pregnancy have opposing effects on caffeine clearance in this simplified model, and their real-world interaction is complex and less studied. Your half-life estimate is less precise—discuss with a healthcare provider.';
+            'Smoking and pregnancy have opposing effects on caffeine clearance in this simplified model, and their real-world interaction is complex and less studied. Your half-life estimate is less precise. Discuss with a healthcare provider.';
     } else if (count >= 2) {
         uncertaintyMessage =
             `Multiple clearance factors selected (${active.join(', ')}). Combined effects are less predictable in this simplified model; treat the half-life as an approximate planning estimate.`;
@@ -620,7 +620,7 @@ function buildPlanningTeaser(result) {
 function buildCaffeinePlanningContent(result) {
     const target = SAFE_THRESHOLD.toFixed(1);
     const intro =
-        `We use about ${target} µg/mL at bedtime as the optimal sleep planning target. In research, that range tends to mean less adenosine receptor blockade on average. It is a planning target, not a promise you will sleep well.`;
+        `This calculator uses about ${target} µg/mL at bedtime as the optimal sleep planning target. In research, that range tends to mean less adenosine receptor blockade on average. It is a planning target, not a promise you will sleep well.`;
 
     const lines = [];
     const {
@@ -724,7 +724,7 @@ function formatLastCaffeineCutoffMessage(cutoffResult, nowHour) {
     const { alreadyOverTarget, cutoffPassed, cutoffHour, targetLevel } = cutoffResult;
 
     if (alreadyOverTarget) {
-        return 'Your logged intakes may already exceed the optimal sleep target at bedtime — cutoff not applicable.';
+        return 'Your logged intakes may already exceed the optimal sleep target at bedtime. Cutoff not applicable.';
     }
 
     const cutoffStr = formatWallClock(cutoffHour);
@@ -962,18 +962,18 @@ function generateRecommendation(zone, opts) {
  */
 function getZoneMechanismSummary(concentration) {
     if (concentration < SAFE_THRESHOLD) {
-        return 'Little adenosine receptor occupancy by caffeine — most A1/A2A sites likely available; sleep-drive signaling largely unopposed.';
+        return 'Little adenosine receptor occupancy by caffeine. Most A1/A2A sites likely available; sleep-drive signaling largely unopposed.';
     }
     if (concentration < CAUTION_THRESHOLD) {
-        return 'Partial adenosine receptor blockade (A1/A2A) — caffeine competes with adenosine; some sleep-pressure signaling may be dampened.';
+        return 'Partial adenosine receptor blockade (A1/A2A). Caffeine competes with adenosine; some sleep-pressure signaling may be dampened.';
     }
     if (concentration < WARNING_THRESHOLD) {
-        return 'Substantial adenosine receptor blockade (A1/A2A) — felt sleepiness can lag behind true sleep pressure.';
+        return 'Substantial adenosine receptor blockade (A1/A2A). Felt sleepiness can lag behind true sleep pressure.';
     }
     if (concentration < DANGER_THRESHOLD) {
-        return 'Heavy adenosine receptor blockade at this estimated level — arousal pathways less sensitive to rising adenosine.';
+        return 'Heavy adenosine receptor blockade at this estimated level. Arousal pathways less sensitive to rising adenosine.';
     }
-    return 'Very heavy adenosine receptor blockade — adenosine’s pro-sleep signal largely countered at many A1/A2A sites.';
+    return 'Very heavy adenosine receptor blockade. Adenosine’s pro-sleep signal largely countered at many A1/A2A sites.';
 }
 
 /**
@@ -1167,6 +1167,58 @@ function getNowLinePlugin(result) {
 }
 
 /**
+ * Resolve a display label for an intake (source name or custom dose).
+ *
+ * @param {{ source?: string, amountMg: number }} intake
+ * @returns {string}
+ */
+function getIntakeSourceLabel(intake) {
+    if (intake.source && typeof CAFFEINE_SOURCES !== 'undefined' && CAFFEINE_SOURCES[intake.source]) {
+        return CAFFEINE_SOURCES[intake.source].label;
+    }
+    return intake.amountMg > 0 ? `${intake.amountMg} mg dose` : 'Intake';
+}
+
+/**
+ * Assign stagger levels so nearby intake labels do not overlap horizontally.
+ *
+ * @param {Array<{ xPos: number }>} markers
+ * @param {number} minGapPx
+ * @returns {Array<{ xPos: number, level: number }>}
+ */
+function assignIntakeLabelLevels(markers, minGapPx = 52) {
+    const sorted = markers.map(m => ({ ...m, level: 0 })).sort((a, b) => a.xPos - b.xPos);
+    for (let i = 1; i < sorted.length; i++) {
+        const usedLevels = new Set();
+        for (let j = 0; j < i; j++) {
+            if (Math.abs(sorted[j].xPos - sorted[i].xPos) < minGapPx) {
+                usedLevels.add(sorted[j].level);
+            }
+        }
+        let level = 0;
+        while (usedLevels.has(level)) level++;
+        sorted[i].level = level;
+    }
+    return sorted;
+}
+
+/**
+ * Find intakes near a chart x-offset (hours from curve start).
+ *
+ * @param {object} result
+ * @param {number} offsetHours
+ * @param {number} [toleranceHours=0.35]
+ * @returns {Array}
+ */
+function getIntakesNearChartOffset(result, offsetHours, toleranceHours = 0.35) {
+    if (!result.intakes) return [];
+    return result.intakes.filter(intake => {
+        const intakeOffset = intake.hour - result.curveStartHour;
+        return Math.abs(intakeOffset - offsetHours) <= toleranceHours;
+    });
+}
+
+/**
  * Draw vertical markers at each logged intake time on the timeline chart.
  *
  * @param {object} result - Output of generateCaffeineCurve
@@ -1180,31 +1232,55 @@ function getIntakeMarkersPlugin(result) {
             const yScale = chart.scales.y;
             if (!xScale || !yScale || !result.intakes) return;
 
-            const ctx = chart.ctx;
-            ctx.save();
-            ctx.font = '10px Inter, sans-serif';
-            ctx.textAlign = 'center';
+            const hideLabels = chart.width < 480;
+            const markerBaseY = yScale.bottom - 28;
+            const labelBaseOffset = 10;
+            const labelLevelStep = 15;
 
-            result.intakes.forEach((intake, idx) => {
+            const visibleMarkers = [];
+            result.intakes.forEach(intake => {
+                if (!intake.amountMg || intake.amountMg <= 0) return;
                 const offset = intake.hour - result.curveStartHour;
                 if (offset < 0 || offset > 24) return;
 
                 const xPos = xScale.getPixelForValue(offset);
                 if (xPos < xScale.left || xPos > xScale.right) return;
+                visibleMarkers.push({ xPos, intake });
+            });
+
+            const staggered = assignIntakeLabelLevels(visibleMarkers);
+            const maxLevel = staggered.reduce((max, m) => Math.max(max, m.level), 0);
+
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+
+            staggered.forEach(marker => {
+                const { xPos, intake, level } = marker;
 
                 ctx.beginPath();
-                ctx.moveTo(xPos, yScale.bottom - 4);
-                ctx.lineTo(xPos, yScale.bottom);
+                ctx.moveTo(xPos, markerBaseY);
+                ctx.lineTo(xPos, yScale.bottom - 2);
                 ctx.strokeStyle = '#999';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([2, 2]);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
+                ctx.beginPath();
+                ctx.arc(xPos, markerBaseY, 3, 0, Math.PI * 2);
                 ctx.fillStyle = '#888';
-                ctx.fillText(`${intake.amountMg}mg`, xPos, yScale.bottom + 12);
+                ctx.fill();
+
+                if (!hideLabels) {
+                    const labelY = markerBaseY - labelBaseOffset - level * labelLevelStep;
+                    ctx.fillStyle = '#666';
+                    ctx.fillText(`${intake.amountMg} mg`, xPos, labelY);
+                }
             });
 
+            chart.$intakeLabelMaxLevel = maxLevel;
             ctx.restore();
         }
     };
@@ -1353,7 +1429,7 @@ function getTimelineChartConfig(result) {
             responsive: true,
             maintainAspectRatio: false,
             parsing: false,
-            layout: { padding: { bottom: 18 } },
+            layout: { padding: { bottom: 48, top: 4 } },
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 title: {
@@ -1390,7 +1466,16 @@ function getTimelineChartConfig(result) {
                             const idx = items[0].dataIndex;
                             const low = curveLow[idx].toFixed(2);
                             const high = curveHigh[idx].toFixed(2);
-                            return `Uncertainty range: ${low}–${high} µg/mL`;
+                            const lines = [`Uncertainty range: ${low}–${high} µg/mL`];
+                            const offset = items[0].parsed.x;
+                            const nearby = getIntakesNearChartOffset(result, offset);
+                            nearby.forEach(intake => {
+                                const sourceLabel = getIntakeSourceLabel(intake);
+                                lines.push(
+                                    `Intake: ${sourceLabel}, ${intake.amountMg} mg at ${formatWallClock(intake.hour)}`
+                                );
+                            });
+                            return lines;
                         }
                     }
                 }
@@ -1824,7 +1909,7 @@ function getCaffeineMaskingChartConfig() {
                 }
             ]
         },
-        options: getSleepEducationalChartOptions('Sleepiness (illustrative — schematic)')
+        options: getSleepEducationalChartOptions('Sleepiness (illustrative, schematic)')
     };
 }
 

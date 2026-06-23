@@ -1,6 +1,6 @@
 # ☕ Caffeine Calculator
 
-Interactive tool to estimate caffeine blood levels and sleep impact — runs entirely in your browser.
+Most caffeine advice boils down to a fixed cutoff time ("stop by 2pm"). That ignores stacking, clearance genetics, and oral contraceptives. This calculator estimates blood caffeine (µg/mL) from your actual drinks and maps bedtime levels to cited sleep research, with the math shown.
 
 **Live site:** [saraxlinnea.github.io/caffeine-calculator](https://saraxlinnea.github.io/caffeine-calculator/)
 
@@ -10,8 +10,8 @@ Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=la
 
 - Estimates **concentration now and at bedtime** (µg/mL) from logged drinks
 - **Overview** verdict and at-a-glance stats
-- **Optimal Sleep Planning** — when another drink might fit and how much headroom you have now
-- **Bedtime stacking breakdown** — estimated contribution of each logged dose at bedtime
+- **Optimal Sleep Planning**: when another drink might fit and how much headroom you have now
+- **Bedtime stacking breakdown**: estimated contribution of each logged dose at bedtime
 - **Sleep zones** tied to research (adenosine A1/A2A blockade)
 - **Evidence** tab with citations and the equations behind your numbers
 
@@ -21,7 +21,8 @@ Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=la
 - Body weight (kg or lbs)
 - Bedtime and current time
 - CYP1A2 metabolizer type (fast / average / slow)
-- Clearance factors: oral contraceptives, smoking, pregnancy
+- Hormonal factors: oral contraceptives, pregnancy
+- Lifestyle: smoking (CYP1A2 induction)
 - Food status (absorption delay)
 
 ## Results tabs
@@ -35,7 +36,7 @@ Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=la
 
 ## Sleep zones (research reference)
 
-Concentration bands on the chart are tied to average effects in controlled studies — not personal guarantees:
+Concentration bands on the chart are tied to average effects in controlled studies. They are not personal guarantees:
 
 - **Below ~0.5 µg/mL:** optimal sleep planning target at bedtime
 - **~0.5–1.4 µg/mL:** may delay sleep onset or reduce sleep quality
@@ -45,17 +46,17 @@ See `SLEEP_THRESHOLDS.md` for detail.
 
 ## Science and documentation
 
-- `CAFFEINE_SCIENCE.md` — literature summary and citations
-- `EQUATIONS.md` — pharmacokinetic formulas with examples
-- `SLEEP_THRESHOLDS.md` — concentration zones and sleep endpoints
-- `CALCULATOR_ARCHITECTURE.md` — technical design (partially predates current tab layout)
+- `CAFFEINE_SCIENCE.md`: literature summary and citations
+- `EQUATIONS.md`: pharmacokinetic formulas with examples
+- `SLEEP_THRESHOLDS.md`: concentration zones and sleep endpoints
+- `CALCULATOR_ARCHITECTURE.md`: technical design (partially predates current tab layout)
 
 ## Project files
 
-- `index.html` — UI, styling, and chart wiring
-- `calculator.js` — core math engine and Chart.js configs
-- `constants.js` — coefficients, zones, citations, factor explainers
-- `favicon.svg` / `og-image.png` — site icon and social preview image
+- `index.html`: UI, styling, and chart wiring
+- `calculator.js`: core math engine and Chart.js configs
+- `constants.js`: coefficients, zones, citations, factor explainers
+- `favicon.svg` / `og-image.png`: site icon and social preview image
 
 ## Run locally
 
@@ -66,7 +67,7 @@ python3 -m http.server 8080
 
 ## Disclaimer
 
-Educational planning only — not medical advice or a guarantee of how you will sleep tonight.
+Educational planning only. Not medical advice or a guarantee of how you will sleep tonight.
 
 ## Built with
 
@@ -74,7 +75,7 @@ HTML · CSS · JavaScript · [Chart.js](https://www.chartjs.org/) · GitHub Page
 
 ## Key references
 
-- Gardiner et al. (2024) — *Sleep*
-- Weibel et al. (2021) — *Journal of Biological Rhythms*
-- Baur et al. (2023) — *medRxiv*
-- Cornelis et al. (2011) — *PLoS Genetics*
+- Gardiner et al. (2023): meta-analysis, *Sleep Med Rev*
+- Baur et al. (2024): concentration–EEG sleep study, *J Sleep Res* (see also 2023 medRxiv preprint)
+- Weibel et al. (2021): *Journal of Biological Rhythms*
+- Cornelis et al. (2011): *PLoS Genetics*

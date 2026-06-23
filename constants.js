@@ -146,7 +146,7 @@ const FACTOR_EXPLAINERS = {
     ocp: {
         title: '💊 Oral Contraceptives & Caffeine Clearance',
         content: `
-            <strong>The Science:</strong> Estrogen in combined oral contraceptives inhibits CYP1A2, the liver enzyme that clears most caffeine. That can substantially extend how long caffeine stays in your system. This is the main hormonal factor modeled here—not an inherent sex difference without OCP use.
+            <strong>The Science:</strong> Estrogen in combined oral contraceptives inhibits CYP1A2, the liver enzyme that clears most caffeine. That can substantially extend how long caffeine stays in your system. This is the main hormonal factor modeled here, not an inherent sex difference without OCP use.
             
             <strong>Your Status:</strong> <span id="ocpStatus">Not on oral contraceptives</span>
             
@@ -196,7 +196,15 @@ const FACTOR_EXPLAINERS = {
             
             <strong>Impact on Your Results:</strong> <span id="pregnancyImpact">No pregnancy adjustment applied</span>.
             
-            <strong>Caution:</strong> Smoking during pregnancy carries serious health risks for the baby. This tool does not provide medical advice—discuss caffeine and smoking with a healthcare provider.
+
+
+
+
+
+
+
+            
+            <strong>Caution:</strong> Smoking during pregnancy carries serious health risks for the baby. This tool does not provide medical advice. Discuss caffeine and smoking with a healthcare provider.
             
             <strong>Sources:</strong> Knutti et al. (1982) PMID 6954898; pregnancy pharmacokinetics reviews (PMC5564294).
         `
@@ -212,7 +220,7 @@ const FACTOR_EXPLAINERS = {
             <ul>
                 <li>Lighter people hit higher peaks from the same dose</li>
                 <li>Heavier people hit lower peaks from the same dose</li>
-                <li>Weight does not change how fast caffeine is cleared — only the peak height</li>
+                <li>Weight does not change how fast caffeine is cleared. It only affects peak height.</li>
             </ul>
             
             <strong>Impact on Your Results:</strong> Your peak concentration is <span id="weightImpact">at baseline</span> compared to a reference weight.
@@ -255,24 +263,24 @@ const FACTOR_EXPLAINERS = {
                 <li><strong>Heavy meal:</strong> Peak in roughly 105 minutes</li>
             </ul>
             
-            <strong>Food delays the peak but does not reduce it.</strong> The same dose produces the same maximum concentration — it just takes longer to get there.
+            <strong>Food delays the peak but does not reduce it.</strong> The same dose produces the same maximum concentration. It just takes longer to get there.
             
             <strong>Impact on Your Results:</strong> With <span id="foodImpact">fasting</span>, your peak arrives faster.
             
-            <strong>Source:</strong> Grimm et al. (2023) Pharmaceutics — gastric emptying and caffeine absorption kinetics
+            <strong>Source:</strong> Grimm et al. (2023) Pharmaceutics: gastric emptying and caffeine absorption kinetics
             <br><a href="https://pubmed.ncbi.nlm.nih.gov/36839650/" target="_blank">PubMed: PMID 36839650</a>
         `
     },
     sleep: {
         title: '😴 How Caffeine Affects Sleep',
         content: `
-            <strong>How it works:</strong> Caffeine is a non-selective <strong>adenosine receptor antagonist</strong> (mainly A1 and A2A). It competes with adenosine at these receptors. Adenosine builds up during wakefulness and promotes sleep drive — blocking it delays how quickly that pressure converts to drowsiness. Separately, evening caffeine has been shown to delay the circadian clock phase, which can shift your natural sleep window later.
+            <strong>How it works:</strong> Caffeine is a non-selective <strong>adenosine receptor antagonist</strong> (mainly A1 and A2A). It competes with adenosine at these receptors. Adenosine builds up during wakefulness and promotes sleep drive. Blocking it delays how quickly that pressure converts to drowsiness. Separately, evening caffeine has been shown to delay the circadian clock phase, which can shift your natural sleep window later.
             
             <strong>What the research shows:</strong>
             <ul>
                 <li>Caffeine consumed even 6 hours before bed measurably reduces sleep (Drake et al. 2013)</li>
                 <li>Average effects across studies: ~45 min longer to fall asleep, ~45 min less total sleep per 200 mg (Gardiner et al. 2023)</li>
-                <li>Individual sensitivity varies widely — some people are much more or less affected than average</li>
+                <li>Individual sensitivity varies widely. Some people are much more or less affected than average.</li>
                 <li>The zones in this tool represent approximate population averages, not personal guarantees</li>
             </ul>
             
@@ -410,7 +418,7 @@ const CITATION_GROUPS = [
         ]
     },
     {
-        title: 'Sex & Hormonal Factors',
+        title: 'Sex, Hormones & Pregnancy',
         items: [
             {
                 authors: 'Patwardhan RV, Desmond PV, Johnson RF, Schenker S',
@@ -435,33 +443,6 @@ const CITATION_GROUPS = [
                 usedFor: 'Replication of prolonged caffeine clearance with low-dose estrogen-containing oral contraceptives.'
             },
             {
-                authors: 'Gu L, Gonzalez FJ, Kalow W, Tang BK',
-                title: 'Biotransformation of caffeine, paraxanthine, theobromine and theophylline by cDNA-expressed human CYP1A2 and CYP2E1',
-                journal: 'Pharmacogenetics',
-                year: 1992,
-                volume: '2',
-                issue: '2',
-                pages: '73-7',
-                pmid: '1302044',
-                usedFor: 'CYP1A2 handles most caffeine metabolism. Cited for inter-individual enzyme variability, not a large inherent sex difference.'
-            }
-        ]
-    },
-    {
-        title: 'Smoking & Pregnancy',
-        items: [
-            {
-                authors: 'Parsons WD, Neims AH',
-                title: 'Effect of smoking on caffeine clearance',
-                journal: 'Clin Pharmacol Ther',
-                year: 1978,
-                volume: '24',
-                issue: '1',
-                pages: '40-5',
-                pmid: '659762',
-                usedFor: 'Smoking induces CYP1A2 and speeds caffeine clearance; supports ~50% shorter half-life modifier.'
-            },
-            {
                 authors: 'Knutti R, Rothweiler H, Schlatter C',
                 title: 'The effect of pregnancy on the pharmacokinetics of caffeine',
                 journal: 'Arch Toxicol',
@@ -482,6 +463,33 @@ const CITATION_GROUPS = [
                 pmcid: 'PMC5564294',
                 pmid: '28419521',
                 usedFor: 'Review of pregnancy-related changes in caffeine pharmacokinetics; trimester-dependent variation.'
+            }
+        ]
+    },
+    {
+        title: 'CYP1A2 & Lifestyle',
+        items: [
+            {
+                authors: 'Gu L, Gonzalez FJ, Kalow W, Tang BK',
+                title: 'Biotransformation of caffeine, paraxanthine, theobromine and theophylline by cDNA-expressed human CYP1A2 and CYP2E1',
+                journal: 'Pharmacogenetics',
+                year: 1992,
+                volume: '2',
+                issue: '2',
+                pages: '73-7',
+                pmid: '1302044',
+                usedFor: 'CYP1A2 handles most caffeine metabolism. Cited for inter-individual enzyme variability.'
+            },
+            {
+                authors: 'Parsons WD, Neims AH',
+                title: 'Effect of smoking on caffeine clearance',
+                journal: 'Clin Pharmacol Ther',
+                year: 1978,
+                volume: '24',
+                issue: '1',
+                pages: '40-5',
+                pmid: '659762',
+                usedFor: 'Smoking induces CYP1A2 and speeds caffeine clearance; supports ~50% shorter half-life modifier.'
             },
             {
                 authors: 'Institute of Medicine (US) Committee on Military Nutrition Research',
