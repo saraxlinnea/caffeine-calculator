@@ -46,9 +46,9 @@ k = 0.693 / t½
 **Use:** Convert half-life to rate constant
 
 **Examples:**
-- 3-hour half-life: k = 0.693 / 3 = 0.231 hr⁻¹ (fast metabolizer)
-- 4-hour half-life: k = 0.693 / 4 = 0.173 hr⁻¹ (typical male)
-- 5-hour half-life: k = 0.693 / 5 = 0.139 hr⁻¹ (female or slow metabolizer)
+- 4-hour half-life: k = 0.693 / 4 = 0.173 hr⁻¹
+- 5-hour half-life: k = 0.693 / 5 = 0.139 hr⁻¹ (baseline in this calculator)
+- 8.5-hour half-life (OCP): k = 0.693 / 8.5 = 0.082 hr⁻¹
 
 ---
 
@@ -173,59 +173,54 @@ Remaining_% (t) = e^(-k × t) × 100
 
 ---
 
-## PART 3: SEX & METABOLIZER ADJUSTMENTS
+## PART 3: CLEARANCE FACTOR ADJUSTMENTS
 
-### **Equation 3.1: Adjusted Half-Life by Sex**
+### **Equation 3.1: Adjusted Half-Life**
 
 **Formula:**
 ```
-Base half-life (male) = 4.0 hours
+Base half-life = 5.0 hours
 
-Adjusted half-life:
-t½_adjusted = t½_base × Sex_factor
+t½_adjusted = t½_base × Base_factor × Metabolizer_factor × Smoking_factor × Pregnancy_factor
+```
 
-Sex_factor values:
-- Male: 1.0 (baseline)
-- Female: 1.125 (12.5% longer)
-- Female (oral contraceptives): 1.30 (30% longer)
-- Female (pregnant): 1.50 (50% longer)
+**Base_factor** (sex / hormonal):
+- Default (male, female, or unspecified, no OCP): **1.0**
+- Oral contraceptives: **1.70** (~70% longer half-life; replaces base sex factor when selected)
+
+**Metabolizer_factor** (CYP1A2, Cornelis et al. 2011):
+- Fast (AA): **0.875**
+- Intermediate (AC): **1.0**
+- Slow (CC): **1.375**
+
+**Lifestyle / physiology multipliers** (applied on top when selected):
+- Smoking: **×0.5** (~50% faster clearance)
+- Pregnancy: **×2.0** (~2× longer half-life; simplified)
+
+**Examples (intermediate metabolizer, no smoking/pregnancy):**
+- Baseline: t½ = 5.0 × 1.0 = **5.0 hours**
+- On oral contraceptives: t½ = 5.0 × 1.70 = **8.5 hours**
+
+**Examples with genetics (no OCP, no smoking/pregnancy):**
+- Fast (AA): t½ = 5.0 × 0.875 = **4.4 hours**
+- Intermediate (AC): t½ = 5.0 × 1.0 = **5.0 hours**
+- Slow (CC): t½ = 5.0 × 1.375 = **6.9 hours**
+
+---
+
+### **Equation 3.2: Combined Factors**
+
+**Formula:**
+```
+t½_final = 5.0 × Base_factor × Metabolizer_factor × (smoking ? 0.5 : 1) × (pregnancy ? 2.0 : 1)
 ```
 
 **Examples:**
-- Male, 200 mg: t½ = 4.0 hours
-- Female, 200 mg: t½ = 4.0 × 1.125 = 4.5 hours
-- Female (contraceptives), 200 mg: t½ = 4.0 × 1.30 = 5.2 hours
+- OCP + average metabolizer: 5.0 × 1.70 × 1.0 = **8.5 hours**
+- OCP + smoker (simplified model): 5.0 × 1.70 × 0.5 = **4.25 hours**
+- Pregnant + average metabolizer: 5.0 × 1.0 × 2.0 = **10.0 hours**
 
----
-
-### **Equation 3.2: Metabolizer Type Adjustment (CYP1A2 Genetics)**
-
-**Formula:**
-```
-t½_metabolizer = t½_base × Metabolizer_factor
-
-Metabolizer_factor (from Cornelis et al. 2011):
-- Fast (AA genotype): 0.875 (12.5% faster)
-- Intermediate (AC genotype): 1.0 (baseline)
-- Slow (CC genotype): 1.375 (37.5% slower)
-```
-
-**Examples (baseline 4.0 hours):**
-- Fast metabolizer (AA): t½ = 4.0 × 0.875 = 3.5 hours
-- Intermediate (AC): t½ = 4.0 × 1.0 = 4.0 hours
-- Slow metabolizer (CC): t½ = 4.0 × 1.375 = 5.5 hours
-
----
-
-### **Equation 3.3: Combined Sex + Genetics Adjustment**
-
-**Formula:**
-```
-t½_final = t½_base × Sex_factor × Metabolizer_factor
-
-Example: Female (AC metabolizer) = 4.0 × 1.125 × 1.0 = 4.5 hours
-Example: Female (CC metabolizer) = 4.0 × 1.125 × 1.375 = 6.2 hours
-```
+**Note:** The live calculator does not apply a separate inherent female half-life multiplier without OCP. Sex is optional/hidden; hormonal and lifestyle factors drive clearance changes.
 
 ---
 
@@ -320,32 +315,25 @@ ELSE:
 
 Use these to verify your calculator implementation:
 
-### **Test Case 1: Male, 200mg coffee, fasting, 70kg**
+### **Test Case 1: Baseline, 200 mg coffee, fasting, 70 kg**
 ```
-Expected peak: 4.71 µg/mL ✓
-Expected half-life: 4.0 hours ✓
-At 8 hours: 1.54 µg/mL (yellow zone) ✓
-At 12 hours: 0.59 µg/mL (green zone) ✓
-Time to green: ~10 hours ✓
+Expected peak: 4.71 µg/mL
+Expected half-life: 5.0 hours (intermediate metabolizer)
+k = 0.139 hr⁻¹
 ```
 
-### **Test Case 2: Female, 150mg tea, light meal, 65kg**
+### **Test Case 2: Oral contraceptives, 100 mg espresso, fasting, 70 kg**
 ```
-Expected peak: 3.83 µg/mL ✓
-Expected half-life: 4.5 hours (female adjustment) ✓
-Tmax: 60 minutes (light meal) ✓
-At 6 hours: 1.38 µg/mL (orange zone) ✓
-At 10 hours: 0.53 µg/mL (green zone) ✓
+Expected peak: 2.36 µg/mL
+Expected half-life: 8.5 hours (5.0 × 1.70)
+k = 0.082 hr⁻¹
 ```
 
-### **Test Case 3: Female + contraceptives, 100mg espresso, empty stomach, 70kg**
+### **Test Case 3: Slow metabolizer (CC), 95 mg coffee, fasting, 70 kg**
 ```
-Expected peak: 2.36 µg/mL ✓
-Expected half-life: 5.2 hours (female + OCP adjustment) ✓
-Tmax: 45 minutes (fasting) ✓
-At 6 hours: 1.34 µg/mL (orange zone - longer staying) ✓
-At 10 hours: 0.72 µg/mL (yellow zone) ✓
-At 15 hours: 0.28 µg/mL (green zone) ✓
+Expected peak: 2.24 µg/mL
+Expected half-life: 6.9 hours (5.0 × 1.375)
+k = 0.100 hr⁻¹
 ```
 
 ---
@@ -353,14 +341,17 @@ At 15 hours: 0.28 µg/mL (green zone) ✓
 ## Summary: Key Coefficients to Hard-Code
 
 ```javascript
-// In constants.js
+// In constants.js (live values)
+const HALFLIFE_BASE_MALE = 5.0;
+const HALFLIFE_MODIFIERS = {
+  female_contraceptives: 1.70,
+  smoking: 0.5,
+  pregnancy: 2.0,
+};
 const COEFFICIENTS = {
   BIOAVAILABILITY: 0.99,
   VOLUME_DIST_PER_KG: 0.6,
-  PEAK_COEFFICIENT: 1.65,  // 0.99 / 0.6
-  BASE_HALF_LIFE: 4.0,
-  BASE_CLEARANCE_PER_KG: 0.08,
+  PEAK_COEFFICIENT: 1.65,
   LN_2: 0.693,
-  EULER: 2.71828,
 };
 ```

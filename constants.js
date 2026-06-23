@@ -15,8 +15,8 @@ const CAFFEINE_SOURCES = {
     caffeine_pill: { mg: 100, label: "Caffeine pill" },
   };
   
-  // HALF-LIFE MODIFIERS (based on sex)
-  // Base male half-life: 4.0 hours
+  // HALF-LIFE MODIFIERS
+  // Base half-life: 5.0 hours (see HALFLIFE_BASE_MALE)
   const HALFLIFE_BASE_MALE = 5.0;
   
   const HALFLIFE_MODIFIERS = {

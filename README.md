@@ -56,7 +56,7 @@ See `SLEEP_THRESHOLDS.md` for detail.
 - `index.html`: UI, styling, and chart wiring
 - `calculator.js`: core math engine and Chart.js configs
 - `constants.js`: coefficients, zones, citations, factor explainers
-- `favicon.svg` / `og-image.png`: site icon and social preview image
+- `favicon.svg` / `assets/caffeine-preview.png`: site icon and social preview image
 
 ## Run locally
 
