@@ -1203,6 +1203,66 @@ function assignIntakeLabelLevels(markers, minGapPx = 52) {
 }
 
 /**
+ * Choose x-axis tick density from chart width so labels stay readable.
+ *
+ * @param {number} chartWidth
+ * @returns {number}
+ */
+function getTimelineXTickLimit(chartWidth) {
+    if (!chartWidth || chartWidth < 520) return 7;
+    if (chartWidth < 720) return 9;
+    if (chartWidth < 960) return 11;
+    return 13;
+}
+
+/**
+ * Adjust timeline legend, ticks, and bottom padding as the chart resizes.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {object} Chart.js plugin object (id: "timelineResponsive")
+ */
+function getTimelineResponsivePlugin(result) {
+    return {
+        id: 'timelineResponsive',
+        beforeUpdate(chart) {
+            const w = chart.width || chart.canvas?.parentNode?.clientWidth || 0;
+            const xTicks = chart.options.scales?.x?.ticks;
+            if (xTicks) {
+                xTicks.maxTicksLimit = getTimelineXTickLimit(w);
+            }
+
+            const legendLabels = chart.options.plugins?.legend?.labels;
+            if (legendLabels) {
+                legendLabels.font = { size: w < 600 ? 10 : 11 };
+            }
+
+            const hideIntakeLabels = w < 520;
+            let maxLevel = 0;
+            if (!hideIntakeLabels && result.intakes) {
+                const chartAreaWidth = Math.max(w - 80, 200);
+                const markers = result.intakes
+                    .filter(intake => intake.amountMg > 0)
+                    .map(intake => intake.hour - result.curveStartHour)
+                    .filter(offset => offset >= 0 && offset <= 24)
+                    .map(offset => ({ xPos: (offset / 24) * chartAreaWidth }));
+                const labelGap = w < 700 ? 44 : 52;
+                maxLevel = assignIntakeLabelLevels(markers, labelGap)
+                    .reduce((max, marker) => Math.max(max, marker.level), 0);
+            }
+
+            const bottomPad = hideIntakeLabels ? 44 : Math.max(56, 48 + maxLevel * 14);
+            const layout = chart.options.layout || (chart.options.layout = {});
+            const padding = layout.padding || (layout.padding = {});
+            layout.padding = {
+                ...padding,
+                bottom: bottomPad,
+                top: 8
+            };
+        }
+    };
+}
+
+/**
  * Find intakes near a chart x-offset (hours from curve start).
  *
  * @param {object} result
@@ -1232,10 +1292,11 @@ function getIntakeMarkersPlugin(result) {
             const yScale = chart.scales.y;
             if (!xScale || !yScale || !result.intakes) return;
 
-            const hideLabels = chart.width < 480;
-            const markerBaseY = yScale.bottom - 28;
-            const labelBaseOffset = 10;
-            const labelLevelStep = 15;
+            const hideLabels = chart.width < 520;
+            const labelGap = chart.width < 700 ? 44 : 52;
+            const markerBaseY = yScale.bottom - (hideLabels ? 18 : 34);
+            const labelBaseOffset = 12;
+            const labelLevelStep = chart.width < 700 ? 14 : 16;
 
             const visibleMarkers = [];
             result.intakes.forEach(intake => {
@@ -1248,7 +1309,7 @@ function getIntakeMarkersPlugin(result) {
                 visibleMarkers.push({ xPos, intake });
             });
 
-            const staggered = assignIntakeLabelLevels(visibleMarkers);
+            const staggered = assignIntakeLabelLevels(visibleMarkers, labelGap);
             const maxLevel = staggered.reduce((max, m) => Math.max(max, m.level), 0);
 
             const ctx = chart.ctx;
@@ -1429,14 +1490,14 @@ function getTimelineChartConfig(result) {
             responsive: true,
             maintainAspectRatio: false,
             parsing: false,
-            layout: { padding: { bottom: 48, top: 4 } },
+            layout: { padding: { bottom: 56, top: 8 } },
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 title: {
                     display: true,
                     text: '24-Hour Caffeine Timeline',
                     font: { size: 16, weight: '600' },
-                    padding: 20,
+                    padding: { top: 4, bottom: 16 },
                     color: '#2c2c2c'
                 },
                 legend: {
@@ -1445,7 +1506,9 @@ function getTimelineChartConfig(result) {
                     labels: {
                         filter: item => !item.text.includes('Lower bound'),
                         boxWidth: 12,
-                        usePointStyle: true
+                        usePointStyle: true,
+                        padding: 16,
+                        font: { size: 11 }
                     }
                 },
                 tooltip: {
@@ -1498,6 +1561,8 @@ function getTimelineChartConfig(result) {
                     max: 24,
                     ticks: {
                         maxTicksLimit: 13,
+                        maxRotation: 0,
+                        autoSkip: true,
                         callback: value => formatWallClock(result.curveStartHour + value)
                     },
                     title: {
@@ -1510,6 +1575,7 @@ function getTimelineChartConfig(result) {
             }
         },
         plugins: [
+            getTimelineResponsivePlugin(result),
             getZoneBackgroundPlugin(),
             getBedtimeLinePlugin(result),
             getNowLinePlugin(result),

@@ -180,6 +180,7 @@
             grid-template-columns: 380px 1fr;
             gap: 0;
             align-items: start;
+            min-width: 0;
         }
 
         /* INPUT PANEL — sticky */
@@ -283,6 +284,7 @@
         /* RESULTS PANEL — scrolls with page */
         .results-panel {
             padding: 50px 60px;
+            min-width: 0;
         }
 
         /* SECTION DIVIDERS */
@@ -347,8 +349,21 @@
         }
 
         .chart-container.timeline-chart {
-            height: 480px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
             margin-top: 0;
+            height: auto;
+            padding: 24px 20px 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chart-container-inner {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            min-width: 0;
         }
 
         .chart-container.clearance-chart {
@@ -1993,6 +2008,13 @@
         }
 
         /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .chart-container-inner {
+                min-width: 780px;
+                height: 400px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .main-content {
                 display: flex;
@@ -2067,7 +2089,13 @@
             }
 
             .chart-container.timeline-chart {
-                height: 400px;
+                height: auto;
+                padding: 16px 12px 12px;
+            }
+
+            .chart-container-inner {
+                min-width: 760px;
+                height: 380px;
             }
 
             .chart-container.clearance-chart {
@@ -2336,7 +2364,9 @@
 
                     <div class="results-section overview-timeline-section" id="curveChartSection">
                         <div class="chart-container timeline-chart">
-                            <canvas id="timelineChart"></canvas>
+                            <div class="chart-container-inner">
+                                <canvas id="timelineChart"></canvas>
+                            </div>
                         </div>
 
                         <div class="chart-reading-guide" id="chartReadingGuide">
@@ -2976,14 +3006,7 @@
             });
         }
 
-        function ensureCurveCharts() {
-            if (!currentResult) return;
-            if (timelineChart) timelineChart.resize();
-            drawWeightChart(currentResult);
-            drawMetabolizerClearanceChart(currentResult);
-            drawOcpClearanceChart(currentResult);
-            updateWeightPanel(currentResult);
-            updateClearancePanel(currentResult);
+        function resizeCurveCharts() {
             requestAnimationFrame(() => {
                 if (timelineChart) timelineChart.resize();
                 if (weightChart) weightChart.resize();
@@ -2992,14 +3015,31 @@
             });
         }
 
+        function ensureCurveCharts() {
+            if (!currentResult) return;
+            if (!timelineChart) drawTimelineChart(currentResult);
+            drawWeightChart(currentResult);
+            drawMetabolizerClearanceChart(currentResult);
+            drawOcpClearanceChart(currentResult);
+            updateWeightPanel(currentResult);
+            updateClearancePanel(currentResult);
+            resizeCurveCharts();
+            requestAnimationFrame(() => {
+                resizeCurveCharts();
+                requestAnimationFrame(resizeCurveCharts);
+            });
+        }
+
         function collapseInputPanel() {
             document.getElementById('mainContent').classList.add('inputs-collapsed');
             updateInputCollapsedSummary();
+            resizeCurveCharts();
         }
 
         function expandInputPanel() {
             document.getElementById('mainContent').classList.remove('inputs-collapsed');
             document.getElementById('inputPanelFull').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            resizeCurveCharts();
         }
 
         function updateInputCollapsedSummary() {
@@ -3378,10 +3418,14 @@
             if (timelineChart) timelineChart.destroy();
             const config = getTimelineChartConfig(result);
             timelineChart = new Chart(ctx, config);
-            requestAnimationFrame(() => {
-                if (timelineChart) timelineChart.resize();
-            });
+            resizeCurveCharts();
         }
+
+        let chartResizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(chartResizeTimer);
+            chartResizeTimer = setTimeout(resizeCurveCharts, 150);
+        });
 
         function drawWeightChart(result) {
             const ctx = document.getElementById('weightChart').getContext('2d');
