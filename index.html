@@ -3090,8 +3090,8 @@
     </div>
 
     <!-- SCRIPTS -->
-    <script src="constants.js"></script>
-    <script src="calculator.js"></script>
+    <script src="constants.js?v=20250622"></script>
+    <script src="calculator.js?v=20250622"></script>
     <script>
         let currentResult = null;
         let timelineChart = null;
@@ -3661,6 +3661,13 @@
                 const copyBtn = document.getElementById('copyResultsBtn');
                 if (copyBtn) copyBtn.hidden = false;
 
+                updateBedtimeOutcomePanel(currentResult);
+                updateHowMuchNowPanel(currentResult);
+                updateOverviewPlanningTeaser(currentResult);
+                updateEvidenceMathPanel(currentResult);
+                updatePkWarnings(currentResult);
+                updateInputCollapsedSummary();
+
                 if (weightChart) { weightChart.destroy(); weightChart = null; }
                 if (metabolizerClearanceChart) { metabolizerClearanceChart.destroy(); metabolizerClearanceChart = null; }
                 if (ocpClearanceChart) { ocpClearanceChart.destroy(); ocpClearanceChart = null; }
@@ -3672,15 +3679,9 @@
                     ensureCurveCharts();
                 }
 
-                updateBedtimeOutcomePanel(currentResult);
-                updateHowMuchNowPanel(currentResult);
-                updateOverviewPlanningTeaser(currentResult);
                 updateCaffeinePlanningPanel(currentResult);
                 updateBedtimeStackingPanel(currentResult);
-                updateEvidenceMathPanel(currentResult);
                 updateFactorExplainerValues(currentResult, data);
-                updatePkWarnings(currentResult);
-                updateInputCollapsedSummary();
                 collapseInputPanel();
 
                 document.getElementById('errorBox').style.display = 'none';
@@ -3757,14 +3758,26 @@
             });
         }
 
+        function formatRemainingPct(value) {
+            const n = Number(value);
+            return (Number.isFinite(n) ? n : 0).toFixed(1);
+        }
+
+        function getRemainingAfterPeakSafe(halfLife) {
+            const rem = getRemainingAfterPeak(halfLife);
+            if (rem.h24 != null && Number.isFinite(rem.h24)) return rem;
+            const k = typeof calculateK === 'function' ? calculateK(halfLife) : 0.693 / halfLife;
+            return { ...rem, h24: Math.exp(-k * 24) * 100 };
+        }
+
         function buildClearanceStatsTable(rows) {
             const body = rows.map(row => `
                 <tr class="${row.highlight ? 'highlight-row' : ''}">
                     <td>${row.label}</td>
-                    <td>${row.h4.toFixed(1)}%</td>
-                    <td>${row.h8.toFixed(1)}%</td>
-                    <td>${row.h12.toFixed(1)}%</td>
-                    <td>${row.h24.toFixed(1)}%</td>
+                    <td>${formatRemainingPct(row.h4)}%</td>
+                    <td>${formatRemainingPct(row.h8)}%</td>
+                    <td>${formatRemainingPct(row.h12)}%</td>
+                    <td>${formatRemainingPct(row.h24)}%</td>
                 </tr>
             `).join('');
             return `
@@ -3803,11 +3816,11 @@
             }
             document.getElementById('metabolizerLabel').textContent = metabolizerText;
 
-            const yours = getRemainingAfterPeak(result.halfLife);
-            document.getElementById('yourRemaining4h').textContent = yours.h4.toFixed(1) + '%';
-            document.getElementById('yourRemaining8h').textContent = yours.h8.toFixed(1) + '%';
-            document.getElementById('yourRemaining12h').textContent = yours.h12.toFixed(1) + '%';
-            document.getElementById('yourRemaining24h').textContent = yours.h24.toFixed(1) + '%';
+            const yours = getRemainingAfterPeakSafe(result.halfLife);
+            document.getElementById('yourRemaining4h').textContent = formatRemainingPct(yours.h4) + '%';
+            document.getElementById('yourRemaining8h').textContent = formatRemainingPct(yours.h8) + '%';
+            document.getElementById('yourRemaining12h').textContent = formatRemainingPct(yours.h12) + '%';
+            document.getElementById('yourRemaining24h').textContent = formatRemainingPct(yours.h24) + '%';
 
             const sex = result.sex || 'unspecified';
             const selected = result.metabolizerType || 'intermediate';
@@ -3819,7 +3832,7 @@
                 { key: 'slow', label: 'Slow (CC)' }
             ].map(({ key, label }) => {
                 const hl = calculateHalfLife(sex, false, key);
-                const rem = getRemainingAfterPeak(hl);
+                const rem = getRemainingAfterPeakSafe(hl);
                 return {
                     label: `${label} (~${hl.toFixed(1)} h)`,
                     ...rem,
@@ -3832,12 +3845,12 @@
             const ocpRows = [
                 {
                     label: `No oral contraceptives (~${noOcpHl.toFixed(1)} h)`,
-                    ...getRemainingAfterPeak(noOcpHl),
+                    ...getRemainingAfterPeakSafe(noOcpHl),
                     highlight: !onOcp
                 },
                 {
                     label: `On oral contraceptives (~${ocpHl.toFixed(1)} h)`,
-                    ...getRemainingAfterPeak(ocpHl),
+                    ...getRemainingAfterPeakSafe(ocpHl),
                     highlight: onOcp
                 }
             ];
