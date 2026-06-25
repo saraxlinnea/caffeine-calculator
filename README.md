@@ -10,7 +10,7 @@ Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=la
 
 - Estimates **concentration now and at bedtime** (µg/mL) from logged drinks
 - **Overview** verdict and at-a-glance stats
-- **Optimal Sleep Planning**: when another drink might fit and how much headroom you have now
+- **Plan your next drink**: when another drink might fit and how much headroom you have now
 - **Bedtime stacking breakdown**: estimated contribution of each logged dose at bedtime
 - **Sleep zones** tied to research (adenosine A1/A2A blockade)
 - **Evidence** tab with citations and the equations behind your numbers
@@ -30,7 +30,7 @@ Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=la
 | Tab | Purpose |
 |-----|---------|
 | **Overview** | Bedtime outcome, recommendation, quick stats, link to planning |
-| **Caffeine curve** | 24h timeline, optimal sleep planning, stacking, weight and clearance charts |
+| **Caffeine curve** | 24h timeline, plan your next drink, stacking, weight and clearance charts |
 | **Sleep** | Zone reference, receptor diagram, pathway education |
 | **Evidence** | Citations, model limitations, personalized math after Calculate |
 
@@ -38,7 +38,7 @@ Try example scenarios: `?scenario=morning`, `?scenario=double`, or `?scenario=la
 
 Concentration bands on the chart are tied to average effects in controlled studies. They are not personal guarantees:
 
-- **Below ~0.5 µg/mL:** optimal sleep planning target at bedtime
+- **Below ~0.5 µg/mL:** lower bedtime residual planning target
 - **~0.5–1.4 µg/mL:** may delay sleep onset or reduce sleep quality
 - **Above ~1.4 µg/mL:** stronger disruption risk (e.g. REM suppression in research)
 
@@ -75,7 +75,10 @@ HTML · CSS · JavaScript · [Chart.js](https://www.chartjs.org/) · GitHub Page
 
 ## Key references
 
-- Gardiner et al. (2023): meta-analysis, *Sleep Med Rev*
-- Baur et al. (2024): concentration–EEG sleep study, *J Sleep Res* (see also 2023 medRxiv preprint)
-- Weibel et al. (2021): *Journal of Biological Rhythms*
-- Cornelis et al. (2011): *PLoS Genetics*
+- Gardiner et al. (2023): meta-analysis, *Sleep Med Rev* — [PMID 36870101](https://pubmed.ncbi.nlm.nih.gov/36870101/)
+- Baur et al. (2024): concentration–EEG sleep study, *J Sleep Res* — [PMID 38221756](https://pubmed.ncbi.nlm.nih.gov/38221756/)
+- Drake et al. (2013): caffeine 0/3/6 h before bed, *J Clin Sleep Med* — [PMID 24235903](https://pubmed.ncbi.nlm.nih.gov/24235903/)
+- Clark & Landolt (2017): caffeine and sleep review, *Sleep Med Rev* — [PMID 26899133](https://pubmed.ncbi.nlm.nih.gov/26899133/)
+- Cornelis et al. (2011): CYP1A2 genetics, *PLoS Genet* — [PMID 21490707](https://pubmed.ncbi.nlm.nih.gov/21490707/)
+
+Full bibliography: Evidence tab in the app or `CAFFEINE_SCIENCE.md`.

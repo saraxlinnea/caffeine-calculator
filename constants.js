@@ -177,7 +177,7 @@ const FACTOR_EXPLAINERS = {
             
             <strong>Impact on Your Results:</strong> <span id="smokingImpact">No smoking adjustment applied</span>.
             
-            <strong>Sources:</strong> Parsons &amp; Neims (1978) PMID 659762;
+            <strong>Sources:</strong> Parsons &amp; Neims (1978) PMID 657717;
             <a href="https://www.ncbi.nlm.nih.gov/books/NBK223808/" target="_blank" rel="noopener">NCBI Bookshelf NBK223808</a>
         `
     },
@@ -206,7 +206,7 @@ const FACTOR_EXPLAINERS = {
             
             <strong>Caution:</strong> Smoking during pregnancy carries serious health risks for the baby. This tool does not provide medical advice. Discuss caffeine and smoking with a healthcare provider.
             
-            <strong>Sources:</strong> Knutti et al. (1982) PMID 6954898; pregnancy pharmacokinetics reviews (PMC5564294).
+            <strong>Sources:</strong> Knutti et al. (1982) PMID 6954898; Yu et al. (2016) PMID 26358647 (PMC5564294).
         `
     },
     weight: {
@@ -453,16 +453,16 @@ const CITATION_GROUPS = [
                 usedFor: 'Pregnancy prolongs caffeine half-life; supports ~2× half-life modifier in this model.'
             },
             {
-                authors: 'Salem F, Johnson TN, Abduljalil K, Jamei M, Rostami-Hodjegan A',
-                title: 'Pregnancy-Induced Changes in the Pharmacokinetics of Caffeine and Its Metabolites',
+                authors: 'Yu T, Campbell SC, Stockmann C, Tak C, Schoen K, et al',
+                title: 'Pregnancy-induced changes in the pharmacokinetics of caffeine and its metabolites',
                 journal: 'J Clin Pharmacol',
-                year: 2017,
-                volume: '57',
-                issue: '9',
-                pages: '1175-1185',
+                year: 2016,
+                volume: '56',
+                issue: '5',
+                pages: '590-6',
                 pmcid: 'PMC5564294',
-                pmid: '28419521',
-                usedFor: 'Review of pregnancy-related changes in caffeine pharmacokinetics; trimester-dependent variation.'
+                pmid: '26358647',
+                usedFor: 'Pregnancy-related changes in caffeine pharmacokinetics; trimester-dependent variation.'
             }
         ]
     },
@@ -488,7 +488,7 @@ const CITATION_GROUPS = [
                 volume: '24',
                 issue: '1',
                 pages: '40-5',
-                pmid: '659762',
+                pmid: '657717',
                 usedFor: 'Smoking induces CYP1A2 and speeds caffeine clearance; supports ~50% shorter half-life modifier.'
             },
             {

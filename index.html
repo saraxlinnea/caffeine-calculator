@@ -118,6 +118,32 @@
             padding: 16px 18px;
         }
 
+        button.hero-card,
+        .hero-action {
+            display: block;
+            width: 100%;
+            text-align: left;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+        }
+
+        button.hero-card:hover,
+        button.hero-card:focus-visible,
+        .hero-action:hover,
+        .hero-action:focus-visible {
+            border-color: var(--accent);
+            background: rgba(212, 165, 116, 0.08);
+            outline: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        button.hero-card:focus-visible,
+        .hero-action:focus-visible {
+            box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.35);
+        }
+
         .hero-card h2 {
             font-size: 0.82em;
             font-weight: 600;
@@ -1003,6 +1029,151 @@
             color: var(--secondary);
             margin-top: 4px;
             line-height: 1.4;
+        }
+
+        .dose-list-empty {
+            font-size: 0.82em;
+            color: var(--secondary);
+            margin: 0 0 8px;
+            line-height: 1.55;
+            padding: 12px 14px;
+            background: white;
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+        }
+
+        .btn-inline-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            font-size: inherit;
+            color: var(--accent);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .btn-inline-link:hover {
+            color: #6b5a42;
+        }
+
+        .input-callout {
+            margin: 0 0 20px;
+            padding: 14px 16px;
+            background: rgba(212, 165, 116, 0.1);
+            border: 1px solid rgba(212, 165, 116, 0.35);
+            border-radius: 6px;
+            font-size: 0.82em;
+            line-height: 1.55;
+            color: var(--primary);
+        }
+
+        .how-much-now-panel {
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 6px;
+            padding: 22px 24px;
+            margin: 0 0 28px;
+        }
+
+        .how-much-now-panel h3 {
+            margin: 0 0 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .how-much-now-headline {
+            font-size: 1.45em;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 12px;
+            line-height: 1.25;
+        }
+
+        .how-much-now-summary {
+            margin: 0 0 10px;
+            font-size: 0.9em;
+            line-height: 1.65;
+            color: var(--primary);
+        }
+
+        .how-much-now-summary:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .plan-drinks-heading {
+            margin: 20px 0 10px;
+            font-size: 0.92em;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.02em;
+        }
+
+        .plan-drinks-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .plan-drink-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 14px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            border-left: 4px solid;
+            font-size: 0.86em;
+            line-height: 1.5;
+        }
+
+        .plan-drink-row.drink-tier-low {
+            background: rgba(122, 155, 142, 0.12);
+            border-left-color: #7a9b8e;
+        }
+
+        .plan-drink-row.drink-tier-moderate {
+            background: rgba(201, 165, 112, 0.16);
+            border-left-color: #c9a570;
+        }
+
+        .plan-drink-row.drink-tier-high {
+            background: rgba(168, 112, 112, 0.12);
+            border-left-color: #a87070;
+        }
+
+        .plan-drink-name {
+            font-weight: 600;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .plan-drink-timing {
+            color: var(--secondary);
+            text-align: right;
+        }
+
+        @media (max-width: 520px) {
+            .plan-drink-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .plan-drink-timing {
+                text-align: left;
+            }
+        }
+
+        .how-much-now-disclaimer {
+            margin: 14px 0 0;
+            font-size: 0.78em;
+            line-height: 1.55;
+            color: var(--secondary);
         }
 
         .clearance-factor-item {
@@ -2142,19 +2313,19 @@
                 <h1>Caffeine Calculator</h1>
             </div>
             <p class="header-tagline">Know your caffeine. Protect your sleep.</p>
-            <div class="hero-strip">
-                <div class="hero-card">
+            <div class="hero-strip" role="group" aria-label="Quick actions">
+                <button type="button" class="hero-card hero-action" onclick="scrollToBedtimeEstimate()">
                     <h2>Estimate at bedtime</h2>
                     <p>See your projected blood level (µg/mL) and sleep zone before tonight.</p>
-                </div>
-                <div class="hero-card">
+                </button>
+                <button type="button" class="hero-card hero-action" onclick="scrollToPlanNextDrink()">
                     <h2>Plan your next drink</h2>
                     <p>Find headroom now and when a repeat dose might still fit.</p>
-                </div>
-                <div class="hero-card">
+                </button>
+                <button type="button" class="hero-card hero-action" onclick="scrollToMath()">
                     <h2>Explore the science</h2>
-                    <p>Adenosine pathways, zone thresholds, and <a href="#" class="tab-jump-link" data-tab="evidence">peer-reviewed sources</a>.</p>
-                </div>
+                    <p>Review the math and peer-reviewed sources.</p>
+                </button>
             </div>
         </div>
 
@@ -2179,11 +2350,21 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="input-callout">
+                    Nothing logged yet? You can still calculate how much caffeine could fit now before adding a drink.
+                </div>
+
+                <div class="form-group" id="doseListSection">
                     <div class="dose-list-header">
                         <label>Today's Caffeine</label>
-                        <button type="button" class="btn-add-dose" onclick="addDoseRow()">+ Add</button>
+                        <button type="button" class="btn-add-dose" id="btnAddDose" onclick="addDoseRow()">+ Add</button>
                     </div>
+                    <p class="dose-list-empty" id="doseListEmpty">
+                        No caffeine logged yet.
+                        <button type="button" class="btn-inline-link" onclick="addDoseRow()">Add a drink</button>
+                        or use
+                        <button type="button" class="btn-inline-link" onclick="scrollToPlanNextDrink()">Plan your next drink</button>.
+                    </p>
                     <div id="doseList"></div>
                     <div class="total-dose-badge" id="totalDoseBadge">Total: 0 mg</div>
                     <p class="dose-list-note">Log each drink separately. Levels stack using superposition.</p>
@@ -2246,7 +2427,7 @@
                         </label>
                         <p class="dose-list-note clearance-factor-note">
                             Model assumes ~50% faster caffeine clearance (shorter half-life) via CYP1A2 induction.
-                            <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#ref-659762">See sources</a>
+                            <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#ref-657717">See sources</a>
                         </p>
                     </div>
                 </div>
@@ -2318,6 +2499,15 @@
                         </div>
                     </div>
 
+                    <div class="how-much-now-panel" id="howMuchNowSection">
+                        <h3>Plan your next drink</h3>
+                        <div id="howMuchNowContent">
+                            <p class="how-much-now-disclaimer" style="margin-top:0;">
+                                Press Calculate to see how much caffeine you could have right now and still stay below the lower bedtime residual target (~0.5 µg/mL).
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="recommendation" id="mainRecommendation">
                         Press Calculate to see your results.
                     </div>
@@ -2347,7 +2537,9 @@
                     </div>
 
                     <p class="overview-cross-links">
-                        <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curvePlanningSection">Optimal sleep planning on your curve →</a>
+                        <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#howMuchNowSection">Plan your next drink →</a>
+                        ·
+                        <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curvePlanningSection">Sleep planning on your curve →</a>
                         ·
                         <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#blockadeStorySection">Why sleep zones? →</a>
                     </p>
@@ -2374,7 +2566,7 @@
                             <ul>
                                 <li><strong>Black line:</strong> estimated caffeine concentration from your logged intakes.</li>
                                 <li><strong>Shaded band:</strong> uncertainty range (dose ±20% and fast vs slow metabolizer bounds).</li>
-                                <li><strong>Green dashed line (~0.5 µg/mL):</strong> optimal sleep planning target at bedtime.</li>
+                                <li><strong>Green dashed line (~0.5 µg/mL):</strong> lower bedtime residual planning target.</li>
                                 <li><strong>Vertical markers:</strong> Now, bedtime, logged doses, and (when shown) latest time for a repeat drink.</li>
                                 <li><strong>Red dashed Baur line (~1.4 µg/mL):</strong> research reference<span data-cite="baur2024"></span>, not a personal sleep cutoff.</li>
                             </ul>
@@ -2387,9 +2579,9 @@
 
                     <div class="results-section caffeine-planning-panel" id="curvePlanningSection">
                         <div class="result-summary">
-                            <h3>Optimal Sleep Planning</h3>
+                            <h3>Plan your next drink</h3>
                             <div id="caffeinePlanningContent">
-                                <p class="caffeine-planning-intro">Press Calculate to see when another drink might still fit and how much you could add right now.</p>
+                                <p class="caffeine-planning-intro">Press Calculate to see how much you could add right now and when a repeat dose might still fit.</p>
                             </div>
                         </div>
                     </div>
@@ -2454,6 +2646,10 @@
                             <div class="result-row">
                                 <span class="result-label">After 12 hours (your inputs)</span>
                                 <span class="result-value" id="yourRemaining12h">—</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">After 24 hours (your inputs)</span>
+                                <span class="result-value" id="yourRemaining24h">—</span>
                             </div>
                         </div>
                         <div class="info-box">
@@ -3116,8 +3312,11 @@
         function addDoseRow(preset = {}) {
             const container = document.getElementById('doseList');
             const rowId = ++doseRowCounter;
-            const source = preset.source ?? 'coffee_8oz';
-            const amountMg = preset.amountMg ?? (CAFFEINE_SOURCES.coffee_8oz ? CAFFEINE_SOURCES.coffee_8oz.mg : 95);
+            const source = preset.source ?? '';
+            let amountMg = preset.amountMg ?? '';
+            if (amountMg === '' && source && CAFFEINE_SOURCES[source]) {
+                amountMg = CAFFEINE_SOURCES[source].mg;
+            }
             const defaultTime = preset.time || formatTimeInputValue(
                 parseTimeInputValue(document.getElementById('nowTime').value)
             );
@@ -3135,13 +3334,47 @@
             `;
             container.appendChild(row);
             updateTotalDoseBadge();
+            updateDoseListEmptyState();
         }
 
         function removeDoseRow(btn) {
-            const container = document.getElementById('doseList');
-            if (container.children.length <= 1) return;
             btn.closest('.dose-row').remove();
             updateTotalDoseBadge();
+            updateDoseListEmptyState();
+        }
+
+        function updateDoseListEmptyState() {
+            const empty = document.getElementById('doseListEmpty');
+            const hasRows = document.querySelectorAll('.dose-row').length > 0;
+            if (empty) empty.hidden = hasRows;
+            const callout = document.querySelector('.input-callout');
+            if (callout) callout.hidden = hasRows;
+        }
+
+        function scrollToBedtimeEstimate() {
+            calculateCaffeine();
+            switchResultTab('overview');
+            requestAnimationFrame(() => {
+                document.getElementById('bedtimeOutcomePanel')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+
+        function scrollToPlanNextDrink() {
+            calculateCaffeine();
+            switchResultTab('overview');
+            requestAnimationFrame(() => {
+                document.getElementById('howMuchNowSection')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+
+        function scrollToMath() {
+            switchResultTab('evidence');
+            requestAnimationFrame(() => {
+                document.getElementById('methodsGlanceSection')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
         }
 
         function handleDoseSourceChange(selectEl) {
@@ -3171,6 +3404,15 @@
 
             if (!result) {
                 el.innerHTML = 'Press <strong>Calculate</strong> to see your numbers plugged into the formulas below.';
+                return;
+            }
+
+            if (result.hasNoLoggedCaffeine) {
+                el.innerHTML = `
+                    <strong>No caffeine logged.</strong>
+                    Your half-life, weight, and timing inputs still apply to
+                    <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#howMuchNowSection">Plan your next drink</a>.
+                `;
                 return;
             }
 
@@ -3207,8 +3449,44 @@
             }
 
             const text = buildPlanningTeaser(result);
-            el.innerHTML = `${text} <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curvePlanningSection">Optimal sleep planning →</a>`;
+            el.innerHTML = `${text} <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curvePlanningSection">Plan your next drink →</a>`;
             el.hidden = false;
+        }
+
+        function renderStandardDrinksHtml(drinks) {
+            if (!drinks?.length || typeof getStandardDrinkDisplay !== 'function') return '';
+
+            const cards = drinks.map(drink => {
+                const { name, timing, tier } = getStandardDrinkDisplay(drink);
+                return `
+                    <div class="plan-drink-row drink-tier-${tier}">
+                        <span class="plan-drink-name">${name}</span>
+                        <span class="plan-drink-timing">${timing}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <p class="plan-drinks-heading">Latest time today for standard drinks</p>
+                <div class="plan-drinks-grid">${cards}</div>
+            `;
+        }
+
+        function updateHowMuchNowPanel(result) {
+            const container = document.getElementById('howMuchNowContent');
+            if (!container || typeof buildHowMuchNowContent !== 'function') return;
+
+            const { headline, summaryParagraphs, standardDrinks, disclaimer } = buildHowMuchNowContent(result);
+            const summaryHtml = (summaryParagraphs || [])
+                .map(text => `<p class="how-much-now-summary">${text}</p>`)
+                .join('');
+
+            container.innerHTML = `
+                <p class="how-much-now-headline">${headline}</p>
+                ${summaryHtml}
+                ${renderStandardDrinksHtml(standardDrinks)}
+                <p class="how-much-now-disclaimer">${disclaimer}</p>
+            `;
         }
 
         function updateCaffeinePlanningPanel(result) {
@@ -3221,7 +3499,7 @@
                 return;
             }
 
-            const { intro, lines } = buildCaffeinePlanningContent(result);
+            const { intro, lines, standardDrinks } = buildCaffeinePlanningContent(result);
             const listHtml = lines.length
                 ? `<ul class="caffeine-planning-lines">${lines.map(line => `<li>${line}</li>`).join('')}</ul>`
                 : '';
@@ -3229,6 +3507,7 @@
             container.innerHTML = `
                 <p class="caffeine-planning-intro">${intro}<span data-cite="drake2013"></span></p>
                 ${listHtml}
+                ${renderStandardDrinksHtml(standardDrinks)}
             `;
 
             if (typeof applyInlineCitations === 'function') {
@@ -3352,17 +3631,15 @@
         function calculateCaffeine() {
             try {
                 const data = getFormData();
-                if (data.intakes.length === 0) {
-                    document.getElementById('errorBox').textContent = 'Add at least one caffeine intake with a dose greater than 0 mg.';
-                    document.getElementById('errorBox').style.display = 'block';
-                    return;
-                }
-
                 currentResult = generateCaffeineCurve(data);
 
-                document.getElementById('totalTodayValue').textContent =
-                    currentResult.totalMg + ' mg (' + currentResult.intakes.length + ' intake' +
-                    (currentResult.intakes.length === 1 ? '' : 's') + ')';
+                if (currentResult.hasNoLoggedCaffeine) {
+                    document.getElementById('totalTodayValue').textContent = '0 mg (none logged)';
+                } else {
+                    document.getElementById('totalTodayValue').textContent =
+                        currentResult.totalMg + ' mg (' + currentResult.intakes.length + ' intake' +
+                        (currentResult.intakes.length === 1 ? '' : 's') + ')';
+                }
                 document.getElementById('yourPeakValue').textContent =
                     currentResult.peakConcentration.toFixed(2) + ' µg/mL';
                 document.getElementById('tmaxValue').textContent =
@@ -3396,6 +3673,7 @@
                 }
 
                 updateBedtimeOutcomePanel(currentResult);
+                updateHowMuchNowPanel(currentResult);
                 updateOverviewPlanningTeaser(currentResult);
                 updateCaffeinePlanningPanel(currentResult);
                 updateBedtimeStackingPanel(currentResult);
@@ -3456,13 +3734,20 @@
             document.getElementById('yourPeakValue').textContent = result.peakConcentration.toFixed(2) + ' µg/mL';
 
             const refDose = result.totalMg || result.dose;
-            const refPeak = (refDose * COEFFICIENTS.PEAK_COEFFICIENT) / 100;
-            const percentDiff = refPeak > 0
-                ? ((result.peakConcentration - refPeak) / refPeak * 100).toFixed(0)
-                : 0;
-            const refLabel = unit === 'lbs' ? '220 lb' : '100 kg';
-            document.getElementById('sensitivityValue').textContent =
-                Math.abs(percentDiff) + '% ' + (percentDiff > 0 ? 'above' : 'below') + ' a ' + refLabel + ' reference';
+            const sensitivityEl = document.getElementById('sensitivityValue');
+            if (!refDose || refDose <= 0) {
+                if (sensitivityEl) sensitivityEl.textContent = '—';
+            } else {
+                const refPeak = (refDose * COEFFICIENTS.PEAK_COEFFICIENT) / 100;
+                const percentDiff = refPeak > 0
+                    ? ((result.peakConcentration - refPeak) / refPeak * 100).toFixed(0)
+                    : 0;
+                const refLabel = unit === 'lbs' ? '220 lb' : '100 kg';
+                if (sensitivityEl) {
+                    sensitivityEl.textContent =
+                        Math.abs(percentDiff) + '% ' + (percentDiff > 0 ? 'above' : 'below') + ' a ' + refLabel + ' reference';
+                }
+            }
         }
 
         function applyInlineCitations(root) {
@@ -3479,6 +3764,7 @@
                     <td>${row.h4.toFixed(1)}%</td>
                     <td>${row.h8.toFixed(1)}%</td>
                     <td>${row.h12.toFixed(1)}%</td>
+                    <td>${row.h24.toFixed(1)}%</td>
                 </tr>
             `).join('');
             return `
@@ -3489,6 +3775,7 @@
                             <th>4 h</th>
                             <th>8 h</th>
                             <th>12 h</th>
+                            <th>24 h</th>
                         </tr>
                     </thead>
                     <tbody>${body}</tbody>
@@ -3520,6 +3807,7 @@
             document.getElementById('yourRemaining4h').textContent = yours.h4.toFixed(1) + '%';
             document.getElementById('yourRemaining8h').textContent = yours.h8.toFixed(1) + '%';
             document.getElementById('yourRemaining12h').textContent = yours.h12.toFixed(1) + '%';
+            document.getElementById('yourRemaining24h').textContent = yours.h24.toFixed(1) + '%';
 
             const sex = result.sex || 'unspecified';
             const selected = result.metabolizerType || 'intermediate';
@@ -3699,6 +3987,7 @@
             document.getElementById('bedtime').value = scenario.bedtime;
 
             scenario.doses.forEach(dose => addDoseRow(dose));
+            updateDoseListEmptyState();
             setActiveScenarioButton(scenarioId);
             switchResultTab('overview');
 
@@ -3822,34 +4111,17 @@
         }
 
         function resetForm() {
-            document.getElementById('mainContent').classList.remove('inputs-collapsed');
-            document.getElementById('doseList').innerHTML = '';
-            document.getElementById('weight').value = '154';
-            document.getElementById('weightUnit').value = 'lbs';
-            document.getElementById('sex').value = '';
-            document.getElementById('contraceptives').checked = false;
-            document.getElementById('smoking').checked = false;
-            document.getElementById('pregnancy').checked = false;
-            document.getElementById('metabolizer').value = 'intermediate';
-            document.getElementById('food').value = 'fasting';
-            document.getElementById('bedtime').value = '23:00';
-
-            const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            document.getElementById('nowTime').value = timeStr;
-            addDoseRow({ source: 'coffee_8oz', amountMg: 95, time: timeStr });
-            switchResultTab('overview');
-            dismissHealthRiskModal();
-            setActiveScenarioButton(null);
             const cleanUrl = new URL(window.location.href);
             cleanUrl.searchParams.delete('scenario');
             history.replaceState(null, '', cleanUrl.pathname + cleanUrl.hash);
+            dismissHealthRiskModal();
             const pkWarningBox = document.getElementById('pkWarningBox');
             if (pkWarningBox) {
                 pkWarningBox.style.display = 'none';
                 pkWarningBox.innerHTML = '';
             }
-            calculateCaffeine();
+            switchResultTab('overview');
+            loadScenario('morning', { skipUrl: true });
         }
 
         window.addEventListener('load', () => {
@@ -3879,11 +4151,7 @@
                 return;
             }
 
-            const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            document.getElementById('nowTime').value = timeStr;
-            addDoseRow({ source: 'coffee_8oz', amountMg: 95, time: timeStr });
-            calculateCaffeine();
+            loadScenario('morning', { skipUrl: true });
         });
     </script>
 </body>

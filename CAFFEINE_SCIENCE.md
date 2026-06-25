@@ -1,105 +1,164 @@
-# Caffeine Pharmacokinetics: Peer-Reviewed Science
+# Caffeine Science: Literature Behind the Calculator
 
-## Sources: Verified ✅
-
-All sources below have been verified on peer-reviewed databases (PubMed, Oxford Academic, Sage Publishing).
+This document mirrors the **Evidence** tab in the calculator (`constants.js` → `CITATION_GROUPS`). All PubMed links below were checked against PubMed metadata.
 
 ---
 
-## Study 1: Dose & Timing Effects ✅
+## Sleep disruption & timing
 
-**Title:** Dose and timing effects of caffeine on subsequent sleep: a randomized clinical crossover trial
-
-**Authors:** Gardiner CL, Weakley J, Burke LM, et al.
-
-**Journal:** *Sleep* (Oxford Academic)
-
-**Published:** 2024, Volume 48, Issue 4, Article zsae230
-
-**Link:** https://academic.oup.com/sleep/article/48/4/zsae230/7815486
-
-**DOI:** 10.1093/sleep/zsae230
-
-**Key Findings:**
-- 100 mg caffeine taken 4 hours before bed: NO significant sleep disruption
-- 400 mg caffeine taken 4 hours before bed: 34% reduction in sleep quality
-- 400 mg caffeine taken 8 hours before bed: significant sleep fragmentation
-- 400 mg caffeine taken 12 hours before bed: delayed sleep initiation
-
-**Clinical Implication:**
-- Typical single coffee (100 mg) is safe up to 4 hours before bed
-- High caffeine doses (400 mg) impact sleep up to 12 hours after consumption
-
----
-
-## Study 2: REM Sleep Disruption ✅
-
-**Title:** Regular Caffeine Intake Delays REM Sleep Promotion and Attenuates Sleep Quality in Healthy Men
-
-**Authors:** Weibel J, et al.
-
-**Journal:** *Journal of Biological Rhythms* (Sage Publishing)
-
-**Published:** 2021, Volume 36, Issue 4, Pages 384-394
-
-**Link:** https://journals.sagepub.com/doi/pdf/10.1177/07487304211013995
-
-**DOI:** 10.1177/07487304211013995
-
-**Study Design:**
-- 20 healthy male caffeine consumers
-- Double-blind crossover trial
-- 10 days of regular caffeine intake (3 × 150 mg daily = 450 mg/day)
-- Sleep monitored via EEG
-- Measure: REM sleep latency, total REM time, subjective sleep quality
-
-**Key Findings:**
-- Regular caffeine delays REM sleep onset (longer latency)
-- Reduces total REM sleep accumulation
-- Increases difficulty waking and morning fatigue
-- Effect occurs even with daytime-only intake (not evening consumption)
-
-**Clinical Implication:**
-- Chronic caffeine use disrupts REM sleep architecture
-- Even if caffeine isn't taken close to bedtime, daily intake impacts sleep quality
-- Regular users report feeling more groggy despite similar total sleep time
-
----
-
-## Study 3: Concentration-Effect Relationship ✅
+### Baur et al. (2024) — concentration vs. EEG delta power
 
 **Title:** Concentration-effect relationships of plasma caffeine on EEG delta power and cardiac autonomic activity during human sleep
 
-**Authors:** Baur DM, et al.
+**Authors:** Baur DM, Dornbierer DA, Landolt HP
 
-**Journal:** *medRxiv* (Preprint - peer review in progress)
+**Journal:** *Journal of Sleep Research*
 
-**Published:** 2023, Posted October 14, 2023
+**Published:** 2024, Volume 33, Issue 5, Article e14140
 
-**Link:** https://www.medrxiv.org/content/10.1101/2023.10.14.23297036v1
+**PMID:** 38221756
 
-**Study Design:**
-- 21 healthy young men
-- Randomized double-blind crossover
-- 160 mg caffeine or placebo administered at habitual bedtime
-- Sleep measured via polysomnography with simultaneous plasma caffeine measurement
-- Measure: EEG delta power (deep sleep indicator), heart rate variability
+**Link:** https://pubmed.ncbi.nlm.nih.gov/38221756/
 
-**Key Findings:**
-- Plasma caffeine concentration range during sleep: 0.2–18.4 µmol/L
-- **Critical threshold: > 7.4 µmol/L (~1.4 µg/mL) → significant EEG delta reduction**
-- At 4.3–4.9 µmol/L (~0.8–0.9 µg/mL) → heart rate changes begin
-- Effect on deep sleep demonstrated up to 4.5+ hours after caffeine intake
+**DOI:** 10.1111/jsr.14140
 
-**Clinical Implication:**
-- Specific blood concentration threshold for sleep disruption: **1.4 µg/mL**
-- Below 0.5 µg/mL: minimal sleep impact
-- Between 0.5-1.4 µg/mL: subtle to moderate impact
-- Above 1.4 µg/mL: significant REM and deep sleep disruption
+**Study design:**
+- 21 healthy young men, randomized double-blind crossover
+- 160 mg caffeine or placebo at habitual bedtime; sleep opportunity 4.5 h later
+- Simultaneous plasma caffeine, polysomnography, EEG, and heart-rate variability
+
+**Key findings:**
+- Plasma caffeine during sleep: 0.2–18.4 µmol/L (high individual variability)
+- Non-linear models: EEG delta (0.75–2.5 Hz) reduction above ~7.4 µmol/L (~**1.4 µg/mL**)
+- Heart-rate effects above ~4.3–4.9 µmol/L (~0.8–0.9 µg/mL)
+
+**Used in this calculator:**
+- Red dashed **Baur line** at ~1.4 µg/mL on the caffeine curve (research reference, not a personal sleep cutoff)
+- Zone copy for concentration–effect relationships in controlled sleep recordings
+
+**Note:** An earlier medRxiv preprint (2023) reported similar findings; the published *J Sleep Res* paper (2024) is what the app cites.
 
 ---
 
-## Study 4: Genetic Basis of Caffeine Metabolism ✅
+### Gardiner et al. (2023) — systematic review & meta-analysis
+
+**Title:** The effect of caffeine on subsequent sleep: A systematic review and meta-analysis
+
+**Authors:** Gardiner C, Weakley J, Burke LM, Roach GD, Sargent C, Maniar N, et al.
+
+**Journal:** *Sleep Medicine Reviews*
+
+**Published:** 2023, Volume 69, Article 101764
+
+**PMID:** 36870101
+
+**Link:** https://pubmed.ncbi.nlm.nih.gov/36870101/
+
+**DOI:** 10.1016/j.smrv.2023.101764
+
+**Key findings (24 studies):**
+- Caffeine reduced total sleep time by ~45 min and sleep efficiency by ~7%
+- Sleep onset latency increased ~9 min; wake after sleep onset ~12 min
+- Light sleep (N1) increased; deep sleep (N3/N4) duration and proportion decreased
+- Guidance from pooled data: e.g. ~107 mg coffee ~8.8 h before bed; higher doses need longer gaps
+
+**Used in this calculator:**
+- Population-average effects on sleep latency, total sleep time, and efficiency
+- Planning copy and zone descriptions (dose–timing averages, not personal guarantees)
+
+**Note:** Gardiner et al. also published a 2024 crossover trial in *Sleep* (DOI 10.1093/sleep/zsae230). The calculator cites the **2023 meta-analysis**, which synthesizes dose- and timing effects across studies.
+
+---
+
+### Drake et al. (2013) — caffeine 0, 3, or 6 hours before bed
+
+**Title:** Caffeine effects on sleep taken 0, 3, or 6 hours before going to bed
+
+**Authors:** Drake C, Roehrs T, Shambroom J, Roth T
+
+**Journal:** *Journal of Clinical Sleep Medicine*
+
+**Published:** 2013, Volume 9, Issue 11, Pages 1195–120
+
+**PMID:** 24235903
+
+**Link:** https://pubmed.ncbi.nlm.nih.gov/24235903/
+
+**Used in this calculator:**
+- Measurable sleep disruption even when caffeine is taken **6 hours** before bedtime
+
+---
+
+### Clark & Landolt (2017) — mechanisms & variability
+
+**Title:** Coffee, caffeine, and sleep: A systematic review of epidemiological studies and randomized controlled trials
+
+**Authors:** Clark I, Landolt HP
+
+**Journal:** *Sleep Medicine Reviews*
+
+**Published:** 2017, Volume 31, Pages 70–78
+
+**PMID:** 26899133
+
+**Link:** https://pubmed.ncbi.nlm.nih.gov/26899133/
+
+**Used in this calculator:**
+- Adenosine receptor mechanisms (A1/A2A), dose–response patterns, and individual variability in caffeine–sleep research
+
+---
+
+### Burke et al. (2015) — circadian clock
+
+**Title:** Effects of caffeine on the human circadian clock in vivo and in vitro
+
+**Authors:** Burke TM, Markwald RR, McHill AW, Chinoy ED, Snider JA, Bessman SC, et al.
+
+**Journal:** *Science Translational Medicine*
+
+**Published:** 2015, Volume 7, Issue 305, Pages 305ra146
+
+**PMID:** 26378246
+
+**Link:** https://pubmed.ncbi.nlm.nih.gov/26378246/
+
+**Used in this calculator:**
+- Evening caffeine can delay circadian melatonin timing — separate from adenosine blockade at bedtime
+
+---
+
+## Sleep zones (summary)
+
+Zones in the app combine Baur concentration–effect data with Gardiner/Drake population averages. They are **planning guides**, not personal sleep guarantees.
+
+| Plasma caffeine | Approx. context | Sleep impact (research summary) | Primary reference |
+|-----------------|-----------------|-------------------------------|-------------------|
+| < 0.5 µg/mL | Lower bedtime residual planning target | Minimal average EEG delta change in Baur protocol | Baur et al. 2024 |
+| 0.5–1.4 µg/mL | Caution zone | Partial adenosine blockade; meta-analytic average effects on latency and total sleep | Gardiner et al. 2023 |
+| ~1.4 µg/mL | Baur line | Delta-power association in controlled protocol | Baur et al. 2024 |
+| 1.4–2.5 µg/mL | Warning zone | Stronger average disruption; reduced slow-wave sleep in studies | Baur et al. 2024; Drake et al. 2013 |
+| > 2.5 µg/mL | High zone | Greater average fragmentation and architecture disruption | Gardiner et al. 2023; Drake et al. 2013 |
+
+---
+
+## Pharmacokinetics (core)
+
+**Source:** NCBI Bookshelf — Pharmacology of caffeine
+
+**Link:** https://www.ncbi.nlm.nih.gov/books/NBK223808/
+
+**Data used in the model:**
+- Absorption: ~99% within 45 minutes (fasting)
+- Peak time (Tmax): ~30–75 minutes (food delays peak, not Cmax)
+- Half-life: ~3–7 h in adults (model uses ~5 h base)
+- Metabolism: predominantly CYP1A2
+- Volume of distribution: ~0.6 L/kg
+
+**Additional PK references in the app:** Grzegorzewski et al. (2021, PMID 35280254); Liguori et al. (1997, PMID 9329065); Arnaud (2011, PMID 20859793).
+
+---
+
+## Genetics (CYP1A2)
 
 **Title:** Genome-wide meta-analysis identifies regions on 7p21 (AHR) and 15q24 (CYP1A2) as determinants of habitual caffeine consumption
 
@@ -107,83 +166,63 @@ All sources below have been verified on peer-reviewed databases (PubMed, Oxford 
 
 **Journal:** *PLoS Genetics*
 
-**Published:** 2011 April 7, Volume 7, Issue 4, Article e1002033
+**Published:** 2011, Volume 7, Issue 4, Article e1002033
 
-**Link:** https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3072367/
+**PMID:** 21490707
+
+**Link:** https://pubmed.ncbi.nlm.nih.gov/21490707/
+
+**PMC:** https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3072367/
 
 **DOI:** 10.1371/journal.pgen.1002033
 
-**PMCID:** PMC3072367
+**Also cited:** Sachse et al. (1999, PMID 10233211) — CYP1A2 rs762551 and caffeine clearance phenotypes.
 
-**Key Findings:**
-- CYP1A2 gene variants determine fast vs. slow caffeine metabolism
-- rs762551 polymorphism (SNP):
-  - AA genotype = Fast metabolizer
-  - AC genotype = Intermediate metabolizer
-  - CC genotype = Slow metabolizer
-- 50% of European population are fast metabolizers (AA)
-- Genetic predisposition explains ~10% of habitual caffeine consumption variation
-
-**Clinical Implication:**
-- Caffeine sensitivity is partly genetic (CYP1A2)
-- Fast metabolizers (AA) can consume more caffeine without side effects
-- Slow metabolizers (CC) are much more sensitive to caffeine's effects
+**Used in this calculator:**
+- Fast / intermediate / slow metabolizer modifiers in the half-life model
 
 ---
 
-## Additional References: Core Pharmacokinetics ✅
+## Sex, hormones & pregnancy
 
-**Source:** National Center for Biotechnology Information (NCBI) Bookshelf
+### Oral contraceptives
 
-**Module:** Caffeine Pharmacology
+**Patwardhan et al. (1980)** — PMID [7359014](https://pubmed.ncbi.nlm.nih.gov/7359014/)  
+Impaired elimination of caffeine by oral contraceptive steroids.
 
-**Link:** https://www.ncbi.nlm.nih.gov/books/NBK223808/
+**Abernethy & Todd (1985)** — PMID [4029248](https://pubmed.ncbi.nlm.nih.gov/4029248/)  
+Impairment of caffeine clearance by chronic use of low-dose oestrogen-containing oral contraceptives.
 
-**Verified Data Points:**
-- Absorption: 99% within 45 minutes
-- Peak time (Tmax): 30–75 minutes (average 50 min)
-- Half-life: 3–7 hours (average 4–5 hours in adults)
-- Metabolism: 95% via CYP1A2 enzyme in liver
-- Bioavailability (oral): 0.99 (essentially 100%)
-- Volume of distribution: 0.6 L/kg
+**Used in this calculator:** OCP half-life modifier (~×1.70).
+
+### Pregnancy
+
+**Knutti et al. (1982)** — PMID [6954898](https://pubmed.ncbi.nlm.nih.gov/6954898/)  
+The effect of pregnancy on the pharmacokinetics of caffeine.
+
+**Yu et al. (2016)** — PMID [26358647](https://pubmed.ncbi.nlm.nih.gov/26358647/)  
+Pregnancy-induced changes in the pharmacokinetics of caffeine and its metabolites.  
+**PMC:** [PMC5564294](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5564294/)
+
+**Used in this calculator:** Pregnancy half-life modifier (~×2.0).
+
+### Smoking
+
+**Parsons & Neims (1978)** — PMID [657717](https://pubmed.ncbi.nlm.nih.gov/657717/)  
+Effect of smoking on caffeine clearance.
+
+**Used in this calculator:** Smoking half-life modifier (~×0.5).
 
 ---
 
-## Sleep Disruption Thresholds (Summary)
+## Food & absorption
 
-Based on Baur et al. (2023) and Gardiner et al. (2024):
-
-| Plasma Caffeine Level | Corresponding mg | Sleep Impact | Study Reference |
-|------------------------|------------------|--------------|-----------------|
-| < 0.3 µg/mL | < 21 mg | Minimal/none | Baur et al. |
-| 0.3–0.5 µg/mL | 21–35 mg | Subtle effects possible | Baur et al. |
-| 0.5–1.0 µg/mL | 35–70 mg | Light sleep delays | Gardiner et al. |
-| 1.0–1.4 µg/mL | 70–98 mg | REM latency increases | Baur et al. |
-| 1.4–2.5 µg/mL | 98–175 mg | Significant sleep disruption | Baur et al. |
-| > 2.5 µg/mL | > 175 mg | Major disruption (fragmentation) | Gardiner et al. |
+**Grimm et al. (2023)** — PMID [36839650](https://pubmed.ncbi.nlm.nih.gov/36839650/)  
+Comparing salivary caffeine kinetics for gastric emptying; supports delayed Tmax with slower gastric emptying.
 
 ---
 
-## Sex Differences in Caffeine Metabolism ✅
+## Safety guidance (not personalized medical advice)
 
-**Source:** Abernethy & Todd (1985)
-
-**Title:** Impairment of caffeine clearance by chronic use of low-dose estrogen-containing oral contraceptives
-
-**Journal:** *European Journal of Clinical Pharmacology*
-
-**Published:** 1985, Volume 28, Issue 4, Pages 425-428
-
-**PMID:** 4070084
-
-**Link:** https://pubmed.ncbi.nlm.nih.gov/4070084/
-
-**Key Finding:**
-- Estrogen inhibits CYP1A2 enzyme
-- Women on oral contraceptives: +30% longer half-life
-- Women (not on contraceptives): +12-15% longer half-life
-- Pregnant women: +50% longer half-life
-
-**Application:**
-- Females metabolize caffeine more slowly than males
-- Oral contraceptive use increases this effect further
+- **FDA:** [Spilling the Beans: How Much Caffeine is Too Much?](https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much)
+- **EFSA (2015):** [Scientific Opinion on the safety of caffeine](https://www.efsa.europa.eu/en/efsajournal/pub/4102) — ~400 mg/day habitual intake for healthy adults; lower in pregnancy

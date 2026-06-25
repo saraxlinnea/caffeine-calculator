@@ -307,7 +307,7 @@ ELSE:
   Zone = DARK_RED (danger - severe disruption)
 ```
 
-**Data source:** Baur et al. (2023)
+**Data sources:** Baur et al. (2024), *J Sleep Res* (PMID 38221756); Gardiner et al. (2023) meta-analysis, *Sleep Med Rev* (PMID 36870101); Drake et al. (2013), *J Clin Sleep Med* (PMID 24235903). See `CAFFEINE_SCIENCE.md`.
 
 ---
 

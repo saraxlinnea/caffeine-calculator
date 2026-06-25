@@ -2,7 +2,9 @@
 
 ## Research-Backed Sleep Disruption Zones
 
-All thresholds derived from Baur et al. (2023), Gardiner et al. (2024), and Weibel et al. (2021).
+Zone boundaries in the calculator align with **Baur et al. (2024)** concentration–EEG findings, **Gardiner et al. (2023)** meta-analysis averages, and **Drake et al. (2013)** dose-timing effects. Adenosine mechanism context draws on **Clark & Landolt (2017)**. These are population research references, not personal sleep guarantees.
+
+See `CAFFEINE_SCIENCE.md` for full citations (PubMed links).
 
 ---
 
@@ -240,3 +242,15 @@ Your actual threshold may vary based on:
 - **Avoid > 1.4 µg/mL (red zone) before bed**
 - **Most people should cut off caffeine 8-10 hours before bed**
 - **Individual response varies by genetics, sex, and sleep sensitivity**
+
+---
+
+## References (calculator Evidence tab)
+
+| Study | Role in zones |
+|-------|----------------|
+| [Baur et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38221756/) — *J Sleep Res* | ~1.4 µg/mL Baur line; EEG delta-power concentration–effect |
+| [Gardiner et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36870101/) — *Sleep Med Rev* | Meta-analysis: latency, total sleep time, efficiency |
+| [Drake et al. 2013](https://pubmed.ncbi.nlm.nih.gov/24235903/) — *J Clin Sleep Med* | Sleep disruption at 0, 3, and 6 h before bed |
+| [Clark & Landolt 2017](https://pubmed.ncbi.nlm.nih.gov/26899133/) — *Sleep Med Rev* | Adenosine mechanisms and dose–response variability |
+| [Burke et al. 2015](https://pubmed.ncbi.nlm.nih.gov/26378246/) — *Sci Transl Med* | Circadian melatonin delay (separate from plasma zones) |
