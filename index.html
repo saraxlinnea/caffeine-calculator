@@ -104,9 +104,9 @@
 
         .hero-strip {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
-            max-width: 900px;
+            max-width: 720px;
             margin: 0 auto;
             text-align: left;
         }
@@ -1933,6 +1933,25 @@
             order: 1;
         }
 
+        @media (max-width: 1024px) {
+            .main-content.inputs-collapsed .input-panel-wrapper {
+                order: 2;
+            }
+
+            .main-content.inputs-collapsed .results-panel {
+                order: 1;
+            }
+
+            .main-content.inputs-collapsed .input-panel-collapsed-bar {
+                position: sticky;
+                bottom: 0;
+                top: auto;
+                z-index: 20;
+                border-bottom: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+
         @media (min-width: 1025px) {
             .main-content.inputs-collapsed .input-panel-wrapper {
                 position: sticky;
@@ -2179,13 +2198,6 @@
         }
 
         /* RESPONSIVE */
-        @media (max-width: 900px) {
-            .chart-container-inner {
-                min-width: 780px;
-                height: 400px;
-            }
-        }
-
         @media (max-width: 1024px) {
             .main-content {
                 display: flex;
@@ -2194,6 +2206,15 @@
 
             .hero-strip {
                 grid-template-columns: 1fr;
+                max-width: none;
+            }
+
+            .chart-container-inner {
+                height: 320px;
+            }
+
+            .chart-container.timeline-chart {
+                overflow-x: hidden;
             }
 
             .methods-glance {
@@ -2260,13 +2281,15 @@
             }
 
             .chart-container.timeline-chart {
-                height: auto;
+                height: 300px;
                 padding: 16px 12px 12px;
+                overflow-x: hidden;
             }
 
             .chart-container-inner {
-                min-width: 760px;
-                height: 380px;
+                min-width: 0;
+                width: 100%;
+                height: 100%;
             }
 
             .chart-container.clearance-chart {
@@ -2314,17 +2337,13 @@
             </div>
             <p class="header-tagline">Know your caffeine. Protect your sleep.</p>
             <div class="hero-strip" role="group" aria-label="Quick actions">
-                <button type="button" class="hero-card hero-action" onclick="scrollToBedtimeEstimate()">
-                    <h2>Estimate at bedtime</h2>
-                    <p>See your projected blood level (µg/mL) and sleep zone before tonight.</p>
+                <button type="button" class="hero-card hero-action" onclick="scrollToLogCoffee()">
+                    <h2>Log your coffee</h2>
+                    <p>Add drinks, times, and your body details to build today's timeline.</p>
                 </button>
                 <button type="button" class="hero-card hero-action" onclick="scrollToPlanNextDrink()">
                     <h2>Plan your next drink</h2>
                     <p>Find headroom now and when a repeat dose might still fit.</p>
-                </button>
-                <button type="button" class="hero-card hero-action" onclick="scrollToMath()">
-                    <h2>Explore the science</h2>
-                    <p>Review the math and peer-reviewed sources.</p>
                 </button>
             </div>
         </div>
@@ -2333,7 +2352,7 @@
             <div class="input-panel-wrapper">
                 <div class="input-panel-collapsed-bar" id="inputCollapsedBar">
                     <span id="inputCollapsedSummary">—</span>
-                    <button type="button" class="btn-edit-inputs" onclick="expandInputPanel()">Edit inputs</button>
+                    <button type="button" class="btn-edit-inputs" onclick="scrollToLogCoffee()">Log your coffee</button>
                 </div>
 
                 <div class="input-panel input-panel-full" id="inputPanelFull">
@@ -3169,7 +3188,13 @@
             });
 
             requestAnimationFrame(() => {
-                if (tabId === 'curve') ensureCurveCharts();
+                if (tabId === 'curve') {
+                    ensureCurveCharts();
+                    requestAnimationFrame(() => {
+                        resizeCurveCharts();
+                        requestAnimationFrame(resizeCurveCharts);
+                    });
+                }
                 if (tabId === 'sleep') ensureSleepCharts();
             });
         }
@@ -3356,6 +3381,15 @@
             switchResultTab('overview');
             requestAnimationFrame(() => {
                 document.getElementById('bedtimeOutcomePanel')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+
+        function scrollToLogCoffee() {
+            document.getElementById('mainContent').classList.remove('inputs-collapsed');
+            resizeCurveCharts();
+            requestAnimationFrame(() => {
+                document.getElementById('doseListSection')
                     ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         }
