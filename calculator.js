@@ -976,6 +976,14 @@ function generateCaffeineCurve(params) {
     );
     const { curve, curveLow, curveHigh, peakConcentration } = buildConcentrationCurves(intakes, pkParams, curveStartHour);
 
+    const buildOverlay = (overrides) =>
+        buildConcentrationCurves(intakes, { ...pkParams, ...overrides }, curveStartHour).curve;
+    const curveFast = buildOverlay({ metabolizerType: 'fast' });
+    const curveIntermediate = buildOverlay({ metabolizerType: 'intermediate' });
+    const curveSlow = buildOverlay({ metabolizerType: 'slow' });
+    const curveWithOcp = buildOverlay({ onContraceptives: true });
+    const curveWithoutOcp = buildOverlay({ onContraceptives: false });
+
     const concentrationAtBedtime = totalConcentrationAt(bedtimeHour, intakes, pkParams, { useBedtimeElapsed: true });
     const concentrationNow = totalConcentrationAt(nowHour, intakes, pkParams);
     const concentrationAtBedtimeLow = totalConcentrationAt(bedtimeHour, intakes, pkParams, {
@@ -1055,6 +1063,11 @@ function generateCaffeineCurve(params) {
         curve,
         curveLow,
         curveHigh,
+        curveFast,
+        curveIntermediate,
+        curveSlow,
+        curveWithOcp,
+        curveWithoutOcp,
         curveStartHour,
         concentrationAtBedtime: Math.round(concentrationAtBedtime * 100) / 100,
         concentrationAtBedtimeLow: Math.round(concentrationAtBedtimeLow * 100) / 100,
@@ -1434,7 +1447,12 @@ function getTimelineResponsivePlugin(result) {
 
             const legendLabels = chart.options.plugins?.legend?.labels;
             if (legendLabels) {
-                legendLabels.font = { size: w < 600 ? 10 : 11 };
+                legendLabels.font = { size: w < 600 ? 9 : 11 };
+            }
+
+            const titleFont = chart.options.plugins?.title?.font;
+            if (titleFont) {
+                titleFont.size = w < 600 ? 14 : 16;
             }
 
             const hideIntakeLabels = w < 520;
@@ -1451,7 +1469,9 @@ function getTimelineResponsivePlugin(result) {
                     .reduce((max, marker) => Math.max(max, marker.level), 0);
             }
 
-            const bottomPad = hideIntakeLabels ? 44 : Math.max(56, 48 + maxLevel * 14);
+            const bottomPad = hideIntakeLabels
+                ? (w < 640 ? 32 : 40)
+                : Math.max(w < 640 ? 36 : 48, 48 + maxLevel * 14);
             const layout = chart.options.layout || (chart.options.layout = {});
             const padding = layout.padding || (layout.padding = {});
             layout.padding = {
@@ -1609,18 +1629,38 @@ function getRepeatDoseLinePlugin(result) {
  * @returns {object} Chart.js config object
  */
 function getTimelineChartConfig(result) {
-    const offsets        = Object.keys(result.curve).map(Number).sort((a, b) => a - b);
-    const toPoints       = (values) => offsets.map((offset, i) => ({ x: offset, y: values[i] }));
-    const concentrations = offsets.map(h => result.curve[h]);
-    const curveLow       = offsets.map(h => result.curveLow[h]);
-    const curveHigh      = offsets.map(h => result.curveHigh[h]);
+    const offsets = Object.keys(result.curve).map(Number).sort((a, b) => a - b);
+    const toPoints = (curveObj) => offsets.map(offset => ({ x: offset, y: curveObj[offset] }));
+    const curveLow = offsets.map(h => result.curveLow[h]);
+    const curveHigh = offsets.map(h => result.curveHigh[h]);
     const baurThreshold = typeof BAUR_DELTA_POWER_THRESHOLD !== 'undefined'
         ? BAUR_DELTA_POWER_THRESHOLD
         : WARNING_THRESHOLD;
     const greenThreshold = SAFE_THRESHOLD;
-    const yMax = Math.ceil(Math.max(...curveHigh, result.peakConcentration, baurThreshold, greenThreshold) * 1.15);
+    const overlayMax = Math.max(
+        ...Object.values(result.curveHigh),
+        ...(result.curveSlow ? Object.values(result.curveSlow) : []),
+        ...(result.curveFast ? Object.values(result.curveFast) : []),
+        ...(result.curveIntermediate ? Object.values(result.curveIntermediate) : []),
+        ...(result.curveWithOcp ? Object.values(result.curveWithOcp) : []),
+        ...(result.curveWithoutOcp ? Object.values(result.curveWithoutOcp) : [])
+    );
+    const yMax = Math.ceil(Math.max(overlayMax, result.peakConcentration, baurThreshold, greenThreshold) * 1.15);
     const baurLinePoints = [{ x: 0, y: baurThreshold }, { x: 24, y: baurThreshold }];
     const greenLinePoints = [{ x: 0, y: greenThreshold }, { x: 24, y: greenThreshold }];
+
+    const overlayDataset = (label, curveObj, color) => ({
+        label,
+        data: toPoints(curveObj),
+        borderColor: color,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        fill: false,
+        tension: 0.4,
+        pointRadius: 0,
+        hidden: true,
+        order: 2
+    });
 
     return {
         type: 'line',
@@ -1628,7 +1668,7 @@ function getTimelineChartConfig(result) {
             datasets: [
                 {
                     label: 'Uncertainty range',
-                    data: toPoints(curveHigh),
+                    data: toPoints(result.curveHigh),
                     borderColor: 'transparent',
                     backgroundColor: 'rgba(212, 165, 116, 0.22)',
                     borderWidth: 0,
@@ -1639,7 +1679,7 @@ function getTimelineChartConfig(result) {
                 },
                 {
                     label: 'Lower bound',
-                    data: toPoints(curveLow),
+                    data: toPoints(result.curveLow),
                     borderColor: 'transparent',
                     backgroundColor: 'transparent',
                     borderWidth: 0,
@@ -1650,7 +1690,7 @@ function getTimelineChartConfig(result) {
                 },
                 {
                     label: 'Estimated concentration',
-                    data: toPoints(concentrations),
+                    data: toPoints(result.curve),
                     borderColor: '#2c2c2c',
                     backgroundColor: 'rgba(44, 44, 44, 0.05)',
                     borderWidth: 2.5,
@@ -1684,53 +1724,59 @@ function getTimelineChartConfig(result) {
                     pointRadius: 0,
                     pointHoverRadius: 0,
                     order: 1
-                }
+                },
+                overlayDataset('Fast metabolizer', result.curveFast, '#7a9b8e'),
+                overlayDataset('Average metabolizer', result.curveIntermediate, '#8a8a8a'),
+                overlayDataset('Slow metabolizer', result.curveSlow, '#a87070'),
+                overlayDataset('On oral contraceptives', result.curveWithOcp, '#7a9b8e'),
+                overlayDataset('No oral contraceptives', result.curveWithoutOcp, '#a87070')
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             parsing: false,
-            layout: { padding: { bottom: 56, top: 8 } },
-            interaction: { mode: 'index', intersect: false },
+            layout: { padding: { bottom: 40, top: 8 } },
+            interaction: { mode: 'nearest', intersect: false },
             plugins: {
                 title: {
                     display: true,
                     text: '24-Hour Caffeine Timeline',
                     font: { size: 16, weight: '600' },
-                    padding: { top: 4, bottom: 16 },
+                    padding: { top: 4, bottom: 12 },
                     color: '#2c2c2c'
                 },
                 legend: {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        filter: item => !item.text.includes('Lower bound'),
+                        filter: item => {
+                            const text = item.text;
+                            return !text.includes('Lower bound')
+                                && !text.includes('metabolizer')
+                                && !text.includes('contraceptive');
+                        },
                         boxWidth: 12,
                         usePointStyle: true,
-                        padding: 16,
+                        padding: 12,
                         font: { size: 11 }
                     }
                 },
                 tooltip: {
-                    filter: item => !item.dataset.label.includes('line (~'),
+                    filter: item => item.dataset.label === 'Estimated concentration',
                     callbacks: {
                         title(items) {
                             const offset = items[0].parsed.x;
                             return formatWallClock(result.curveStartHour + offset);
                         },
                         label(item) {
-                            if (item.dataset.label.includes('line (~')) {
-                                return null;
-                            }
-                            const y = item.parsed.y;
-                            return `Estimated: ${y.toFixed(2)} µg/mL`;
+                            return `Estimated: ${item.parsed.y.toFixed(2)} µg/mL`;
                         },
                         afterBody(items) {
                             const idx = items[0].dataIndex;
                             const low = curveLow[idx].toFixed(2);
                             const high = curveHigh[idx].toFixed(2);
-                            const lines = [`Uncertainty range: ${low}–${high} µg/mL`];
+                            const lines = [`Range: ${low}–${high} µg/mL`];
                             const offset = items[0].parsed.x;
                             const nearby = getIntakesNearChartOffset(result, offset);
                             nearby.forEach(intake => {

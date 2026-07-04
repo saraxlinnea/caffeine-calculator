@@ -1482,34 +1482,121 @@
             margin-bottom: 4px;
         }
 
-        .curve-subnav {
+        .chart-corner-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 5;
-            padding-top: 4px;
+            gap: 6px;
+            justify-content: flex-end;
+            max-width: min(100%, 280px);
         }
 
-        .curve-subnav a {
-            padding: 6px 14px;
-            font-size: 0.8em;
+        .btn-chart-ctrl {
+            padding: 5px 10px;
+            font-size: 0.72em;
             font-weight: 500;
-            color: var(--secondary);
-            text-decoration: none;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--primary);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            transition: color 0.15s, border-color 0.15s;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
         }
 
-        .curve-subnav a:hover {
-            color: var(--primary);
+        .btn-chart-ctrl:hover {
             border-color: var(--accent);
+        }
+
+        .btn-chart-ctrl.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 1px 4px rgba(212, 165, 116, 0.35);
+        }
+
+        .btn-chart-ctrl.active-ocp-on {
+            background: #7a9b8e;
+            border-color: #7a9b8e;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 1px 4px rgba(122, 155, 142, 0.35);
+        }
+
+        .btn-chart-ctrl.active-ocp-off {
+            background: #a87070;
+            border-color: #a87070;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 1px 4px rgba(168, 112, 112, 0.35);
+        }
+
+        .chart-caption {
+            margin: 14px 0 0;
+            font-size: 0.88em;
+            line-height: 1.55;
+            color: var(--secondary);
+        }
+
+        .chart-caption[hidden] {
+            display: none;
+        }
+
+        .chart-legend-swatches {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chart-legend-item {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chart-swatch {
+            display: block;
+            justify-self: center;
+            width: 100%;
+        }
+
+        .chart-swatch-line {
+            height: 0;
+            border-top: 2.5px solid #2c2c2c;
+        }
+
+        .chart-swatch-band {
+            height: 16px;
+            background: rgba(212, 165, 116, 0.22);
+            border: 1px solid rgba(212, 165, 116, 0.4);
+            border-radius: 2px;
+        }
+
+        .chart-swatch-dashed {
+            height: 0;
+            border-top-width: 1.5px;
+            border-top-style: dashed;
+        }
+
+        .chart-swatch-dashed-green {
+            border-top-color: #7a9b8e;
+        }
+
+        .chart-swatch-dashed-red {
+            border-top-color: #a87070;
+        }
+
+        .chart-swatch-vertical {
+            width: 3px;
+            height: 18px;
+            background: rgba(44, 44, 44, 0.4);
+            border-radius: 1px;
+            justify-self: center;
         }
 
         .site-footer {
@@ -2210,11 +2297,16 @@
             }
 
             .chart-container-inner {
-                height: 320px;
+                height: 380px;
             }
 
             .chart-container.timeline-chart {
                 overflow-x: hidden;
+                height: 380px;
+            }
+
+            .chart-corner-controls {
+                max-width: 100%;
             }
 
             .methods-glance {
@@ -2281,7 +2373,7 @@
             }
 
             .chart-container.timeline-chart {
-                height: 300px;
+                height: 400px;
                 padding: 16px 12px 12px;
                 overflow-x: hidden;
             }
@@ -2566,29 +2658,43 @@
 
                 <!-- TAB: CAFFEINE CURVE -->
                 <div id="tab-curve" class="results-tab-panel" role="tabpanel">
-                    <nav class="curve-subnav" aria-label="Curve sections">
-                        <a href="#curveChartSection">Chart</a>
-                        <a href="#curvePlanningSection">Planning</a>
-                        <a href="#curveStackingSection">Stacking</a>
-                        <a href="#curveFactorsSection">Factors</a>
-                    </nav>
-
                     <div class="results-section overview-timeline-section" id="curveChartSection">
                         <div class="chart-container timeline-chart">
                             <div class="chart-container-inner">
+                                <div class="chart-corner-controls" id="chartCornerControls" role="group" aria-label="Chart comparison controls">
+                                    <button type="button" class="btn-chart-ctrl" id="cycleMetabolizerBtn" title="Cycle metabolizer comparison: off, fast, average, slow">Compare speed</button>
+                                    <button type="button" class="btn-chart-ctrl" id="cycleOcpBtn" title="Cycle OCP comparison: off, on OCP, off OCP">Compare OCP</button>
+                                </div>
                                 <canvas id="timelineChart"></canvas>
                             </div>
                         </div>
 
+                        <p class="chart-caption" id="chartCaption" hidden></p>
+
                         <div class="chart-reading-guide" id="chartReadingGuide">
                             <h4>How to read this chart</h4>
-                            <ul>
-                                <li><strong>Black line:</strong> estimated caffeine concentration from your logged intakes.</li>
-                                <li><strong>Shaded band:</strong> uncertainty range (dose ±20% and fast vs slow metabolizer bounds).</li>
-                                <li><strong>Green dashed line (~0.5 µg/mL):</strong> lower bedtime residual planning target.</li>
-                                <li><strong>Vertical markers:</strong> Now, bedtime, logged doses, and (when shown) latest time for a repeat drink.</li>
-                                <li><strong>Red dashed Baur line (~1.4 µg/mL):</strong> research reference<span data-cite="baur2024"></span>, not a personal sleep cutoff.</li>
-                            </ul>
+                            <div class="chart-legend-swatches">
+                                <div class="chart-legend-item">
+                                    <span class="chart-swatch chart-swatch-line" aria-hidden="true"></span>
+                                    <span><strong>Black line:</strong> estimated caffeine concentration from your logged intakes and profile settings.</span>
+                                </div>
+                                <div class="chart-legend-item">
+                                    <span class="chart-swatch chart-swatch-band" aria-hidden="true"></span>
+                                    <span><strong>Shaded band:</strong> dose uncertainty (±20%). Use <em>Compare speed</em> or <em>Compare OCP</em> (top-right) to overlay alternate scenarios.</span>
+                                </div>
+                                <div class="chart-legend-item">
+                                    <span class="chart-swatch chart-swatch-dashed chart-swatch-dashed-green" aria-hidden="true"></span>
+                                    <span><strong>Green dashed line (~0.5 µg/mL):</strong> lower bedtime residual planning target.</span>
+                                </div>
+                                <div class="chart-legend-item">
+                                    <span class="chart-swatch chart-swatch-dashed chart-swatch-dashed-red" aria-hidden="true"></span>
+                                    <span><strong>Red dashed Baur line (~1.4 µg/mL):</strong> research reference<span data-cite="baur2024"></span>, not a personal sleep cutoff.</span>
+                                </div>
+                                <div class="chart-legend-item">
+                                    <span class="chart-swatch chart-swatch-vertical" aria-hidden="true"></span>
+                                    <span><strong>Vertical markers:</strong> Now, bedtime, logged doses, and (when shown) latest time for a repeat drink.</span>
+                                </div>
+                            </div>
                             <p style="margin:12px 0 0;font-size:0.88em;line-height:1.55;color:var(--secondary);">
                                 Colored background bands tie to average sleep effects in research.
                                 <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#zoneReferenceSection">What do these zones mean? →</a>
@@ -3109,8 +3215,8 @@
     </div>
 
     <!-- SCRIPTS -->
-    <script src="constants.js?v=20250622"></script>
-    <script src="calculator.js?v=20250622"></script>
+    <script src="constants.js?v=20250703b"></script>
+    <script src="calculator.js?v=20250704a"></script>
     <script>
         let currentResult = null;
         let timelineChart = null;
@@ -3121,6 +3227,135 @@
         let caffeineMaskingChart = null;
         let melatoninChart = null;
         let doseRowCounter = 0;
+
+        const METABOLIZER_OVERLAY_INDEX = { fast: 5, intermediate: 6, slow: 7 };
+        const OCP_OVERLAY_INDEX = { on: 8, off: 9 };
+        const METABOLIZER_CYCLE = ['none', 'fast', 'intermediate', 'slow'];
+        const OCP_CYCLE = ['none', 'on', 'off'];
+        const METABOLIZER_LABELS = {
+            none: 'Compare speed',
+            fast: 'Fast',
+            intermediate: 'Average',
+            slow: 'Slow'
+        };
+        const OCP_LABELS = {
+            none: 'Compare OCP',
+            on: 'On OCP',
+            off: 'Off OCP'
+        };
+        const METABOLIZER_OVERLAY_COLORS = {
+            fast: '#7a9b8e',
+            intermediate: '#8a8a8a',
+            slow: '#a87070'
+        };
+        const OCP_OVERLAY_COLORS = {
+            on: '#7a9b8e',
+            off: '#a87070'
+        };
+
+        let metabolizerCycleIndex = 0;
+        let ocpCycleIndex = 0;
+
+        function updateChartCaption() {
+            const el = document.getElementById('chartCaption');
+            if (!el) return;
+            if (!currentResult) {
+                el.textContent = '';
+                el.hidden = true;
+                return;
+            }
+            el.hidden = false;
+            const metabMode = METABOLIZER_CYCLE[metabolizerCycleIndex];
+            const ocpMode = OCP_CYCLE[ocpCycleIndex];
+            const profileNote = currentResult.onContraceptives
+                ? ' Your profile has oral contraceptives on.'
+                : '';
+
+            if (metabMode === 'none' && ocpMode === 'none') {
+                el.textContent =
+                    `Estimated caffeine concentration over 24 hours from your logged intakes and profile settings.${profileNote}`;
+                return;
+            }
+
+            const overlayParts = [];
+            if (metabMode !== 'none') {
+                const label = METABOLIZER_LABELS[metabMode].toLowerCase();
+                const color = METABOLIZER_OVERLAY_COLORS[metabMode];
+                overlayParts.push(
+                    `<span style="color:${color};font-weight:600">${label}</span> metabolizer`
+                );
+            }
+            if (ocpMode === 'on') {
+                overlayParts.push(
+                    `<span style="color:${OCP_OVERLAY_COLORS.on};font-weight:600">on oral contraceptives</span>`
+                );
+            } else if (ocpMode === 'off') {
+                overlayParts.push(
+                    `<span style="color:${OCP_OVERLAY_COLORS.off};font-weight:600">no oral contraceptives</span>`
+                );
+            }
+
+            el.innerHTML =
+                `Your curve (black) compared with ${overlayParts.join(' and ')} (colored lines). Profile settings unchanged.${profileNote}`;
+        }
+
+        function applyChartOverlays() {
+            if (!timelineChart) return;
+
+            const metabMode = METABOLIZER_CYCLE[metabolizerCycleIndex];
+            const ocpMode = OCP_CYCLE[ocpCycleIndex];
+
+            Object.values(METABOLIZER_OVERLAY_INDEX).forEach(idx => {
+                timelineChart.setDatasetVisibility(idx, false);
+            });
+            if (metabMode !== 'none') {
+                timelineChart.setDatasetVisibility(METABOLIZER_OVERLAY_INDEX[metabMode], true);
+            }
+
+            timelineChart.setDatasetVisibility(OCP_OVERLAY_INDEX.on, ocpMode === 'on');
+            timelineChart.setDatasetVisibility(OCP_OVERLAY_INDEX.off, ocpMode === 'off');
+
+            const cycleBtn = document.getElementById('cycleMetabolizerBtn');
+            if (cycleBtn) {
+                cycleBtn.textContent = METABOLIZER_LABELS[metabMode];
+                cycleBtn.classList.toggle('active', metabMode !== 'none');
+                cycleBtn.setAttribute('aria-pressed', metabMode !== 'none' ? 'true' : 'false');
+            }
+
+            const ocpBtn = document.getElementById('cycleOcpBtn');
+            if (ocpBtn) {
+                ocpBtn.textContent = OCP_LABELS[ocpMode];
+                ocpBtn.classList.remove('active-ocp-on', 'active-ocp-off');
+                if (ocpMode === 'on') ocpBtn.classList.add('active-ocp-on');
+                else if (ocpMode === 'off') ocpBtn.classList.add('active-ocp-off');
+                ocpBtn.setAttribute('aria-pressed', ocpMode !== 'none' ? 'true' : 'false');
+            }
+
+            timelineChart.update('none');
+            updateChartCaption();
+        }
+
+        function resetChartOverlays() {
+            metabolizerCycleIndex = 0;
+            ocpCycleIndex = 0;
+            applyChartOverlays();
+        }
+
+        function setupChartCornerControls() {
+            const host = document.getElementById('chartCornerControls');
+            if (!host || host.dataset.bound) return;
+            host.dataset.bound = '1';
+
+            document.getElementById('cycleMetabolizerBtn')?.addEventListener('click', () => {
+                metabolizerCycleIndex = (metabolizerCycleIndex + 1) % METABOLIZER_CYCLE.length;
+                applyChartOverlays();
+            });
+
+            document.getElementById('cycleOcpBtn')?.addEventListener('click', () => {
+                ocpCycleIndex = (ocpCycleIndex + 1) % OCP_CYCLE.length;
+                applyChartOverlays();
+            });
+        }
 
         const DOSE_SOURCE_OPTIONS = [
             { value: '', label: 'Custom' },
@@ -3731,6 +3966,8 @@
             if (timelineChart) timelineChart.destroy();
             const config = getTimelineChartConfig(result);
             timelineChart = new Chart(ctx, config);
+            setupChartCornerControls();
+            resetChartOverlays();
             resizeCurveCharts();
         }
 
@@ -4178,16 +4415,6 @@
             applyInlineCitations(document.getElementById('tab-sleep'));
             ensureSleepCharts();
             setupTabJumpLinks();
-            document.querySelectorAll('.curve-subnav a').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    if (!document.getElementById('tab-curve').classList.contains('active')) {
-                        e.preventDefault();
-                        switchResultTab('curve');
-                        const target = document.querySelector(link.getAttribute('href'));
-                        requestAnimationFrame(() => target?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-                    }
-                });
-            });
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 document.querySelectorAll('animateMotion').forEach(el => el.remove());
             }
