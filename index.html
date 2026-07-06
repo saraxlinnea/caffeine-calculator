@@ -1314,8 +1314,8 @@
             border: 1px solid var(--border);
             border-left: 4px solid var(--accent);
             border-radius: 8px;
-            padding: 22px 24px;
-            margin-top: 16px;
+            padding: 16px 18px;
+            margin-top: 12px;
             transition: background 0.25s ease, border-color 0.25s ease;
         }
 
@@ -1344,7 +1344,7 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .bedtime-outcome-panel h3 {
@@ -1379,6 +1379,201 @@
             color: var(--secondary);
             margin-top: 6px;
             letter-spacing: 0;
+        }
+
+        .outcome-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .outcome-stat-card {
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .outcome-stat-card.zone-safe { border-left-color: var(--success); }
+        .outcome-stat-card.zone-caution { border-left-color: var(--warning); }
+        .outcome-stat-card.zone-warning { border-left-color: #c4924a; }
+        .outcome-stat-card.zone-danger { border-left-color: var(--danger); }
+
+        .outcome-stat-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .outcome-stat-label {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            line-height: 1.3;
+        }
+
+        .outcome-stat-card .zone-badge {
+            font-size: 0.68em;
+            padding: 4px 8px;
+        }
+
+        .outcome-stat-conc {
+            font-size: 1.65em;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .outcome-stat-conc .conc-unit {
+            font-size: 0.45em;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-left: 3px;
+        }
+
+        .outcome-stat-range {
+            display: block;
+            font-size: 0.72em;
+            color: var(--secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .outcome-stat-subtitle {
+            display: block;
+            font-size: 0.72em;
+            color: var(--secondary);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .overview-glance-strip {
+            font-size: 0.84em;
+            line-height: 1.5;
+            color: var(--primary);
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 0 0 12px;
+        }
+
+        .overview-glance-strip.is-placeholder {
+            color: var(--secondary);
+        }
+
+        .overview-glance-label {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .units-primer-inline {
+            margin: 10px 0;
+            padding: 8px 12px;
+            font-size: 0.76em;
+        }
+
+        .overview-level-details {
+            margin: 0;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        .overview-level-details summary {
+            padding: 10px 14px;
+            font-size: 0.84em;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .overview-level-details-body {
+            padding: 0 14px 12px;
+        }
+
+        .overview-level-details-body p {
+            font-size: 0.84em;
+            line-height: 1.55;
+            color: var(--primary);
+            margin: 0 0 8px;
+        }
+
+        .overview-level-details-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .overview-level-details-body .how-much-now-disclaimer {
+            margin-top: 10px;
+        }
+
+        #tab-overview .recommendation {
+            margin-top: 12px;
+            padding: 14px 16px;
+            line-height: 1.55;
+        }
+
+        #tab-overview .how-much-now-panel {
+            padding: 16px 18px;
+            margin: 12px 0 20px;
+        }
+
+        .overview-level-explainer {
+            margin-top: 4px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .overview-level-explainer > h4 {
+            font-size: 0.82em;
+            font-weight: 600;
+            margin: 0 0 14px;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .overview-level-explainer-block {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .overview-level-explainer-block:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .overview-level-explainer-block h5 {
+            font-size: 0.88em;
+            font-weight: 600;
+            margin: 0 0 8px;
+            color: var(--primary);
+        }
+
+        .overview-level-explainer-block p {
+            font-size: 0.84em;
+            line-height: 1.55;
+            color: var(--primary);
+            margin: 0 0 8px;
+        }
+
+        .overview-level-explainer-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .overview-level-explainer-block .explainer-research {
+            color: var(--secondary);
+            font-size: 0.82em;
         }
 
         .zone-badge {
@@ -2351,6 +2546,14 @@
                 font-size: 2em;
             }
 
+            .outcome-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .outcome-stat-conc {
+                font-size: 1.85em;
+            }
+
             .site-footer {
                 padding: 28px 20px 32px;
             }
@@ -2596,26 +2799,16 @@
 
                 <!-- TAB: OVERVIEW -->
                 <div id="tab-overview" class="results-tab-panel active" role="tabpanel">
-                    <p class="units-primer">
-                        <strong>µg/mL</strong> = micrograms of caffeine per milliliter of blood. This calculator estimates that from your dose, weight, and clearance. It is not a lab test.
-                    </p>
+                    <div class="overview-glance-strip is-placeholder" id="overviewGlanceStrip">
+                        <span class="overview-glance-label">Inputs:</span> Press Calculate to see today's totals.
+                    </div>
 
                     <div class="bedtime-outcome-panel" id="bedtimeOutcomePanel">
                         <div class="bedtime-outcome-header">
-                            <h3>Bedtime outcome (estimated)</h3>
-                            <span id="bedtimeZoneBadge" class="zone-badge zone-badge-safe" hidden></span>
+                            <h3>Your levels (estimated)</h3>
                         </div>
                         <div id="bedtimeOutcomeContent">
-                            <p class="bedtime-outcome-text">Press Calculate to see your estimated level at bedtime.</p>
-                        </div>
-                    </div>
-
-                    <div class="how-much-now-panel" id="howMuchNowSection">
-                        <h3>Plan your next drink</h3>
-                        <div id="howMuchNowContent">
-                            <p class="how-much-now-disclaimer" style="margin-top:0;">
-                                Press Calculate to see how much caffeine you could have right now and still stay below the lower bedtime residual target (~0.5 µg/mL).
-                            </p>
+                            <p class="bedtime-outcome-text">Press Calculate to see your estimated caffeine levels right now, at today's peak, and at bedtime.</p>
                         </div>
                     </div>
 
@@ -2627,25 +2820,16 @@
                         <button type="button" class="btn-copy-results" id="copyResultsBtn" onclick="copyResultsSummary()" hidden>Copy summary</button>
                     </div>
 
-                    <p class="overview-planning-teaser" id="overviewPlanningTeaser" hidden></p>
-
-                    <div class="results-section">
-                        <div class="result-summary">
-                            <h3>At a glance</h3>
-                            <div class="result-row">
-                                <span class="result-label">Total Today</span>
-                                <span class="result-value" id="totalTodayValue">—</span>
-                            </div>
-                            <div class="result-row">
-                                <span class="result-label">Concentration Now</span>
-                                <span class="result-value" id="nowValue">—</span>
-                            </div>
-                            <div class="result-row">
-                                <span class="result-label">Half-life (your inputs)</span>
-                                <span class="result-value" id="halflifeValue">—</span>
-                            </div>
+                    <div class="how-much-now-panel" id="howMuchNowSection">
+                        <h3>Plan your next drink</h3>
+                        <div id="howMuchNowContent">
+                            <p class="how-much-now-disclaimer" style="margin-top:0;">
+                                Press Calculate to see how much caffeine you could have right now and still stay below the lower bedtime residual target (~0.5 µg/mL).
+                            </p>
                         </div>
                     </div>
+
+                    <p class="overview-planning-teaser" id="overviewPlanningTeaser" hidden></p>
 
                     <p class="overview-cross-links">
                         <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#howMuchNowSection">Plan your next drink →</a>
@@ -3216,7 +3400,7 @@
 
     <!-- SCRIPTS -->
     <script src="constants.js?v=20250703b"></script>
-    <script src="calculator.js?v=20250704a"></script>
+    <script src="calculator.js?v=20250706c"></script>
     <script>
         let currentResult = null;
         let timelineChart = null;
@@ -3400,6 +3584,21 @@
             return parts[0] + parts[1] / 60;
         }
 
+        function getDefaultNowTime() {
+            try {
+                const now = new Date();
+                if (Number.isNaN(now.getTime())) return '14:00';
+                return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            } catch {
+                return '14:00';
+            }
+        }
+
+        function setNowTimeInput(value) {
+            const input = document.getElementById('nowTime');
+            if (input) input.value = value;
+        }
+
         function formatTimeInputValue(decimalHour) {
             const h = Math.floor(decimalHour % 24);
             const m = Math.round((decimalHour % 1) * 60);
@@ -3430,7 +3629,14 @@
                         requestAnimationFrame(resizeCurveCharts);
                     });
                 }
-                if (tabId === 'sleep') ensureSleepCharts();
+                if (tabId === 'sleep') {
+                    ensureSleepCharts();
+                    requestAnimationFrame(() => {
+                        if (sleepPressureChart) sleepPressureChart.resize();
+                        if (caffeineMaskingChart) caffeineMaskingChart.resize();
+                        if (melatoninChart) melatoninChart.resize();
+                    });
+                }
             });
         }
 
@@ -3473,7 +3679,7 @@
 
         function ensureCurveCharts() {
             if (!currentResult) return;
-            if (!timelineChart) drawTimelineChart(currentResult);
+            drawTimelineChart(currentResult);
             drawWeightChart(currentResult);
             drawMetabolizerClearanceChart(currentResult);
             drawOcpClearanceChart(currentResult);
@@ -3484,6 +3690,13 @@
                 resizeCurveCharts();
                 requestAnimationFrame(resizeCurveCharts);
             });
+        }
+
+        function destroyCurveCharts() {
+            if (timelineChart) { timelineChart.destroy(); timelineChart = null; }
+            if (weightChart) { weightChart.destroy(); weightChart = null; }
+            if (metabolizerClearanceChart) { metabolizerClearanceChart.destroy(); metabolizerClearanceChart = null; }
+            if (ocpClearanceChart) { ocpClearanceChart.destroy(); ocpClearanceChart = null; }
         }
 
         function collapseInputPanel() {
@@ -3784,30 +3997,75 @@
             }
         }
 
+        const OVERVIEW_UNITS_PRIMER_HTML =
+            '<p class="units-primer units-primer-inline"><strong>µg/mL</strong> = micrograms of caffeine per milliliter of blood. This calculator estimates that from your dose, weight, and clearance. It is not a lab test.</p>';
+
+        function updateOverviewGlanceStrip(result) {
+            const el = document.getElementById('overviewGlanceStrip');
+            if (!el || !result) return;
+
+            const intakePart = result.hasNoLoggedCaffeine
+                ? '0 mg logged'
+                : `${result.totalMg} mg · ${result.intakes.length} intake${result.intakes.length === 1 ? '' : 's'}`;
+            const halfLifePart = `half-life ${result.halfLife.toFixed(1)} h`;
+            const nowStr = typeof formatWallClock === 'function'
+                ? formatWallClock(result.nowHour)
+                : '';
+            const bedStr = typeof formatWallClock === 'function'
+                ? formatWallClock(result.bedtimeHour)
+                : '';
+            const timingPart = nowStr && bedStr ? ` · As of ${nowStr} · Bed ${bedStr}` : '';
+
+            el.innerHTML = `<span class="overview-glance-label">Inputs:</span> ${intakePart} · ${halfLifePart}${timingPart}`;
+            el.classList.remove('is-placeholder');
+        }
+
+        function renderOutcomeStatCard(card) {
+            const meta = getZoneBadgeMeta(card.zone);
+            const zoneClass = getZoneClass(card.zone);
+            return `
+                <div class="outcome-stat-card zone-${zoneClass}">
+                    <div class="outcome-stat-card-header">
+                        <span class="outcome-stat-label">${card.label}</span>
+                        <span class="${meta.badgeClass}">${meta.shortLabel}</span>
+                    </div>
+                    <div class="outcome-stat-conc">
+                        ${card.concentration.toFixed(2)}<span class="conc-unit">µg/mL</span>
+                    </div>
+                    <span class="outcome-stat-range">Uncertainty ${card.rangeLow.toFixed(2)}–${card.rangeHigh.toFixed(2)} µg/mL</span>
+                    ${card.subtitle ? `<span class="outcome-stat-subtitle">${card.subtitle}</span>` : ''}
+                </div>
+            `;
+        }
+
         function updateBedtimeOutcomePanel(result) {
             const container = document.getElementById('bedtimeOutcomeContent');
             const panel = document.getElementById('bedtimeOutcomePanel');
-            const badge = document.getElementById('bedtimeZoneBadge');
-            if (!container || !panel || typeof getBedtimeOutcome !== 'function') return;
+            if (!container || !panel || typeof buildOverviewLevelContent !== 'function') return;
 
-            const outcome = getBedtimeOutcome(result);
-            const meta = getZoneBadgeMeta(result.zoneAtBedtime);
+            const { cards, summaryParagraphs, disclaimer } = buildOverviewLevelContent(result);
+            const bedtimeMeta = getZoneBadgeMeta(result.zoneAtBedtime);
 
-            panel.className = `bedtime-outcome-panel ${meta.panelClass}`;
-            if (badge) {
-                badge.textContent = meta.shortLabel;
-                badge.className = meta.badgeClass;
-                badge.hidden = false;
-            }
+            panel.className = `bedtime-outcome-panel ${bedtimeMeta.panelClass}`;
+
+            const cardsHtml = cards.map(renderOutcomeStatCard).join('');
+            const summaryHtml = summaryParagraphs.map(text => `<p>${text}</p>`).join('');
 
             container.innerHTML = `
-                <div class="bedtime-outcome-conc">
-                    ${outcome.concentration.toFixed(2)}<span class="conc-unit">µg/mL</span>
-                    <span class="conc-range">Uncertainty range ${outcome.rangeLow.toFixed(2)}–${outcome.rangeHigh.toFixed(2)} µg/mL</span>
+                <div class="outcome-stats-grid">
+                    ${cardsHtml}
                 </div>
-                <p class="bedtime-outcome-text" style="margin-top:10px;">
-                    <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#zoneReferenceSection">What does this zone mean? →</a>
-                </p>
+                ${OVERVIEW_UNITS_PRIMER_HTML}
+                <details class="overview-level-details">
+                    <summary>What these levels mean</summary>
+                    <div class="overview-level-details-body">
+                        ${summaryHtml}
+                        <p class="how-much-now-disclaimer">${disclaimer}</p>
+                        <p class="bedtime-outcome-text" style="margin-top:10px;margin-bottom:0;">
+                            <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#zoneReferenceSection">Full zone reference and citations →</a>
+                        </p>
+                    </div>
+                </details>
             `;
         }
 
@@ -3893,35 +4151,17 @@
             };
         }
 
-        function formatConcentrationWithRange(nominal, low, high, zoneLabel) {
-            return `${nominal.toFixed(2)} µg/mL (${low.toFixed(2)}–${high.toFixed(2)}): ${zoneLabel}`;
-        }
-
         function calculateCaffeine() {
             try {
                 const data = getFormData();
                 currentResult = generateCaffeineCurve(data);
 
-                if (currentResult.hasNoLoggedCaffeine) {
-                    document.getElementById('totalTodayValue').textContent = '0 mg (none logged)';
-                } else {
-                    document.getElementById('totalTodayValue').textContent =
-                        currentResult.totalMg + ' mg (' + currentResult.intakes.length + ' intake' +
-                        (currentResult.intakes.length === 1 ? '' : 's') + ')';
-                }
+                updateOverviewGlanceStrip(currentResult);
+
                 document.getElementById('yourPeakValue').textContent =
                     currentResult.peakConcentration.toFixed(2) + ' µg/mL';
                 document.getElementById('tmaxValue').textContent =
                     currentResult.tmax_minutes + ' min';
-                document.getElementById('halflifeValue').textContent =
-                    currentResult.halfLife.toFixed(1) + ' hrs';
-                document.getElementById('nowValue').textContent =
-                    formatConcentrationWithRange(
-                        currentResult.concentrationNow,
-                        currentResult.concentrationNowLow,
-                        currentResult.concentrationNowHigh,
-                        currentResult.zoneNow.label
-                    );
 
                 const recBox = document.getElementById('mainRecommendation');
                 recBox.textContent = currentResult.recommendation;
@@ -3937,11 +4177,7 @@
                 updatePkWarnings(currentResult);
                 updateInputCollapsedSummary();
 
-                if (weightChart) { weightChart.destroy(); weightChart = null; }
-                if (metabolizerClearanceChart) { metabolizerClearanceChart.destroy(); metabolizerClearanceChart = null; }
-                if (ocpClearanceChart) { ocpClearanceChart.destroy(); ocpClearanceChart = null; }
-
-                drawTimelineChart(currentResult);
+                destroyCurveCharts();
                 updateWeightPanel(currentResult);
                 updateClearancePanel(currentResult);
                 if (document.getElementById('tab-curve').classList.contains('active')) {
@@ -4267,7 +4503,9 @@
             document.getElementById('food').value = 'fasting';
             document.getElementById('weight').value = '154';
             document.getElementById('weightUnit').value = 'lbs';
-            document.getElementById('nowTime').value = scenario.nowTime;
+            if (options.useScenarioTime !== false) {
+                setNowTimeInput(scenario.nowTime);
+            }
             document.getElementById('bedtime').value = scenario.bedtime;
 
             scenario.doses.forEach(dose => addDoseRow(dose));
@@ -4413,19 +4651,20 @@
             renderCitations();
             applyInlineCitations(document.getElementById('tab-curve'));
             applyInlineCitations(document.getElementById('tab-sleep'));
-            ensureSleepCharts();
             setupTabJumpLinks();
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 document.querySelectorAll('animateMotion').forEach(el => el.remove());
             }
 
+            setNowTimeInput(getDefaultNowTime());
+
             const scenarioId = parseScenarioFromUrl();
             if (scenarioId) {
-                loadScenario(scenarioId, { skipUrl: true });
+                loadScenario(scenarioId, { skipUrl: true, useScenarioTime: true });
                 return;
             }
 
-            loadScenario('morning', { skipUrl: true });
+            loadScenario('morning', { skipUrl: true, useScenarioTime: false });
         });
     </script>
 </body>

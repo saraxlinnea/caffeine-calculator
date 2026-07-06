@@ -278,6 +278,39 @@ function buildConcentrationCurves(intakes, params, curveStartHour) {
 }
 
 /**
+ * Find stacked daily peak concentration and wall-clock time from curve samples.
+ *
+ * @param {object} curve - Nominal concentration by hour offset from curveStartHour
+ * @param {object} curveLow
+ * @param {object} curveHigh
+ * @param {number} curveStartHour
+ * @returns {{ peakConcentration: number, peakHour: number, peakConcentrationLow: number, peakConcentrationHigh: number, zoneAtPeak: object }}
+ */
+function findDailyPeak(curve, curveLow, curveHigh, curveStartHour) {
+    let peakConcentration = 0;
+    let peakOffset = 0;
+
+    for (const [offsetStr, conc] of Object.entries(curve)) {
+        const offset = parseFloat(offsetStr);
+        if (conc > peakConcentration) {
+            peakConcentration = conc;
+            peakOffset = offset;
+        }
+    }
+
+    const key = String(Math.round(peakOffset * 10) / 10);
+    const peakHour = curveStartHour + peakOffset;
+
+    return {
+        peakConcentration,
+        peakHour,
+        peakConcentrationLow: curveLow[key] ?? peakConcentration,
+        peakConcentrationHigh: curveHigh[key] ?? peakConcentration,
+        zoneAtPeak: classifyZone(peakConcentration)
+    };
+}
+
+/**
  * Max additional mg safe to take now given stacked intakes already logged.
  *
  * @param {Array} intakes
@@ -974,7 +1007,15 @@ function generateCaffeineCurve(params) {
     const curveStartHour = Math.floor(
         intakeHours.length ? Math.min(...intakeHours, nowHour, bedtimeHour) : Math.min(nowHour, bedtimeHour)
     );
-    const { curve, curveLow, curveHigh, peakConcentration } = buildConcentrationCurves(intakes, pkParams, curveStartHour);
+    const { curve, curveLow, curveHigh } =
+        buildConcentrationCurves(intakes, pkParams, curveStartHour);
+    const {
+        peakConcentration,
+        peakHour,
+        peakConcentrationLow,
+        peakConcentrationHigh,
+        zoneAtPeak
+    } = findDailyPeak(curve, curveLow, curveHigh, curveStartHour);
 
     const buildOverlay = (overrides) =>
         buildConcentrationCurves(intakes, { ...pkParams, ...overrides }, curveStartHour).curve;
@@ -1057,7 +1098,11 @@ function generateCaffeineCurve(params) {
         pkUncertainty,
         k,
         c_max,
-        peakConcentration,
+        peakConcentration: Math.round(peakConcentration * 100) / 100,
+        peakHour,
+        peakConcentrationLow: Math.round(peakConcentrationLow * 100) / 100,
+        peakConcentrationHigh: Math.round(peakConcentrationHigh * 100) / 100,
+        zoneAtPeak,
         tmax_minutes,
         tmax_hours,
         curve,
@@ -1189,6 +1234,192 @@ function getZoneMechanismSummary(concentration) {
 }
 
 /**
+ * Short zone label without emoji or suffix.
+ *
+ * @param {object} zone - SLEEP_ZONES entry
+ * @returns {string}
+ */
+function getZoneLabelShort(zone) {
+    return (zone.label || '')
+        .replace(/[🟢🟡🟠🔴⛔]\s*/g, '')
+        .replace(' estimated level', '')
+        .trim();
+}
+
+/**
+ * Population-average sleep research context for a concentration at bedtime.
+ *
+ * @param {number} concentration - µg/mL
+ * @returns {string}
+ */
+function getBedtimeResearchSummary(concentration) {
+    if (concentration < SAFE_THRESHOLD) {
+        return 'Baur et al. reported minimal EEG delta-power changes at lower plasma levels. Sleep onset and architecture are unlikely to be meaningfully affected for most people.';
+    }
+    if (concentration < CAUTION_THRESHOLD) {
+        return 'Population studies report average dose-dependent effects on sleep latency and total sleep time; sensitive individuals may notice milder sleep onset.';
+    }
+    if (concentration < WARNING_THRESHOLD) {
+        return 'Research suggests measurable average effects on sleep onset and quality at this level, approaching the Baur delta-power reference.';
+    }
+    if (concentration < DANGER_THRESHOLD) {
+        return 'Baur et al. associated concentrations around and above ~1.4 µg/mL with reduced EEG delta power in their controlled protocol. Group averages also suggest delayed sleep onset.';
+    }
+    return 'Research consistently shows stronger average effects on sleep architecture, onset, and total sleep time across this concentration range.';
+}
+
+/**
+ * Plain-language subjective effects by zone and time-of-day context.
+ *
+ * @param {number} concentration - µg/mL
+ * @param {'daytime'|'bedtime'} context
+ * @returns {string}
+ */
+function getSubjectiveFeelSummary(concentration, context) {
+    if (context === 'bedtime') {
+        if (concentration < SAFE_THRESHOLD) {
+            return 'Sleep is unlikely to be affected much at this residual level.';
+        }
+        if (concentration < CAUTION_THRESHOLD) {
+            return 'You might take a bit longer to fall asleep or sleep a little lighter. Some people notice little change.';
+        }
+        if (concentration < WARNING_THRESHOLD) {
+            return 'Sleep onset may take longer and mornings may feel less refreshing for some people.';
+        }
+        if (concentration < DANGER_THRESHOLD) {
+            return 'Tossing, night waking, or morning grogginess are common at similar levels. The link to caffeine is easy to miss.';
+        }
+        return 'Research at this level often shows delayed sleep onset and fragmented sleep on average.';
+    }
+
+    if (concentration < SAFE_THRESHOLD) {
+        return 'Likely little active effect. Typical between doses or hours after coffee.';
+    }
+    if (concentration < CAUTION_THRESHOLD) {
+        return 'A common alertness range. You may feel more awake; sleepiness can feel weaker than it is.';
+    }
+    if (concentration < WARNING_THRESHOLD) {
+        return 'Stronger alertness is likely. You may feel less tired than your actual sleep drive.';
+    }
+    if (concentration < DANGER_THRESHOLD) {
+        return 'Jitters, restlessness, or trouble winding down are possible. Habitual users may feel only alert.';
+    }
+    return 'Often very stimulating. Jitteriness or anxiety are possible; tolerance varies.';
+}
+
+/**
+ * Short merged copy for the Overview "What these levels mean" dropdown.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {string[]}
+ */
+function buildOverviewLevelSummary(result) {
+    const nowLabel = getZoneLabelShort(result.zoneNow);
+    const peakLabel = getZoneLabelShort(result.zoneAtPeak);
+    const bedLabel = getZoneLabelShort(result.zoneAtBedtime);
+    const allSame = nowLabel === peakLabel && peakLabel === bedLabel;
+
+    const hasPeakTime = !result.hasNoLoggedCaffeine && result.peakConcentration > 0;
+    const peakTimeStr = hasPeakTime && typeof formatWallClock === 'function'
+        ? formatWallClock(result.peakHour)
+        : null;
+
+    if (allSame) {
+        if (result.concentrationAtBedtime < SAFE_THRESHOLD) {
+            return [
+                `All three snapshots are in the ${nowLabel} range. Likely little active effect now; sleep at bedtime is unlikely to be affected much.`
+            ];
+        }
+        if (result.concentrationAtBedtime < CAUTION_THRESHOLD) {
+            return [
+                `All three snapshots are in the ${nowLabel} range. You may feel more awake now; sleep onset may take a bit longer tonight for some people.`
+            ];
+        }
+        if (result.concentrationAtBedtime < WARNING_THRESHOLD) {
+            return [
+                `All three snapshots are in the ${nowLabel} range. Stronger alertness now; sleep onset and morning rest may be affected for some people.`
+            ];
+        }
+        return [
+            `All three snapshots are in the ${nowLabel} range. ${getSubjectiveFeelSummary(result.concentrationAtBedtime, 'bedtime')}`
+        ];
+    }
+
+    const paragraphs = [
+        `Right now (${nowLabel}): ${getSubjectiveFeelSummary(result.concentrationNow, 'daytime')}`
+    ];
+
+    let peakLead = `Today's peak (${peakLabel}`;
+    if (peakTimeStr) peakLead += ` at ${peakTimeStr}`;
+    peakLead += `): ${getSubjectiveFeelSummary(result.peakConcentration, 'daytime')}`;
+    paragraphs.push(peakLead);
+
+    paragraphs.push(
+        `At bedtime (${bedLabel}): ${getSubjectiveFeelSummary(result.concentrationAtBedtime, 'bedtime')}`
+    );
+
+    return paragraphs;
+}
+
+/**
+ * Overview panel: three level snapshots and personalized explainer blocks.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {{ cards: Array, summaryParagraphs: string[], disclaimer: string }}
+ */
+function buildOverviewLevelContent(result) {
+    const hasPeakTime = !result.hasNoLoggedCaffeine && result.peakConcentration > 0;
+    const peakTimeLabel = hasPeakTime && typeof formatWallClock === 'function'
+        ? `Peak around ${formatWallClock(result.peakHour)}`
+        : null;
+
+    const nowTimeLabel = typeof formatWallClock === 'function'
+        ? `As of ${formatWallClock(result.nowHour)}`
+        : null;
+
+    const cards = [
+        {
+            id: 'now',
+            label: 'Right now',
+            concentration: result.concentrationNow,
+            rangeLow: result.concentrationNowLow,
+            rangeHigh: result.concentrationNowHigh,
+            zone: result.zoneNow,
+            subtitle: nowTimeLabel
+        },
+        {
+            id: 'peak',
+            label: "Today's peak",
+            concentration: result.peakConcentration,
+            rangeLow: result.peakConcentrationLow,
+            rangeHigh: result.peakConcentrationHigh,
+            zone: result.zoneAtPeak,
+            subtitle: peakTimeLabel
+        },
+        {
+            id: 'bedtime',
+            label: 'At bedtime',
+            concentration: result.concentrationAtBedtime,
+            rangeLow: result.concentrationAtBedtimeLow,
+            rangeHigh: result.concentrationAtBedtimeHigh,
+            zone: result.zoneAtBedtime,
+            subtitle: typeof formatWallClock === 'function'
+                ? `Target ${formatWallClock(result.bedtimeHour)}`
+                : null
+        }
+    ];
+
+    const disclaimer =
+        'Model estimate only. Not a blood test or medical advice. Your response may differ from population averages.';
+
+    return {
+        cards,
+        summaryParagraphs: buildOverviewLevelSummary(result),
+        disclaimer
+    };
+}
+
+/**
  * Plain-language bedtime interpretation tied to cited research.
  * No synthetic scores; no exact REM/deep-sleep predictions.
  *
@@ -1201,26 +1432,13 @@ function getBedtimeOutcome(result) {
     const high = result.concentrationAtBedtimeHigh;
     const zone = result.zoneAtBedtime;
 
-    let interpretation;
-    if (conc < SAFE_THRESHOLD) {
-        interpretation = 'Baur et al. reported minimal EEG delta-power changes at lower plasma levels. Sleep onset and architecture are unlikely to be meaningfully affected for most people.';
-    } else if (conc < CAUTION_THRESHOLD) {
-        interpretation = 'Population studies report average dose-dependent effects on sleep latency and total sleep time; sensitive individuals may notice milder sleep onset.';
-    } else if (conc < WARNING_THRESHOLD) {
-        interpretation = 'Research suggests measurable average effects on sleep onset and quality at this level, approaching the Baur delta-power reference.';
-    } else if (conc < DANGER_THRESHOLD) {
-        interpretation = 'Baur et al. associated concentrations around and above ~1.4 µg/mL with reduced EEG delta power in their controlled protocol. Group averages also suggest delayed sleep onset.';
-    } else {
-        interpretation = 'Research consistently shows stronger average effects on sleep architecture, onset, and total sleep time across this concentration range.';
-    }
-
     return {
         concentration: conc,
         rangeLow: low,
         rangeHigh: high,
-        zoneLabel: zone.label.replace(' estimated level', ''),
+        zoneLabel: getZoneLabelShort(zone),
         mechanismSummary: getZoneMechanismSummary(conc),
-        interpretation
+        interpretation: getBedtimeResearchSummary(conc)
     };
 }
 
@@ -2302,8 +2520,12 @@ if (typeof module !== 'undefined' && module.exports) {
         generateRecommendation,
         getZoneBackgroundPlugin,
         getBedtimeOutcome,
+        buildOverviewLevelContent,
+        buildOverviewLevelSummary,
         buildHowMuchNowContent,
         getZoneMechanismSummary,
+        getZoneLabelShort,
+        findDailyPeak,
         buildClearanceCurve,
         getRemainingAfterPeak,
         getTimelineChartConfig,
