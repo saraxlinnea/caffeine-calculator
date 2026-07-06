@@ -1,375 +1,143 @@
-# Caffeine Calculator: Technical Architecture with Multiple Curves
+# Caffeine Calculator: Technical Architecture
 
-## Design Overview
+## Application overview
 
-This calculator displays **4 interactive visualizations** instead of just one concentration curve. This gives users deeper understanding of:
-1. How THEIR caffeine behaves (timeline)
-2. How BODY WEIGHT affects peak concentration
-3. How GENETICS affect half-life
-4. SLEEP SCIENCE thresholds
+Static single-page site (`index.html` + `calculator.js` + `constants.js`) on GitHub Pages. After **Calculate**, results appear in four tabs.
 
----
+### File roles
 
-## TAB 1: CAFFEINE TIMELINE (Main Dashboard)
+| File | Responsibility |
+|------|----------------|
+| `index.html` | Layout, CSS, form inputs, tab switching, Chart.js lifecycle, inline glue (`calculateCaffeine`, Overview panels, copy summary) |
+| `calculator.js` | PK engine, zone classification, recommendation copy, Chart.js config builders, custom timeline tooltip |
+| `constants.js` | Coefficients, sleep zones, citations, factor explainers |
+| `test/calculator.test.js` | Node unit tests (`npm test`) for core math |
 
-### **What It Shows**
-Single curve: Caffeine concentration over 24 hours for the user's specific parameters
+### Result tabs
 
-### **Visual Elements**
-```
-Y-axis: Caffeine concentration (0-8 µg/mL)
-X-axis: Time (0-24 hours)
+1. **Overview** — Primary dashboard.
+   - **Inputs glance strip:** total mg, intake count, half-life, as-of time, bedtime.
+   - **Three level cards:** Right now, Today's peak, At bedtime (zone badge, µg/mL, uncertainty range, time subtitle).
+   - **Bedtime recommendation** (`#mainRecommendation`) directly under the cards, from `generateRecommendation()`.
+   - **µg/mL primer** and **collapsed explainer** (`<details>`) via `buildOverviewLevelSummary()`.
+   - **Plan your next drink** (Overview only; not duplicated on Curve).
+   - Cross-links to Curve chart and Sleep zone reference.
 
-Background zones (colored bands):
-- Green (< 0.5 µg/mL): Safe for sleep
-- Yellow (0.5-1.0): Caution
-- Orange (1.0-1.4): REM disruption
-- Red (1.4-2.5): Significant disruption
-- Dark red (> 2.5): Danger
+2. **Caffeine curve** — 24-hour timeline + educational sub-charts.
+   - Compare toolbar **below** the chart title (not overlaid on the plot).
+   - Custom external tooltip: all visible datasets (including compare overlays), 2s auto-hide, touch-follow on mobile.
+   - Stacking breakdown, weight vs peak, metabolizer/OCP clearance charts.
+   - Charts **lazy-drawn** when the tab becomes visible; destroyed on recalculate.
 
-Curve: Exponential decay starting from peak
+3. **Sleep** — Zone reference, receptor diagram, schematic Chart.js education charts (lazy-drawn).
 
-Markers:
-- Peak point (marked with ●)
-- Sleep zone indicator line (where bedtime falls)
-- Recommendation text box below
-```
+4. **Evidence** — Citations, model limitations, personalized math walkthrough.
 
-### **User Inputs**
-- Caffeine dose (mg) OR source
-- Body weight (kg or lbs)
-- Sex (M/F)
-- Food status (yes/no)
-- Current time
-- Target bedtime
-
-### **Outputs**
-- Peak concentration (µg/mL)
-- Time to peak (minutes)
-- Half-life (hours)
-- Concentration at bedtime
-- Zone assessment (green/yellow/red)
-- Recommendation: "Stop caffeine by X:XX pm"
-
-### **Calculation Flow**
-```
-1. Get base half-life (male = 4.0 hrs)
-2. Adjust for sex (female = +12.5%)
-3. Calculate elimination constant k = 0.693 / t½
-4. Calculate peak: C_max = dose × 1.65 / weight_kg
-5. Add Tmax adjustment for food
-6. Generate curve for 24 hours
-7. Find concentration at bedtime
-8. Classify zone (green/yellow/red)
-9. Calculate time to reach safe threshold (< 0.5)
-```
-
----
-
-## TAB 2: PEAK vs. BODY WEIGHT COMPARISON
-
-### **What It Shows**
-How body weight affects peak concentration for **same dose**
-
-### **Visual Elements**
-```
-X-axis: Body weight (kg) [40, 50, 60, 70, 80, 90, 100+]
-Y-axis: Peak concentration (µg/mL) [0-8]
-
-Curve: Inverse relationship (↑ weight = ↓ peak)
-
-User's marker: Arrow/highlight at their weight
-
-Percentile info: "You're at Xth percentile for caffeine sensitivity"
-
-Formula displayed: C_max = (Dose × 1.65) / Weight_kg
-```
-
-### **Insight It Provides**
-- **Heavier people:** Lower peak concentration from same dose
-- **Lighter people:** Higher peak concentration (more sensitive)
-- Example: 200mg coffee hits differently at 60kg vs 90kg
-
-### **Key Takeaway**
-"Body weight directly affects how high your peak goes, but NOT how fast it leaves your system"
-
----
-
-## TAB 3: CLEARANCE RATE & HALF-LIFE
-
-### **What It Shows**
-How caffeine remaining changes over time based on **genetics + sex**
-
-### **Visual Elements**
-```
-X-axis: Time since peak (hours) [0, 4, 8, 12, 16, 20, 24]
-Y-axis: Remaining caffeine (%) [0%, 100%]
-
-Three curves overlaid:
-- Fast metabolizer (CC genotype): Steeper decline
-- Average metabolizer (AC genotype): Medium decline
-- Slow metabolizer (AA genotype): Shallow decline
-
-User's curve: Highlighted in bold
-
-Half-life markings:
-- At 50% mark (one half-life)
-- At 25% mark (two half-lives)
-- At 12.5% mark (three half-lives)
-
-Table below showing:
-- Your half-life: X hours
-- Remaining at 4hrs: Y%
-- Remaining at 8hrs: Z%
-- Remaining at 12hrs: W%
-```
-
-### **Insight It Provides**
-- **Same dose, same peak, DIFFERENT decay rates**
-- Slow metabolizers stay at high levels longer
-- Fast metabolizers clear caffeine quickly
-- Example table:
-  ```
-  Time    Fast (AA)   Average (AC)   Slow (CC)
-  0 hrs   100%        100%           100%
-  4 hrs   50%         50%            50%
-  8 hrs   25%         25%            25%
-  12 hrs  12%         12%            12%
-  
-  (Note: half-life determines these percentages, 
-   but absolute concentration depends on peak)
-  ```
-
-### **Key Takeaway**
-"Your genetics determine how fast you metabolize caffeine, independent of body weight"
-
----
-
-## TAB 4: SLEEP IMPACT ZONES (Science Explanation)
-
-### **What It Shows**
-Exact concentration thresholds for sleep disruption
-
-### **Visual Elements**
-```
-Vertical stacked bars showing zones:
-
-🟢 GREEN < 0.5 µg/mL (Safe - minimal sleep impact)
-  - REM sleep: normal
-  - Deep sleep: normal
-  - Duration: full effect
-
-🟡 YELLOW 0.5-1.0 µg/mL (Caution - subtle effects)
-  - REM sleep: latency +10-20 min
-  - Deep sleep: slightly reduced
-  - User perception: "lighter sleep"
-
-🟠 ORANGE 1.0-1.4 µg/mL (REM disruption)
-  - REM sleep: latency +30-60 min
-  - Deep sleep: 20-40% reduced
-  - User perception: "tossed and turned"
-
-🔴 RED 1.4-2.5 µg/mL (Significant disruption)
-  - REM sleep: severely delayed
-  - Deep sleep: 50%+ reduced
-  - Fragmentation: 3-5 extra arousals
-
-⛔ DARK RED > 2.5 µg/mL (Danger - severe insomnia-like)
-  - REM sleep: extreme latency
-  - Deep sleep: nearly eliminated
-  - User perception: "couldn't sleep"
-
-Timeline overlay for user's bedtime:
-- Mark where user's bedtime falls
-- Show what zone they'd be in
-- Show estimated sleep quality
-```
-
-### **Data Displayed**
-Each zone shows:
-- Concentration range (µg/mL)
-- Sleep changes (REM latency, deep sleep %, fragmentation)
-- User perception
-- Corresponding dose example
-- Study source (Baur et al. / Gardiner et al.)
-
-### **Insight It Provides**
-- Specific numerical thresholds from research
-- What actually happens physiologically
-- Why people don't always "feel" caffeine impact
-
-### **Key Takeaway**
-"Below 0.5 µg/mL is genuinely safe. Above 1.4 is genuinely disruptive. In between is individual."
-
----
-
-## COMPARISON TAB (Optional 5th Tab)
-
-### **What It Shows**
-Scenario planning: Compare different choices
-
-### **Compare Options**
-- Same dose, different times
-- Different doses, same time
-- Different body weights, same dose
-- Your profile vs. "average person"
-
-### **Example Comparisons**
-1. **200mg coffee at 10am vs. 2pm**
-   - "If I wait 4 hours, I'll be in GREEN at 11pm"
-   
-2. **100mg vs. 200mg dose**
-   - "200mg means I need to cut off 2 hours earlier"
-
-3. **Your weight vs. friend's weight**
-   - "You're 70kg, friend is 80kg. Same coffee hits differently"
-
----
-
-## Data Flow Architecture
+### Calculation flow
 
 ```
-USER INPUT
-  ↓
-CALCULATIONS ENGINE (calculator.js)
-  ├─ calculate_peak_concentration()
-  ├─ calculate_half_life()
-  ├─ generate_caffeine_curve()
-  ├─ calculate_zone_classification()
-  └─ calculate_time_to_threshold()
-  ↓
-DATA OBJECT
-  {
-    peak: 4.71,
-    tmax: 50,
-    half_life: 4.0,
-    curve: {0: 0, 1: 2.4, 2: 3.8, ...},
-    concentration_at_bed: 0.72,
-    zone: "yellow",
-    recommendation: "Stop by 3pm",
-    metabolizer_info: {...},
-    sleep_science: {...}
-  }
-  ↓
-CHART RENDERING (charts.js)
-  ├─ render_timeline_chart()
-  ├─ render_weight_comparison()
-  ├─ render_clearance_rate()
-  └─ render_sleep_zones()
-  ↓
-DISPLAY TO USER (HTML/CSS)
-  └─ Tabbed interface with 4 visualizations
+User inputs → generateCaffeineCurve(params)
+  → half-life from sex, food, smoking, OCP, pregnancy, metabolizer type
+  → stacked intakes → curve samples (0.5 h steps)
+  → findDailyPeak() for today's peak time/level
+  → concentrationNow, concentrationAtBedtime, zones
+  → generateRecommendation(), buildOverviewLevelContent(), chart configs
+```
+
+### Chart lifecycle (`index.html`)
+
+- `destroyCurveCharts()` on each Calculate (avoids stale/hidden canvas state).
+- `ensureCurveCharts()` when user opens **Caffeine curve** tab.
+- Sleep tab charts initialized on first open of **Sleep** tab.
+
+### Time model
+
+- **Current time** defaults to device clock on load (`getDefaultNowTime()`); 2:00 PM fallback if unset.
+- Scenario buttons can override time when clicked.
+- Same-day elapsed hours only (`hoursElapsedSameDay`); no yesterday carryover.
+
+### Testing
+
+```bash
+npm test                        # Node unit tests for calculator.js
+python3 -m http.server 8080     # manual browser QA
 ```
 
 ---
 
-## File Structure for Frontend
+## Chart reference
+
+Charts live on **Caffeine curve** and **Sleep** tabs. All use Chart.js, configured in `calculator.js`.
+
+| Chart | Tab | Purpose |
+|-------|-----|---------|
+| 24-hour timeline | Curve | User's stacked concentration curve with sleep-zone background bands; optional compare overlays (metabolism speed, OCP) |
+| Weight vs peak | Curve | Inverse relationship: same dose, different body weights |
+| Metabolizer clearance | Curve | Fast / intermediate / slow decay curves (% remaining) |
+| OCP clearance | Curve | With vs without oral contraceptives |
+| Sleep education (pressure, masking, melatonin) | Sleep | Schematic curves for adenosine/caffeine education (not personalized PK) |
+
+**Timeline visual elements:** Y-axis µg/mL, X-axis clock time, colored zone bands from `SLEEP_ZONES`, markers for now and bedtime, uncertainty band on main curve.
+
+---
+
+## Pharmacokinetics (core formulas)
+
+Implemented in `calculator.js`; coefficients in `constants.js`.
 
 ```
-caffeine-calculator/
-├── index.html                 (Main page, tab structure)
-├── css/
-│   ├── style.css             (General styling)
-│   ├── tabs.css              (Tab navigation)
-│   ├── charts.css            (Chart styling)
-│   └── zones.css             (Color zones)
-├── js/
-│   ├── calculator.js         (Core math engine)
-│   ├── charts.js             (Chart.js integration)
-│   ├── tabs.js               (Tab switching)
-│   ├── ui.js                 (DOM manipulation)
-│   └── main.js               (Initialization)
-└── data/
-    └── constants.js          (Hard-coded caffeine data)
+k = 0.693 / t½
+C_peak ≈ (dose_mg × absorption_factor) / weight_kg
+C(t) = Σ C_peak,i × exp(-k × hours_since_peak,i)   // stacked intakes
+```
+
+Half-life modifiers: sex, food, smoking, OCP, pregnancy, CYP1A2 metabolizer type.
+
+Peak time (Tmax) adjusted for fed vs fasting. Curve sampled every 0.5 h from earliest intake through bedtime window.
+
+---
+
+## Sleep zones
+
+From `constants.js` / `@SLEEP_THRESHOLDS.md`. Used for card badges, chart bands, and recommendations.
+
+| Zone | µg/mL | Label |
+|------|-------|-------|
+| Green | &lt; 0.5 | Low estimated level |
+| Yellow | 0.5–1.0 | Moderate estimated level |
+| Orange | 1.0–1.4 | Elevated estimated level |
+| Red | 1.4–2.5 | High estimated level |
+| Dark red | &gt; 2.5 | Very high estimated level |
+
+Language stays probabilistic ("estimated", "may") — not absolute safe/unsafe claims.
+
+---
+
+## Data flow
+
+```
+index.html (form)
+  → getFormData() / getIntakesFromForm()
+  → generateCaffeineCurve()          [calculator.js]
+  → result object (curve, zones, peak, recommendation, …)
+  → updateBedtimeOutcomePanel()      [cards + recommendation + explainer]
+  → getTimelineChartConfig() etc.    [lazy on tab open]
+  → Chart.js render
 ```
 
 ---
 
-## Chart Libraries
+## Mobile UX notes
 
-### **Recommended: Chart.js**
-- Lightweight (~50KB)
-- Excellent line/bar charts
-- Color zones easy to add
-- Good performance
-
-### **Alternative: Plotly.js**
-- More powerful
-- Better interactivity (hover shows values)
-- Heavier (~3MB)
-- Overkill for this use case
-
-**Recommendation: Use Chart.js for main curves, add hover tooltips manually**
+- Timeline chart fits ~390px viewport; no `min-width` forcing horizontal scroll.
+- Compare buttons sit below chart title, not over the plot.
+- Custom timeline tooltip follows touch; auto-hides after 2s.
+- Collapsed input summary stays above results after Calculate.
 
 ---
 
-## Interactivity Features
+## Known model limitations
 
-### **Tab 1: Caffeine Timeline**
-- Hover over curve → show exact value at that time
-- Click to see what time that concentration occurs
-- Zoom in/out (optional)
-- Download curve as image (optional)
-
-### **Tab 2: Weight Comparison**
-- Slider to adjust your weight → see peak change in real-time
-- Show "equivalent dose" for other weight
-- Display percentile
-
-### **Tab 3: Clearance Rate**
-- Toggle between %, absolute mg, or µg/mL
-- Show your exact parameters
-- Expandable detail panel with math
-
-### **Tab 4: Sleep Zones**
-- Collapsible sections for each zone
-- Link to studies (Baur, Gardiner)
-- Your timeline marked on zones
-
----
-
-## Mobile Responsiveness
-
-All tabs must work on phone:
-- Tabs stack vertically on small screens
-- Charts adjust height/width
-- Input form is full-width
-- Readable on 320px+ width
-
----
-
-## Performance Considerations
-
-**Calculations:**
-- All math happens client-side (instant)
-- No server calls
-- Curves generated on-demand
-
-**Rendering:**
-- Lazy load charts (only render visible tab)
-- Debounce input updates (wait 500ms after user stops typing)
-- Cache curve data (don't recalculate on tab switch)
-
----
-
-## Testing Strategy
-
-Each curve should verify against:
-
-**Tab 1 (Timeline):**
-- Test Case 1: Male 200mg, should hit yellow at 8hrs
-- Test Case 2: Female 150mg, should stay longer
-- Test Case 3: Stacked doses should add correctly
-
-**Tab 2 (Weight):**
-- Heavier weight → lower peak (inverse)
-- 70kg baseline reference
-
-**Tab 3 (Clearance):**
-- At 4 hrs: should show 50% remaining
-- At 8 hrs: should show 25% remaining
-- Different half-lives should produce different curves
-
-**Tab 4 (Zones):**
-- Zone boundaries at exact thresholds
-- Color coding matches spec
+- Same-day time model only; no carryover from previous days.
+- Peak time sampled every 0.5 h (display can wrap past midnight).
+- Subjective feel copy is interpretive, not personalized lab data.

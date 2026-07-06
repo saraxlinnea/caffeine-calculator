@@ -1,0 +1,8 @@
+{
+  "name": "caffeine-calculator",
+  "private": true,
+  "description": "Static caffeine pharmacokinetics calculator",
+  "scripts": {
+    "test": "node --test test/calculator.test.js"
+  }
+}

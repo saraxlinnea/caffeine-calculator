@@ -1673,6 +1673,11 @@ function getTimelineResponsivePlugin(result) {
                 titleFont.size = w < 600 ? 14 : 16;
             }
 
+            const yScale = chart.options.scales?.y;
+            if (yScale?.title) {
+                yScale.title.display = w >= 360;
+            }
+
             const hideIntakeLabels = w < 520;
             let maxLevel = 0;
             if (!hideIntakeLabels && result.intakes) {
@@ -1840,6 +1845,155 @@ function getRepeatDoseLinePlugin(result) {
 }
 
 /**
+ * Custom touch-friendly tooltip for the timeline chart.
+ * Shows all visible curves at the nearest time point; auto-hides after 2s unless touching.
+ *
+ * @param {object} result
+ * @param {number[]} curveLow
+ * @param {number[]} curveHigh
+ * @returns {object} Chart.js plugin
+ */
+function getTimelineCustomTooltipPlugin(result, curveLow, curveHigh) {
+    const SKIP_LABELS = /Lower bound|Uncertainty range|bedtime residual|Baur line/;
+
+    function getNearestDataIndex(chart, pixelX) {
+        const dataset = chart.data.datasets.find(d => d.label === 'Estimated concentration');
+        if (!dataset?.data?.length) return 0;
+        const xScale = chart.scales.x;
+        let nearest = 0;
+        let minDist = Infinity;
+        dataset.data.forEach((pt, i) => {
+            const px = xScale.getPixelForValue(pt.x);
+            const dist = Math.abs(px - pixelX);
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = i;
+            }
+        });
+        return nearest;
+    }
+
+    function buildTooltipHtml(chart, dataIndex) {
+        const mainDs = chart.data.datasets.find(d => d.label === 'Estimated concentration');
+        const offset = mainDs?.data[dataIndex]?.x ?? 0;
+        const timeStr = formatWallClock(result.curveStartHour + offset);
+        const rows = [];
+
+        chart.data.datasets.forEach(ds => {
+            if (ds.hidden || !ds.label || SKIP_LABELS.test(ds.label)) return;
+            const point = ds.data[dataIndex];
+            if (!point || point.y == null || Number.isNaN(point.y)) return;
+            if (ds.data.length <= 2) return;
+            const short = ds.label.replace('Estimated concentration', 'Estimated');
+            rows.push(`<div class="chart-tooltip-row"><span>${short}</span><strong>${point.y.toFixed(2)} µg/mL</strong></div>`);
+        });
+
+        const low = curveLow[dataIndex]?.toFixed(2);
+        const high = curveHigh[dataIndex]?.toFixed(2);
+        const extras = [];
+        if (low != null && high != null) {
+            extras.push(`<div class="chart-tooltip-meta">Range: ${low}–${high} µg/mL</div>`);
+        }
+        getIntakesNearChartOffset(result, offset).forEach(intake => {
+            const sourceLabel = getIntakeSourceLabel(intake);
+            extras.push(
+                `<div class="chart-tooltip-meta">Intake: ${sourceLabel}, ${intake.amountMg} mg at ${formatWallClock(intake.hour)}</div>`
+            );
+        });
+
+        return `<div class="chart-tooltip-title">${timeStr}</div>${rows.join('')}${extras.join('')}`;
+    }
+
+    return {
+        id: 'timelineCustomTooltip',
+        afterInit(chart) {
+            const parent = chart.canvas.parentNode;
+            if (!parent || parent.querySelector('.chart-external-tooltip')) return;
+
+            const el = document.createElement('div');
+            el.className = 'chart-external-tooltip';
+            el.setAttribute('role', 'tooltip');
+            el.hidden = true;
+            parent.appendChild(el);
+
+            let hideTimer = null;
+            let touching = false;
+
+            const hide = () => {
+                el.hidden = true;
+                el.style.opacity = '0';
+            };
+
+            const scheduleHide = () => {
+                clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => {
+                    if (!touching) hide();
+                }, 2000);
+            };
+
+            const showAt = (clientX, clientY) => {
+                const rect = chart.canvas.getBoundingClientRect();
+                const pixelX = clientX - rect.left;
+                const dataIndex = getNearestDataIndex(chart, pixelX);
+                el.innerHTML = buildTooltipHtml(chart, dataIndex);
+                el.hidden = false;
+                el.style.opacity = '1';
+
+                const parentRect = parent.getBoundingClientRect();
+                let left = clientX - parentRect.left + 12;
+                let top = clientY - parentRect.top - 12;
+                const maxLeft = parentRect.width - el.offsetWidth - 8;
+                const maxTop = parentRect.height - el.offsetHeight - 8;
+                left = Math.max(8, Math.min(left, maxLeft));
+                top = Math.max(8, Math.min(top, maxTop));
+                el.style.left = `${left}px`;
+                el.style.top = `${top}px`;
+            };
+
+            const onPointerMove = (clientX, clientY) => {
+                if (clientX == null || clientY == null) return;
+                showAt(clientX, clientY);
+                if (!touching) scheduleHide();
+            };
+
+            chart.canvas.addEventListener('mousemove', (e) => {
+                touching = false;
+                onPointerMove(e.clientX, e.clientY);
+            });
+            chart.canvas.addEventListener('mouseleave', () => {
+                touching = false;
+                scheduleHide();
+            });
+            chart.canvas.addEventListener('touchstart', (e) => {
+                touching = true;
+                clearTimeout(hideTimer);
+                const t = e.touches[0];
+                if (t) onPointerMove(t.clientX, t.clientY);
+            }, { passive: true });
+            chart.canvas.addEventListener('touchmove', (e) => {
+                touching = true;
+                clearTimeout(hideTimer);
+                const t = e.touches[0];
+                if (t) onPointerMove(t.clientX, t.clientY);
+            }, { passive: true });
+            chart.canvas.addEventListener('touchend', () => {
+                touching = false;
+                scheduleHide();
+            });
+            chart.canvas.addEventListener('touchcancel', () => {
+                touching = false;
+                scheduleHide();
+            });
+
+            chart.$timelineTooltip = { hide, scheduleHide };
+        },
+        beforeDestroy(chart) {
+            chart.canvas?.parentNode?.querySelector('.chart-external-tooltip')?.remove();
+        }
+    };
+}
+
+/**
  * Build the Chart.js config for the 24-hour concentration timeline.
  * Plugins: zone bands, bedtime, now, repeat-dose deadline, intake markers.
  *
@@ -1954,15 +2108,11 @@ function getTimelineChartConfig(result) {
             responsive: true,
             maintainAspectRatio: false,
             parsing: false,
-            layout: { padding: { bottom: 40, top: 8 } },
+            layout: { padding: { left: 2, right: 8, bottom: 36, top: 4 } },
             interaction: { mode: 'nearest', intersect: false },
             plugins: {
                 title: {
-                    display: true,
-                    text: '24-Hour Caffeine Timeline',
-                    font: { size: 16, weight: '600' },
-                    padding: { top: 4, bottom: 12 },
-                    color: '#2c2c2c'
+                    display: false
                 },
                 legend: {
                     display: true,
@@ -1976,36 +2126,12 @@ function getTimelineChartConfig(result) {
                         },
                         boxWidth: 12,
                         usePointStyle: true,
-                        padding: 12,
+                        padding: 10,
                         font: { size: 11 }
                     }
                 },
                 tooltip: {
-                    filter: item => item.dataset.label === 'Estimated concentration',
-                    callbacks: {
-                        title(items) {
-                            const offset = items[0].parsed.x;
-                            return formatWallClock(result.curveStartHour + offset);
-                        },
-                        label(item) {
-                            return `Estimated: ${item.parsed.y.toFixed(2)} µg/mL`;
-                        },
-                        afterBody(items) {
-                            const idx = items[0].dataIndex;
-                            const low = curveLow[idx].toFixed(2);
-                            const high = curveHigh[idx].toFixed(2);
-                            const lines = [`Range: ${low}–${high} µg/mL`];
-                            const offset = items[0].parsed.x;
-                            const nearby = getIntakesNearChartOffset(result, offset);
-                            nearby.forEach(intake => {
-                                const sourceLabel = getIntakeSourceLabel(intake);
-                                lines.push(
-                                    `Intake: ${sourceLabel}, ${intake.amountMg} mg at ${formatWallClock(intake.hour)}`
-                                );
-                            });
-                            return lines;
-                        }
-                    }
+                    enabled: false
                 }
             },
             scales: {
@@ -2015,10 +2141,15 @@ function getTimelineChartConfig(result) {
                     title: {
                         display: true,
                         text: 'Concentration (µg/mL)',
-                        font: { size: 12, weight: '500' },
-                        color: '#2c2c2c'
+                        font: { size: 11, weight: '500' },
+                        color: '#2c2c2c',
+                        padding: { top: 0, bottom: 4 }
                     },
-                    ticks: { callback: value => value.toFixed(1) }
+                    ticks: {
+                        callback: value => value.toFixed(1),
+                        maxTicksLimit: 6,
+                        padding: 2
+                    }
                 },
                 x: {
                     type: 'linear',
@@ -2033,13 +2164,14 @@ function getTimelineChartConfig(result) {
                     title: {
                         display: true,
                         text: 'Time of Day',
-                        font: { size: 12, weight: '500' },
+                        font: { size: 11, weight: '500' },
                         color: '#2c2c2c'
                     }
                 }
             }
         },
         plugins: [
+            getTimelineCustomTooltipPlugin(result, curveLow, curveHigh),
             getTimelineResponsivePlugin(result),
             getZoneBackgroundPlugin(),
             getBedtimeLinePlugin(result),
@@ -2525,6 +2657,8 @@ if (typeof module !== 'undefined' && module.exports) {
         buildHowMuchNowContent,
         getZoneMechanismSummary,
         getZoneLabelShort,
+        hoursElapsedSameDay,
+        hoursElapsedToBedtime,
         findDailyPeak,
         buildClearanceCurve,
         getRemainingAfterPeak,

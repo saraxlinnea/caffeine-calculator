@@ -67,17 +67,15 @@ python3 -m http.server 8080
 
 ## Testing
 
-There is no automated test suite: no unit tests for `calculator.js` and no browser tests in CI. That means nothing runs on push to catch regressions in the math or charts.
+**Automated:** run `npm test` for Node unit tests on core PK math in `calculator.js` (`generateCaffeineCurve`, `findDailyPeak`, `classifyZone`, etc.).
 
-After you change the code, check it manually in a browser:
+**Manual (browser):** after code changes, hard refresh and spot-check:
 
-1. Hard refresh, confirm **Current Time** matches your clock (or 2:00 PM fallback).
+1. Confirm **Current Time** matches your clock (or 2:00 PM fallback).
 2. Log a dose, press **Calculate**, and read the three Overview cards (now, peak, bedtime).
-3. Open **Caffeine curve** and confirm the timeline and clearance charts render.
-4. Open **Sleep** and confirm the schematic charts render.
+3. Open **Caffeine curve** — compare buttons below title, timeline tooltip on touch/hover, sub-charts render.
+4. Open **Sleep** and confirm schematic charts render.
 5. Try a scenario button (`Morning coffee`, etc.) and confirm demo times override the clock.
-
-That manual pass is the project's QA until automated tests are added.
 
 ## Disclaimer
 

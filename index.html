@@ -1515,7 +1515,8 @@
             margin-top: 10px;
         }
 
-        #tab-overview .recommendation {
+        #tab-overview .recommendation,
+        #bedtimeOutcomeContent .recommendation {
             margin-top: 12px;
             padding: 14px 16px;
             line-height: 1.55;
@@ -1678,15 +1679,68 @@
         }
 
         .chart-corner-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            justify-content: flex-end;
-            max-width: min(100%, 280px);
+            justify-content: flex-start;
+        }
+
+        .timeline-chart-toolbar {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-chart-heading {
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.02em;
+            margin: 0;
+        }
+
+        .chart-container-inner {
+            position: relative;
+        }
+
+        .chart-external-tooltip {
+            position: absolute;
+            z-index: 20;
+            pointer-events: none;
+            background: rgba(44, 44, 44, 0.94);
+            color: #fafaf8;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 0.78em;
+            line-height: 1.45;
+            max-width: min(280px, calc(100% - 16px));
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            transition: opacity 0.15s ease;
+        }
+
+        .chart-tooltip-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 1.05em;
+        }
+
+        .chart-tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 3px;
+        }
+
+        .chart-tooltip-row span {
+            color: rgba(250, 250, 248, 0.82);
+        }
+
+        .chart-tooltip-meta {
+            margin-top: 6px;
+            color: rgba(250, 250, 248, 0.72);
+            font-size: 0.95em;
         }
 
         .btn-chart-ctrl {
@@ -2577,8 +2631,21 @@
 
             .chart-container.timeline-chart {
                 height: 400px;
-                padding: 16px 12px 12px;
+                padding: 12px 8px 10px;
                 overflow-x: hidden;
+            }
+
+            .timeline-chart-heading {
+                font-size: 0.92em;
+            }
+
+            .chart-corner-controls {
+                gap: 5px;
+            }
+
+            .btn-chart-ctrl {
+                font-size: 0.68em;
+                padding: 4px 8px;
             }
 
             .chart-container-inner {
@@ -2812,10 +2879,6 @@
                         </div>
                     </div>
 
-                    <div class="recommendation" id="mainRecommendation">
-                        Press Calculate to see your results.
-                    </div>
-
                     <div class="overview-actions">
                         <button type="button" class="btn-copy-results" id="copyResultsBtn" onclick="copyResultsSummary()" hidden>Copy summary</button>
                     </div>
@@ -2834,7 +2897,7 @@
                     <p class="overview-cross-links">
                         <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#howMuchNowSection">Plan your next drink →</a>
                         ·
-                        <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curvePlanningSection">Sleep planning on your curve →</a>
+                        <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curveChartSection">Your caffeine curve →</a>
                         ·
                         <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#blockadeStorySection">Why sleep zones? →</a>
                     </p>
@@ -2844,11 +2907,14 @@
                 <div id="tab-curve" class="results-tab-panel" role="tabpanel">
                     <div class="results-section overview-timeline-section" id="curveChartSection">
                         <div class="chart-container timeline-chart">
-                            <div class="chart-container-inner">
+                            <div class="timeline-chart-toolbar">
+                                <h4 class="timeline-chart-heading">24-Hour Caffeine Timeline</h4>
                                 <div class="chart-corner-controls" id="chartCornerControls" role="group" aria-label="Chart comparison controls">
                                     <button type="button" class="btn-chart-ctrl" id="cycleMetabolizerBtn" title="Cycle metabolizer comparison: off, fast, average, slow">Compare speed</button>
                                     <button type="button" class="btn-chart-ctrl" id="cycleOcpBtn" title="Cycle OCP comparison: off, on OCP, off OCP">Compare OCP</button>
                                 </div>
+                            </div>
+                            <div class="chart-container-inner">
                                 <canvas id="timelineChart"></canvas>
                             </div>
                         </div>
@@ -2864,7 +2930,7 @@
                                 </div>
                                 <div class="chart-legend-item">
                                     <span class="chart-swatch chart-swatch-band" aria-hidden="true"></span>
-                                    <span><strong>Shaded band:</strong> dose uncertainty (±20%). Use <em>Compare speed</em> or <em>Compare OCP</em> (top-right) to overlay alternate scenarios.</span>
+                                    <span><strong>Shaded band:</strong> dose uncertainty (±20%). Use <em>Compare speed</em> or <em>Compare OCP</em> (above the chart) to overlay alternate scenarios.</span>
                                 </div>
                                 <div class="chart-legend-item">
                                     <span class="chart-swatch chart-swatch-dashed chart-swatch-dashed-green" aria-hidden="true"></span>
@@ -2883,15 +2949,6 @@
                                 Colored background bands tie to average sleep effects in research.
                                 <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#zoneReferenceSection">What do these zones mean? →</a>
                             </p>
-                        </div>
-                    </div>
-
-                    <div class="results-section caffeine-planning-panel" id="curvePlanningSection">
-                        <div class="result-summary">
-                            <h3>Plan your next drink</h3>
-                            <div id="caffeinePlanningContent">
-                                <p class="caffeine-planning-intro">Press Calculate to see how much you could add right now and when a repeat dose might still fit.</p>
-                            </div>
                         </div>
                     </div>
 
@@ -3400,7 +3457,7 @@
 
     <!-- SCRIPTS -->
     <script src="constants.js?v=20250703b"></script>
-    <script src="calculator.js?v=20250706c"></script>
+    <script src="calculator.js?v=20250706d"></script>
     <script>
         let currentResult = null;
         let timelineChart = null;
@@ -3931,7 +3988,7 @@
             }
 
             const text = buildPlanningTeaser(result);
-            el.innerHTML = `${text} <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curvePlanningSection">Plan your next drink →</a>`;
+            el.innerHTML = `${text} <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#howMuchNowSection">Plan your next drink →</a>`;
             el.hidden = false;
         }
 
@@ -3969,32 +4026,6 @@
                 ${renderStandardDrinksHtml(standardDrinks)}
                 <p class="how-much-now-disclaimer">${disclaimer}</p>
             `;
-        }
-
-        function updateCaffeinePlanningPanel(result) {
-            const container = document.getElementById('caffeinePlanningContent');
-            if (!container || typeof buildCaffeinePlanningContent !== 'function') return;
-
-            if (!result) {
-                container.innerHTML =
-                    '<p class="caffeine-planning-intro">Press Calculate to see when another drink might still fit and how much you could add right now.</p>';
-                return;
-            }
-
-            const { intro, lines, standardDrinks } = buildCaffeinePlanningContent(result);
-            const listHtml = lines.length
-                ? `<ul class="caffeine-planning-lines">${lines.map(line => `<li>${line}</li>`).join('')}</ul>`
-                : '';
-
-            container.innerHTML = `
-                <p class="caffeine-planning-intro">${intro}<span data-cite="drake2013"></span></p>
-                ${listHtml}
-                ${renderStandardDrinksHtml(standardDrinks)}
-            `;
-
-            if (typeof applyInlineCitations === 'function') {
-                applyInlineCitations(container);
-            }
         }
 
         const OVERVIEW_UNITS_PRIMER_HTML =
@@ -4050,11 +4081,13 @@
 
             const cardsHtml = cards.map(renderOutcomeStatCard).join('');
             const summaryHtml = summaryParagraphs.map(text => `<p>${text}</p>`).join('');
+            const recClass = getZoneClass(result.zoneAtBedtime);
 
             container.innerHTML = `
                 <div class="outcome-stats-grid">
                     ${cardsHtml}
                 </div>
+                <div class="recommendation ${recClass} result-animate" id="mainRecommendation">${result.recommendation}</div>
                 ${OVERVIEW_UNITS_PRIMER_HTML}
                 <details class="overview-level-details">
                     <summary>What these levels mean</summary>
@@ -4163,10 +4196,6 @@
                 document.getElementById('tmaxValue').textContent =
                     currentResult.tmax_minutes + ' min';
 
-                const recBox = document.getElementById('mainRecommendation');
-                recBox.textContent = currentResult.recommendation;
-                recBox.className = 'recommendation ' + getZoneClass(currentResult.zoneAtBedtime) + ' result-animate';
-
                 const copyBtn = document.getElementById('copyResultsBtn');
                 if (copyBtn) copyBtn.hidden = false;
 
@@ -4184,7 +4213,6 @@
                     ensureCurveCharts();
                 }
 
-                updateCaffeinePlanningPanel(currentResult);
                 updateBedtimeStackingPanel(currentResult);
                 updateFactorExplainerValues(currentResult, data);
                 collapseInputPanel();
@@ -4522,19 +4550,42 @@
             calculateCaffeine();
         }
 
+        function getZoneShortLabel(zone) {
+            return (zone?.label || '')
+                .replace(/[🟢🟡🟠🔴⛔]\s*/g, '')
+                .replace(' estimated level', '')
+                .trim();
+        }
+
         async function copyResultsSummary() {
             if (!currentResult) return;
 
+            const nowStr = typeof formatWallClock === 'function'
+                ? formatWallClock(currentResult.nowHour)
+                : 'now';
             const bedtimeStr = typeof formatWallClock === 'function'
                 ? formatWallClock(currentResult.bedtimeHour)
                 : 'bedtime';
-            const zoneText = (currentResult.zoneAtBedtime.label || '')
-                .replace(/[🟢🟡🟠🔴⛔]\s*/g, '')
-                .trim();
+            const peakStr = typeof formatWallClock === 'function'
+                ? formatWallClock(currentResult.peakHour)
+                : '';
+            const intakePart = currentResult.hasNoLoggedCaffeine
+                ? '0 mg logged'
+                : `${currentResult.totalMg} mg · ${currentResult.intakes.length} intake${currentResult.intakes.length === 1 ? '' : 's'}`;
+            const glanceLine = `Inputs: ${intakePart} · half-life ${currentResult.halfLife.toFixed(1)} h · As of ${nowStr} · Bed ${bedtimeStr}`;
+            const nowLabel = getZoneShortLabel(currentResult.zoneNow);
+            const peakLabel = getZoneShortLabel(currentResult.zoneAtPeak);
+            const bedLabel = getZoneShortLabel(currentResult.zoneAtBedtime);
+            const peakLine = peakStr
+                ? `Peak: ${currentResult.peakConcentration.toFixed(2)} µg/mL at ${peakStr} (${peakLabel})`
+                : `Peak: ${currentResult.peakConcentration.toFixed(2)} µg/mL (${peakLabel})`;
+
             const text = [
                 'Caffeine Calculator estimate',
-                `Bedtime (${bedtimeStr}): ${currentResult.concentrationAtBedtime.toFixed(2)} µg/mL: ${zoneText}`,
-                `Now: ${currentResult.concentrationNow.toFixed(2)} µg/mL`,
+                glanceLine,
+                `Now: ${currentResult.concentrationNow.toFixed(2)} µg/mL (${nowLabel})`,
+                peakLine,
+                `Bedtime: ${currentResult.concentrationAtBedtime.toFixed(2)} µg/mL (${bedLabel})`,
                 currentResult.recommendation,
                 '',
                 SITE_BASE_URL
