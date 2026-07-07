@@ -1552,9 +1552,19 @@ function getBedtimeLinePlugin(result) {
             ctx.setLineDash([6, 4]);
             ctx.stroke();
             ctx.fillStyle = '#d4a574';
-            ctx.font = '11px Inter, sans-serif';
+            ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Bedtime', xPos, yScale.top - 6);
+            const bedConc = result.concentrationAtBedtime.toFixed(2);
+            ctx.fillText(`Bed · ${bedConc} µg/mL`, xPos, yScale.top - 6);
+
+            const yBed = yScale.getPixelForValue(result.concentrationAtBedtime);
+            ctx.beginPath();
+            ctx.arc(xPos, yBed, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#d4a574';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
             ctx.restore();
         }
     };
@@ -1590,9 +1600,68 @@ function getNowLinePlugin(result) {
             ctx.setLineDash([]);
             ctx.stroke();
             ctx.fillStyle = '#7a9b8e';
-            ctx.font = '11px Inter, sans-serif';
+            ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Now', xPos, yScale.top - 6);
+            const nowConc = result.concentrationNow.toFixed(2);
+            ctx.fillText(`Now · ${nowConc} µg/mL`, xPos, yScale.top - 6);
+
+            const yNow = yScale.getPixelForValue(result.concentrationNow);
+            ctx.beginPath();
+            ctx.arc(xPos, yNow, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#7a9b8e';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+        }
+    };
+}
+
+/**
+ * Draw a labeled marker at today's peak on the main concentration curve.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {object} Chart.js plugin object (id: "peakMarker")
+ */
+function getPeakMarkerPlugin(result) {
+    return {
+        id: 'peakMarker',
+        afterDraw(chart) {
+            if (result.hasNoLoggedCaffeine || !result.peakConcentration) return;
+
+            const xScale = chart.scales.x;
+            const yScale = chart.scales.y;
+            if (!xScale || !yScale) return;
+
+            const offset = result.peakHour - result.curveStartHour;
+            if (offset < 0 || offset > 24) return;
+
+            const xPos = xScale.getPixelForValue(offset);
+            if (xPos < xScale.left || xPos > xScale.right) return;
+
+            const yPeak = yScale.getPixelForValue(result.peakConcentration);
+            const ctx = chart.ctx;
+            ctx.save();
+
+            ctx.beginPath();
+            ctx.arc(xPos, yPeak, 5.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#2c2c2c';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#2c2c2c';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            const peakTime = typeof formatWallClock === 'function'
+                ? formatWallClock(result.peakHour)
+                : '';
+            const label = peakTime
+                ? `Peak · ${peakTime} · ${result.peakConcentration.toFixed(2)} µg/mL`
+                : `Peak · ${result.peakConcentration.toFixed(2)} µg/mL`;
+            ctx.fillText(label, xPos, Math.max(yPeak - 12, yScale.top + 10));
             ctx.restore();
         }
     };
@@ -1910,6 +1979,7 @@ function getTimelineCustomTooltipPlugin(result, curveLow, curveHigh) {
             const parent = chart.canvas.parentNode;
             if (!parent || parent.querySelector('.chart-external-tooltip')) return;
 
+            const chartHost = parent.closest('.chart-container-inner') || parent;
             const el = document.createElement('div');
             el.className = 'chart-external-tooltip';
             el.setAttribute('role', 'tooltip');
@@ -1962,7 +2032,14 @@ function getTimelineCustomTooltipPlugin(result, curveLow, curveHigh) {
             });
             chart.canvas.addEventListener('mouseleave', () => {
                 touching = false;
-                scheduleHide();
+                clearTimeout(hideTimer);
+                hide();
+            });
+            chartHost.addEventListener('mouseleave', (e) => {
+                if (e.relatedTarget && chartHost.contains(e.relatedTarget)) return;
+                touching = false;
+                clearTimeout(hideTimer);
+                hide();
             });
             chart.canvas.addEventListener('touchstart', (e) => {
                 touching = true;
@@ -1998,9 +2075,11 @@ function getTimelineCustomTooltipPlugin(result, curveLow, curveHigh) {
  * Plugins: zone bands, bedtime, now, repeat-dose deadline, intake markers.
  *
  * @param {object} result - Output of generateCaffeineCurve
+ * @param {{ animate?: boolean }} [chartOptions]
  * @returns {object} Chart.js config object
  */
-function getTimelineChartConfig(result) {
+function getTimelineChartConfig(result, chartOptions = {}) {
+    const shouldAnimate = chartOptions.animate !== false;
     const offsets = Object.keys(result.curve).map(Number).sort((a, b) => a - b);
     const toPoints = (curveObj) => offsets.map(offset => ({ x: offset, y: curveObj[offset] }));
     const curveLow = offsets.map(h => result.curveLow[h]);
@@ -2108,7 +2187,11 @@ function getTimelineChartConfig(result) {
             responsive: true,
             maintainAspectRatio: false,
             parsing: false,
-            layout: { padding: { left: 2, right: 8, bottom: 36, top: 4 } },
+            animation: shouldAnimate ? {
+                duration: 550,
+                easing: 'easeOutQuart'
+            } : false,
+            layout: { padding: { left: 2, right: 8, bottom: 36, top: 14 } },
             interaction: { mode: 'nearest', intersect: false },
             plugins: {
                 title: {
@@ -2176,6 +2259,7 @@ function getTimelineChartConfig(result) {
             getZoneBackgroundPlugin(),
             getBedtimeLinePlugin(result),
             getNowLinePlugin(result),
+            getPeakMarkerPlugin(result),
             getRepeatDoseLinePlugin(result),
             getIntakeMarkersPlugin(result)
         ]
