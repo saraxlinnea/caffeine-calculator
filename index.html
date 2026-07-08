@@ -35,11 +35,11 @@
         :root {
             --primary: #3f362e;
             --secondary: #6b6259;
-            --accent: #d4a88a;
+            --accent: #c69350;
             --light-bg: #faf6f0;
             --border: #dcd2c4;
-            --success: #9bb5a0;
-            --warning: #d4a88a;
+            --success: #a7b58f;
+            --warning: #c69350;
             --danger: #c9a59a;
             --shadow: 0 2px 10px rgba(74, 64, 56, 0.07);
             --font-display: 'DM Serif Display', Georgia, 'Times New Roman', serif;
@@ -47,18 +47,13 @@
             --cream-deep: #ede7dd;
             --espresso: #3f362e;
             --espresso-soft: #5c5148;
-            --sage: #9bb5a0;
-            --sage-dark: #7fa088;
-            --sage-light: #eef4ef;
-            --caramel: #c67d5e;
-            --caramel-dark: #b56b4d;
+            --caramel: #c69350;
+            --caramel-dark: #b07f3b;
+            --gold-soft: #e8d9b8;
             --clay: #c9a59a;
-            --blue: #8fabc9;
-            --blue-dark: #7492b3;
-            --tab-overview-bg: #ffffff;
-            --tab-curve-bg: #f4f9f5;
-            --tab-sleep-bg: #f8f5fb;
-            --tab-evidence-bg: #fdfbf7;
+            --tab-bar-bg: #37302a;
+            --tab-active-bg: #4a4038;
+            --panel-bg: #fdfbf7;
             --coffee: #6b5345;
             --coffee-light: #8a6f5c;
         }
@@ -123,56 +118,34 @@
         }
 
         .header-pour-logo .pour-pitcher {
-            transform-origin: 28px 50px;
+            transform-origin: 34px 50px;
         }
 
-        .header-pour-logo:not(.is-replaying) .pour-pitcher {
-            animation: pitcher-tilt 2.6s ease-in-out forwards;
+        .header-pour-logo .pour-cup-group {
+            transform-origin: 72px 52px;
         }
 
-        .header-pour-logo .pour-stream {
-            stroke-dasharray: 50;
-            stroke-dashoffset: 50;
-            opacity: 0;
-        }
-
-        .header-pour-logo:not(.is-replaying) .pour-stream {
-            animation: pour-stream 2.6s ease-in-out forwards;
-        }
-
+        /* Resting (poured) state — also the no-JS / reduced-motion fallback */
         .header-pour-logo .cup-fill {
             transform-box: fill-box;
             transform-origin: center bottom;
-            transform: scaleY(0);
-        }
-
-        .header-pour-logo:not(.is-replaying):not(.has-intro-played) .cup-fill {
-            animation: fill-cup 0.9s ease-out forwards;
-            animation-delay: 1.45s;
+            transform: scaleY(0.65);
         }
 
         .header-pour-logo .pot-fill-anim {
             transform-box: fill-box;
-            transform-origin: center top;
-            transform: scaleY(1);
-        }
-
-        .header-pour-logo:not(.is-replaying):not(.has-intro-played) .pot-fill-anim {
-            animation: drain-pot 0.9s ease-in-out forwards;
-            animation-delay: 1.45s;
+            transform-origin: center bottom;
+            transform: scaleY(0.72);
         }
 
         .header-pour-logo .cup-meniscus {
+            opacity: 0.55;
+        }
+
+        .header-pour-logo .pour-stream {
+            stroke-dasharray: 26;
+            stroke-dashoffset: 26;
             opacity: 0;
-        }
-
-        .header-pour-logo:not(.is-replaying):not(.has-intro-played) .cup-meniscus {
-            animation: show-meniscus 0.35s ease forwards;
-            animation-delay: 2.25s;
-        }
-
-        .header-pour-logo .pour-cup-group {
-            transform-origin: 80px 52px;
         }
 
         .header-pour-logo .spill-stream {
@@ -181,71 +154,84 @@
             opacity: 0;
         }
 
-        .header-pour-logo.has-intro-played:not(.is-replaying) .cup-fill {
-            transform: scaleY(0.65);
+        /* Intro: plays exactly once. Class ships in the HTML and is removed by JS. */
+        .header-pour-logo.is-intro .pour-pitcher {
+            animation: pitcher-tilt 2.6s ease-in-out both;
         }
 
-        .header-pour-logo.has-intro-played:not(.is-replaying) .pot-fill-anim {
-            transform: scaleY(0.72);
+        .header-pour-logo.is-intro .pour-stream {
+            animation: pour-stream 2.6s ease-in-out both;
         }
 
-        .header-pour-logo.has-intro-played:not(.is-replaying) .cup-meniscus {
-            opacity: 0.55;
+        .header-pour-logo.is-intro .cup-fill {
+            animation: fill-cup 2.6s ease-in-out both;
         }
 
+        .header-pour-logo.is-intro .pot-fill-anim {
+            animation: drain-pot 2.6s ease-in-out both;
+        }
+
+        .header-pour-logo.is-intro .cup-meniscus {
+            animation: show-meniscus 2.6s ease-in-out both;
+        }
+
+        /* Click replay: spill then refill */
         .header-pour-logo.is-replaying .pour-pitcher {
-            animation: hpl-pitcher-replay 4.2s ease-in-out forwards;
+            animation: hpl-pitcher-replay 4.2s ease-in-out both;
         }
 
         .header-pour-logo.is-replaying .pour-stream {
-            animation: hpl-stream-replay 4.2s ease-in-out forwards;
+            animation: hpl-stream-replay 4.2s ease-in-out both;
         }
 
         .header-pour-logo.is-replaying .pour-cup-group {
-            animation: hpl-cup-tip 4.2s ease-in-out forwards;
+            animation: hpl-cup-tip 4.2s ease-in-out both;
         }
 
         .header-pour-logo.is-replaying .cup-fill {
-            animation: hpl-cup-fill-replay 4.2s ease-in-out forwards;
+            animation: hpl-cup-fill-replay 4.2s ease-in-out both;
         }
 
         .header-pour-logo.is-replaying .pot-fill-anim {
-            animation: hpl-pot-fill-replay 4.2s ease-in-out forwards;
+            animation: hpl-pot-fill-replay 4.2s ease-in-out both;
         }
 
         .header-pour-logo.is-replaying .cup-meniscus {
-            animation: hpl-meniscus-replay 4.2s ease-in-out forwards;
+            animation: hpl-meniscus-replay 4.2s ease-in-out both;
         }
 
         .header-pour-logo.is-replaying .spill-stream {
-            animation: hpl-spill-drip 4.2s ease-in-out forwards;
+            animation: hpl-spill-drip 4.2s ease-in-out both;
         }
 
         @keyframes pitcher-tilt {
-            0%, 12% { transform: translate(0, 0) rotate(0deg); }
-            30%, 40% { transform: translate(0, -9px) rotate(0deg); }
-            56%, 74% { transform: translate(0, -9px) rotate(22deg); }
-            92%, 100% { transform: translate(0, 0) rotate(0deg); }
+            0%, 10% { transform: translate(0, 0) rotate(0deg); }
+            28%, 44% { transform: translate(0, -13px) rotate(0deg); }
+            58%, 86% { transform: translate(0, -13px) rotate(20deg); }
+            96%, 100% { transform: translate(0, 0) rotate(0deg); }
         }
 
         @keyframes pour-stream {
-            0%, 50% { stroke-dashoffset: 50; opacity: 0; }
-            58%, 72% { stroke-dashoffset: 0; opacity: 0.92; }
-            100% { stroke-dashoffset: 0; opacity: 0; }
+            0%, 58% { stroke-dashoffset: 26; opacity: 0; stroke-width: 1.2; }
+            64% { stroke-dashoffset: 15; opacity: 0.85; stroke-width: 1.6; }
+            74% { stroke-dashoffset: 0; opacity: 0.9; stroke-width: 2.8; }
+            84% { stroke-dashoffset: 0; opacity: 0.92; stroke-width: 4.4; }
+            100% { stroke-dashoffset: 0; opacity: 0; stroke-width: 4.4; }
         }
 
         @keyframes fill-cup {
-            0% { transform: scaleY(0); }
-            100% { transform: scaleY(0.65); }
+            0%, 76% { transform: scaleY(0); }
+            96%, 100% { transform: scaleY(0.65); }
         }
 
         @keyframes drain-pot {
-            0% { transform: scaleY(1); }
-            100% { transform: scaleY(0.72); }
+            0%, 76% { transform: scaleY(1); }
+            96%, 100% { transform: scaleY(0.72); }
         }
 
         @keyframes show-meniscus {
-            to { opacity: 0.55; }
+            0%, 90% { opacity: 0; }
+            100% { opacity: 0.55; }
         }
 
         @keyframes hpl-cup-tip {
@@ -256,8 +242,8 @@
 
         @keyframes hpl-cup-fill-replay {
             0%, 6% { transform: scaleY(0.65); }
-            16%, 30% { transform: scaleY(0); }
-            72%, 100% { transform: scaleY(0.65); }
+            18%, 84% { transform: scaleY(0); }
+            96%, 100% { transform: scaleY(0.65); }
         }
 
         @keyframes hpl-spill-drip {
@@ -268,16 +254,18 @@
         }
 
         @keyframes hpl-pitcher-replay {
-            0%, 40% { transform: translate(0, 0) rotate(0deg); }
-            52%, 58% { transform: translate(0, -9px) rotate(0deg); }
-            66%, 82% { transform: translate(0, -9px) rotate(22deg); }
+            0%, 42% { transform: translate(0, 0) rotate(0deg); }
+            54%, 62% { transform: translate(0, -13px) rotate(0deg); }
+            72%, 88% { transform: translate(0, -13px) rotate(20deg); }
             96%, 100% { transform: translate(0, 0) rotate(0deg); }
         }
 
         @keyframes hpl-stream-replay {
-            0%, 62% { stroke-dashoffset: 50; opacity: 0; }
-            68%, 80% { stroke-dashoffset: 0; opacity: 0.92; }
-            100% { stroke-dashoffset: 0; opacity: 0; }
+            0%, 70% { stroke-dashoffset: 26; opacity: 0; stroke-width: 1.2; }
+            76% { stroke-dashoffset: 12; opacity: 0.85; stroke-width: 1.8; }
+            84% { stroke-dashoffset: 0; opacity: 0.9; stroke-width: 3.2; }
+            90% { stroke-dashoffset: 0; opacity: 0.92; stroke-width: 4.4; }
+            100% { stroke-dashoffset: 0; opacity: 0; stroke-width: 4.4; }
         }
 
         @keyframes hpl-pot-fill-replay {
@@ -287,7 +275,7 @@
 
         @keyframes hpl-meniscus-replay {
             0%, 6% { opacity: 0.55; }
-            14%, 68% { opacity: 0; }
+            20%, 88% { opacity: 0; }
             100% { opacity: 0.55; }
         }
 
@@ -329,7 +317,7 @@
         .header-tagline {
             font-family: var(--font-display);
             font-size: 0.95em;
-            color: var(--sage-dark);
+            color: var(--caramel-dark);
             font-weight: 400;
             font-style: italic;
             letter-spacing: 0.01em;
@@ -349,10 +337,12 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
-            width: min(360px, 100%);
+            width: min(340px, 100%);
             text-align: left;
             align-self: end;
-            margin-top: 6px;
+            justify-self: end;
+            margin-top: 18px;
+            margin-right: 18px;
         }
 
         .hero-card {
@@ -368,7 +358,7 @@
         }
 
         .hero-card--plan {
-            background: var(--blue);
+            background: var(--espresso);
             color: #fff;
         }
 
@@ -392,14 +382,14 @@
 
         button.hero-card--plan:hover,
         button.hero-card--plan:focus-visible {
-            background: var(--blue-dark);
+            background: var(--espresso-soft);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(61, 50, 44, 0.12);
             outline: none;
         }
 
         button.hero-card:focus-visible {
-            box-shadow: 0 0 0 2px var(--cream), 0 0 0 4px rgba(111, 138, 115, 0.45);
+            box-shadow: 0 0 0 2px var(--cream), 0 0 0 4px rgba(198, 147, 80, 0.5);
         }
 
         .hero-card h2 {
@@ -576,8 +566,8 @@
         .results-tabs {
             display: flex;
             gap: 4px;
-            background: var(--cream);
-            border: 1px solid var(--border);
+            background: var(--tab-bar-bg);
+            border: 1px solid var(--tab-bar-bg);
             border-bottom: none;
             border-radius: 10px 10px 0 0;
             padding: 6px 6px 0;
@@ -592,33 +582,21 @@
             border-radius: 8px 8px 0 0;
             font-size: 0.84em;
             font-weight: 600;
-            color: var(--secondary);
+            color: rgba(255, 255, 255, 0.72);
             cursor: pointer;
             transition: color 0.15s, background 0.15s;
             margin-bottom: 0;
         }
 
         .results-tab:hover {
-            color: var(--espresso);
-            background: rgba(255, 255, 255, 0.45);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .results-tab.active {
-            color: var(--espresso);
-            background: var(--tab-overview-bg);
-            box-shadow: inset 0 -2px 0 var(--sage);
-        }
-
-        .results-tab[data-tab="curve"].active {
-            background: var(--tab-curve-bg);
-        }
-
-        .results-tab[data-tab="sleep"].active {
-            background: var(--tab-sleep-bg);
-        }
-
-        .results-tab[data-tab="evidence"].active {
-            background: var(--tab-evidence-bg);
+            color: #fff;
+            background: var(--tab-active-bg);
+            box-shadow: inset 0 -3px 0 var(--caramel);
         }
 
         .results-tab-panel {
@@ -634,10 +612,10 @@
             display: block;
         }
 
-        #tab-overview { background: var(--tab-overview-bg); }
-        #tab-curve { background: var(--tab-curve-bg); }
-        #tab-sleep { background: var(--tab-sleep-bg); }
-        #tab-evidence { background: var(--tab-evidence-bg); }
+        #tab-overview,
+        #tab-curve,
+        #tab-sleep,
+        #tab-evidence { background: var(--panel-bg); }
 
         /* SECTION DIVIDERS */
         .results-section {
@@ -3020,32 +2998,32 @@
         <div class="header">
             <div class="header-inner">
                 <div class="header-logo-wrap" aria-hidden="true" title="Click to spill and refill">
-                    <svg class="header-pour-logo" id="headerPourLogo" viewBox="0 0 120 72" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="header-pour-logo is-intro" id="headerPourLogo" viewBox="0 0 120 72" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <clipPath id="hplPotClip">
-                                <path d="M 15 50 L 15 26 C 15 16 22 9 33 8 C 44 7 52 14 52 26 L 52 50 Z"/>
+                                <path d="M 15 52 L 15 25 Q 15 20 20 20 L 47 20 Q 52 20 52 25 L 52 52 Z"/>
                             </clipPath>
                             <clipPath id="hplCupClip">
-                                <path d="M 78 36 L 79.5 50.5 Q 87 53.5 94.5 50.5 L 96 36 Z"/>
+                                <path d="M 70 36 L 71.5 50.5 Q 79 53.5 86.5 50.5 L 88 36 Z"/>
                             </clipPath>
                         </defs>
                         <line x1="6" y1="56" x2="114" y2="56" stroke="#6b5f56" stroke-width="1.3" stroke-linecap="round"/>
                         <g class="pour-pitcher">
-                            <path d="M 10 32 C 4 32 4 44 10 44" fill="none" stroke="#4a4038" stroke-width="3.4" stroke-linecap="round"/>
-                            <path d="M 15 50 L 15 26 C 15 16 22 9 33 8 C 44 7 52 14 52 26 L 52 50 Z" fill="#faf6f0" stroke="#6b5f56" stroke-width="1.3" stroke-linejoin="round"/>
-                            <rect class="pot-fill-anim" x="15" y="14" width="37" height="36" fill="#6b5345" clip-path="url(#hplPotClip)"/>
-                            <line x1="19" y1="22" x2="48" y2="22" stroke="#8a6f5c" stroke-width="1.1" opacity="0.45"/>
-                            <rect x="19" y="4" width="28" height="4.5" rx="0.6" fill="#4a4038"/>
-                            <polygon points="47,5.5 59,1.5 59,10.5" fill="#4a4038"/>
+                            <path d="M 12 28 C 5 28 5 46 12 46" fill="none" stroke="#4a4038" stroke-width="3.4" stroke-linecap="round"/>
+                            <path d="M 15 52 L 15 25 Q 15 20 20 20 L 47 20 Q 52 20 52 25 L 52 52 Z" fill="#faf6f0" stroke="#6b5f56" stroke-width="1.3" stroke-linejoin="round"/>
+                            <rect class="pot-fill-anim" x="15" y="20" width="37" height="32" fill="#6b5345" clip-path="url(#hplPotClip)"/>
+                            <line x1="19" y1="29" x2="48" y2="29" stroke="#8a6f5c" stroke-width="1.1" opacity="0.4"/>
+                            <rect x="14" y="12" width="35" height="8" rx="2.5" fill="#4a4038"/>
+                            <polygon points="48,14 58,18 48,20.5" fill="#4a4038"/>
                         </g>
-                        <path class="pour-stream" d="M 58.5 6 C 64 15 74 25 87 34" stroke="#6b5345" stroke-width="4.6" fill="none" stroke-linecap="round"/>
-                        <path class="spill-stream" d="M 82 46 C 80 52 79 58 78 64" stroke="#6b5345" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path class="pour-stream" d="M 67 17 C 71 24 76 30 79 36" stroke="#6b5345" stroke-width="4.4" fill="none" stroke-linecap="round"/>
+                        <path class="spill-stream" d="M 74 46 C 72 52 71 58 70 64" stroke="#6b5345" stroke-width="4" fill="none" stroke-linecap="round"/>
                         <g class="pour-cup-group">
                             <g class="pour-cup">
-                                <path d="M 77 36 L 79 50.5 Q 87 53.5 95 50.5 L 97 36" fill="none" stroke="#6b5f56" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                                <rect class="cup-fill" x="78" y="36" width="18" height="18" fill="#6b5345" clip-path="url(#hplCupClip)"/>
-                                <line x1="80" y1="36" x2="94" y2="36" stroke="#8a6f5c" stroke-width="1.1" opacity="0" class="cup-meniscus"/>
-                                <path d="M 98.5 39.5 C 105 39.5 105 47.5 98.5 47.5" fill="none" stroke="#6b5f56" stroke-width="2.3" stroke-linecap="round"/>
+                                <path d="M 69 36 L 71 50.5 Q 79 53.5 87 50.5 L 89 36" fill="none" stroke="#6b5f56" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <rect class="cup-fill" x="70" y="36" width="18" height="18" fill="#6b5345" clip-path="url(#hplCupClip)"/>
+                                <line x1="72" y1="36" x2="86" y2="36" stroke="#8a6f5c" stroke-width="1.1" opacity="0" class="cup-meniscus"/>
+                                <path d="M 90.5 39.5 C 97 39.5 97 47.5 90.5 47.5" fill="none" stroke="#6b5f56" stroke-width="2.3" stroke-linecap="round"/>
                             </g>
                         </g>
                     </svg>
@@ -3820,8 +3798,8 @@
     </div>
 
     <!-- SCRIPTS -->
-    <script src="constants.js?v=20250703b"></script>
-    <script src="calculator.js?v=20250706e"></script>
+    <script src="constants.js?v=20260707a"></script>
+    <script src="calculator.js?v=20260707b"></script>
     <script>
         let currentResult = null;
         let timelineChart = null;
@@ -5075,15 +5053,29 @@
 
         function initHeaderPourLogo() {
             const logo = document.getElementById('headerPourLogo');
-            if (!logo || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (!logo) return;
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                logo.classList.remove('is-intro');
+                return;
+            }
+
+            // The intro is already running (is-intro ships in the HTML so it starts
+            // at first paint). Remove it once, after its duration, to hand off to the
+            // resting state. This guarantees the fill plays exactly once.
+            let introDone = false;
+            const endIntro = () => {
+                if (introDone) return;
+                introDone = true;
+                logo.classList.remove('is-intro');
+            };
+            const introTimer = window.setTimeout(endIntro, 2700);
 
             let replaying = false;
-            const introTimer = window.setTimeout(() => logo.classList.add('has-intro-played'), 2700);
-
             logo.closest('.header-logo-wrap')?.addEventListener('click', () => {
                 if (replaying) return;
                 replaying = true;
-                logo.classList.add('has-intro-played');
+                endIntro();
                 logo.classList.remove('is-replaying');
                 void logo.offsetWidth;
                 logo.classList.add('is-replaying');

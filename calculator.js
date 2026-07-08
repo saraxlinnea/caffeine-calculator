@@ -1554,8 +1554,12 @@ function getBedtimeLinePlugin(result) {
             ctx.fillStyle = '#d4a574';
             ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
             const bedConc = result.concentrationAtBedtime.toFixed(2);
-            ctx.fillText(`Bed · ${bedConc} µg/mL`, xPos, yScale.top - 6);
+            const bedLabel = `Bed · ${bedConc} µg/mL`;
+            const bedHalf = ctx.measureText(bedLabel).width / 2;
+            const bedX = Math.max(xScale.left + bedHalf + 4, Math.min(xPos, xScale.right - bedHalf - 4));
+            ctx.fillText(bedLabel, bedX, yScale.top - 16);
 
             const yBed = yScale.getPixelForValue(result.concentrationAtBedtime);
             ctx.beginPath();
@@ -1602,8 +1606,12 @@ function getNowLinePlugin(result) {
             ctx.fillStyle = '#7a9b8e';
             ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
             const nowConc = result.concentrationNow.toFixed(2);
-            ctx.fillText(`Now · ${nowConc} µg/mL`, xPos, yScale.top - 6);
+            const nowLabel = `Now · ${nowConc} µg/mL`;
+            const nowHalf = ctx.measureText(nowLabel).width / 2;
+            const nowX = Math.max(xScale.left + nowHalf + 4, Math.min(xPos, xScale.right - nowHalf - 4));
+            ctx.fillText(nowLabel, nowX, yScale.top - 16);
 
             const yNow = yScale.getPixelForValue(result.concentrationNow);
             ctx.beginPath();
@@ -2191,7 +2199,7 @@ function getTimelineChartConfig(result, chartOptions = {}) {
                 duration: 550,
                 easing: 'easeOutQuart'
             } : false,
-            layout: { padding: { left: 2, right: 8, bottom: 36, top: 14 } },
+            layout: { padding: { left: 2, right: 8, bottom: 36, top: 26 } },
             interaction: { mode: 'nearest', intersect: false },
             plugins: {
                 title: {
