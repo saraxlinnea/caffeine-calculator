@@ -3,6 +3,6 @@
   "private": true,
   "description": "Static caffeine pharmacokinetics calculator",
   "scripts": {
-    "test": "node --test test/calculator.test.js"
+    "test": "node --test test/*.test.js"
   }
 }

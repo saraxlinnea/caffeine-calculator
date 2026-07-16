@@ -1214,6 +1214,20 @@
             font-size: 0.87em;
             line-height: 1.7;
             color: var(--primary);
+            scroll-margin-top: 80px;
+        }
+
+        .citation-num {
+            font-weight: 600;
+            color: var(--espresso);
+            margin-right: 0.35em;
+        }
+
+        .citation-duplicate-note {
+            display: block;
+            font-size: 0.82em;
+            color: var(--secondary);
+            margin-bottom: 4px;
         }
 
         .citation-item a {
@@ -1830,6 +1844,76 @@
         #tab-overview .how-much-now-panel {
             padding: 16px 18px;
             margin: 12px 0 20px;
+        }
+
+        .label-optional {
+            font-weight: 400;
+            color: var(--secondary);
+            font-size: 0.9em;
+        }
+
+        .exercise-panel .exercise-stat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 12px 0 14px;
+        }
+
+        .exercise-stat {
+            flex: 1 1 140px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+
+        .exercise-stat-label {
+            display: block;
+            font-size: 0.72em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        .exercise-stat-value {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: var(--espresso);
+        }
+
+        .exercise-stat-unit {
+            font-size: 0.75em;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-left: 2px;
+        }
+
+        .exercise-worth-callout {
+            margin: 0 0 16px;
+            padding: 14px 16px;
+            background: rgba(198, 147, 80, 0.12);
+            border: 1px solid rgba(198, 147, 80, 0.35);
+            border-radius: 8px;
+            font-size: 0.92em;
+            line-height: 1.55;
+            color: var(--primary);
+        }
+
+        .exercise-sleep-tradeoff {
+            margin: 14px 0 0;
+            padding: 14px 16px;
+            background: rgba(122, 155, 142, 0.1);
+            border: 1px solid rgba(122, 155, 142, 0.35);
+            border-radius: 8px;
+            font-size: 0.9em;
+            line-height: 1.55;
+        }
+
+        .exercise-overview-teaser .exercise-teaser-link {
+            margin-top: 10px;
+            font-size: 0.9em;
         }
 
         .overview-level-explainer {
@@ -3095,6 +3179,13 @@
                 <div class="form-group">
                     <label>Target Bedtime</label>
                     <input type="time" id="bedtime" value="23:00">
+                    <p class="dose-list-note">Use the time you plan to sleep. After-midnight times (e.g. 1:00 AM) count as that night, not the morning you woke up.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Workout time <span class="label-optional">(optional)</span></label>
+                    <input type="time" id="workoutTime" value="">
+                    <p class="dose-list-note">Used for exercise timing tips and estimated caffeine at workout start.</p>
                 </div>
 
                 <input type="hidden" id="sex" value="">
@@ -3197,6 +3288,8 @@
                     <button type="button" class="results-tab" role="tab" aria-selected="false"
                             data-tab="sleep" onclick="switchResultTab('sleep')">Sleep</button>
                     <button type="button" class="results-tab" role="tab" aria-selected="false"
+                            data-tab="exercise" onclick="switchResultTab('exercise')">Exercise</button>
+                    <button type="button" class="results-tab" role="tab" aria-selected="false"
                             data-tab="evidence" onclick="switchResultTab('evidence')">Evidence</button>
                 </div>
 
@@ -3228,12 +3321,26 @@
                         </div>
                     </div>
 
+                    <div class="how-much-now-panel exercise-panel exercise-overview-teaser" id="exerciseOverviewTeaser">
+                        <h3>Exercise</h3>
+                        <div id="exerciseOverviewTeaserContent">
+                            <p class="how-much-now-disclaimer" style="margin-top:0;">
+                                Optional: set a workout time above, then Calculate. Gains in studies are small on average. Sleep at night often matters more.
+                            </p>
+                        </div>
+                        <p class="exercise-teaser-link">
+                            <a href="#" class="tab-jump-link" data-tab="exercise" data-scroll="#exerciseTabPersonalSection">Full exercise guide →</a>
+                        </p>
+                    </div>
+
                     <p class="overview-planning-teaser" id="overviewPlanningTeaser" hidden></p>
 
                     <p class="overview-cross-links">
                         <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curveChartSection">See full 24h curve →</a>
                         ·
                         <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#howMuchNowSection">Plan your next drink →</a>
+                        ·
+                        <a href="#" class="tab-jump-link" data-tab="exercise" data-scroll="#exerciseTabPersonalSection">Exercise guide →</a>
                         ·
                         <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#blockadeStorySection">Why sleep zones? →</a>
                     </p>
@@ -3284,7 +3391,7 @@
                                 </div>
                                 <div class="chart-legend-item">
                                     <span class="chart-swatch chart-swatch-vertical" aria-hidden="true"></span>
-                                    <span><strong>Vertical markers:</strong> Now, bedtime, logged doses, and (when shown) latest time for a repeat drink.</span>
+                                    <span><strong>Vertical markers:</strong> Now, bedtime, workout (when set), logged doses, and (when shown) latest time for a repeat drink.</span>
                                 </div>
                             </div>
                             <p style="margin:12px 0 0;font-size:0.88em;line-height:1.55;color:var(--secondary);">
@@ -3641,6 +3748,144 @@
                     </details>
                 </div>
 
+                <!-- TAB: EXERCISE -->
+                <div id="tab-exercise" class="results-tab-panel" role="tabpanel">
+                    <p class="curve-overview-link">
+                        <a href="#" class="tab-jump-link" data-tab="overview" data-scroll="#bedtimeOutcomePanel">← Back to your three levels (Overview)</a>
+                    </p>
+
+                    <div class="exercise-worth-callout" id="exerciseBodyEffects">
+                        <strong>Exercise and caffeine</strong>
+                        <p style="margin:10px 0 0;font-size:0.92em;line-height:1.55;">
+                            Working out does <strong>not</strong> change how fast you clear caffeine in this model. Your half-life still comes from weight, food, OCP, smoking, pregnancy, and metabolizer settings.
+                        </p>
+                        <ul style="margin:10px 0 0;padding-left:1.25em;line-height:1.6;font-size:0.92em;">
+                            <li><strong>Modest performance edge:</strong> caffeine can help some exercise outcomes on average, especially endurance. Effects are usually small, and not everyone responds<span data-cite="guest2021"></span><span data-cite="southward2018"></span>.</li>
+                            <li><strong>Daily movement:</strong> in a randomized real-world trial, coffee days were linked to about <strong>1,000 more steps</strong> than caffeine-avoidance days<span data-cite="marcus2023"></span>. That kind of activity bump may matter more for overall health than a tiny race-day gain.</li>
+                            <li><strong>Sleep tradeoff:</strong> late caffeine for a workout can still be elevated at bedtime and impair sleep<span data-cite="drake2013"></span><span data-cite="gardiner2023"></span><span data-cite="marcus2023"></span>. Sleep supports recovery and the training adaptations (including muscle) you get from exercise, so the tradeoff is real.</li>
+                        </ul>
+                        <p style="margin:12px 0 0;font-size:0.88em;line-height:1.55;color:var(--secondary);">
+                            This tab estimates <strong>caffeine only</strong> from what you log. Moving workout time alone does not change bedtime caffeine; changing drinks does.
+                        </p>
+                    </div>
+
+                    <details class="collapsible-section" id="exerciseTabPersonalSection" open>
+                        <summary>Your workout and sleep</summary>
+                        <div class="collapsible-section-body">
+                            <div class="how-much-now-panel exercise-panel" id="exercisePlanningSection">
+                                <div id="exercisePlanningContent">
+                                    <p class="how-much-now-disclaimer" style="margin-top:0;">
+                                        Press Calculate after logging drinks. We show when residual caffeine is highest today (no extra dose needed) and how that lines up with bedtime.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="collapsible-section" id="exerciseResearchSection" open>
+                        <summary>What studies report on average</summary>
+                        <div class="collapsible-section-body">
+                            <p class="sleep-education-intro pathway-disclaimer" style="margin-top:0;">
+                                Population averages only. People respond differently<span data-cite="pickering2019"></span><span data-cite="guest2021"></span>.
+                            </p>
+                            <ul style="margin:12px 0 16px;padding-left:1.25em;line-height:1.6;font-size:0.92em;">
+                                <li>Caffeine before exercise helps in many studies, but not all<span data-cite="guest2021"></span><span data-cite="grgic2020"></span>.</li>
+                                <li><strong>Endurance</strong>, especially time trials, has the steadiest average effect<span data-cite="southward2018"></span><span data-cite="doherty2004"></span>.</li>
+                                <li>Beyond the gym: coffee days were linked to roughly <strong>1,000 more daily steps</strong> than caffeine-avoidance days in a randomized ambulatory trial<span data-cite="marcus2023"></span>.</li>
+                                <li>A common study range is <strong>about 3 to 6 mg/kg</strong><span data-cite="guest2021"></span><span data-cite="ganio2009"></span>.</li>
+                                <li>Capsules or coffee are often taken <strong>about 60 minutes</strong> before exercise. Gum or gel can kick in sooner<span data-cite="guest2021"></span>.</li>
+                            </ul>
+                            <table class="zone-mechanism-table" aria-label="Caffeine and exercise outcomes in meta-analyses">
+                                <thead>
+                                    <tr>
+                                        <th>Outcome</th>
+                                        <th>Typical finding</th>
+                                        <th>Caveat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Endurance time trial</td>
+                                        <td>Small average gain (roughly 2 to 3%)<span data-cite="southward2018"></span></td>
+                                        <td>Some trials find no benefit or worse times</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Muscle strength</td>
+                                        <td>Small average effect; upper body a bit clearer<span data-cite="grgic2018"></span></td>
+                                        <td>Lower body is less consistent; few female participants</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Power / jump</td>
+                                        <td>Small, uneven effect<span data-cite="grgic2018"></span><span data-cite="grgic2020"></span></td>
+                                        <td>Wide spread person to person</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+
+                    <details class="collapsible-section" id="exerciseRisksSection" open>
+                        <summary>Risks, energy drinks, and other ingredients</summary>
+                        <div class="collapsible-section-body">
+                            <p style="margin:0 0 12px;font-size:0.92em;line-height:1.6;">
+                                This calculator models <strong>caffeine only</strong>. Pre-workout powders and energy drinks often add taurine, sugar, guarana, B vitamins, and other compounds. Harm reports usually involve the whole product, and researchers are still teasing apart which ingredients matter<span data-cite="gutierrez2021"></span>.
+                            </p>
+                            <ul style="margin:0 0 14px;padding-left:1.25em;line-height:1.6;font-size:0.92em;">
+                                <li><strong>Exercise + caffeine:</strong> caffeinated energy drinks before aerobic exercise have been linked to higher systolic blood pressure during the session in meta-analyses of healthy adults<span data-cite="grinberg2022"></span>. Anxiety, jitters, and poor sleep are common downsides at higher doses<span data-cite="guest2021"></span>.</li>
+                                <li><strong>Case reports:</strong> poison-center and clinical reports have tied energy-drink use to cardiovascular and neurologic symptoms, especially with heavy or combined use<span data-cite="gutierrez2021"></span>.</li>
+                                <li><strong>Caffeine + taurine:</strong> the interaction is not settled. A review noted taurine might blunt some cardiovascular effects of caffeine<span data-cite="schaffer2014"></span>. In isolated heart-tissue experiments, caffeine and taurine each shortened repolarization and made abnormal rhythms easier to trigger; that is one proposed route for serious outcomes after energy-drink use<span data-cite="ellermann2022"></span>. Reviews of whole drinks often point to caffeine and sugar as the main drivers, but most people drink the mix, not single ingredients.</li>
+                            </ul>
+                            <p class="zone-mechanism-caveat" style="margin:0;">
+                                If you have high blood pressure, a heart rhythm condition, or you feel unwell after energy drinks, talk to a clinician. This app is for planning, not medical advice.
+                            </p>
+                        </div>
+                    </details>
+
+                    <details class="collapsible-section" id="exerciseDoseTimingSection">
+                        <summary>Dose and timing reference</summary>
+                        <div class="collapsible-section-body">
+                            <p style="margin:0 0 12px;font-size:0.92em;line-height:1.55;">
+                                Numbers from sports-nutrition reviews, not a prescription. Heavier people need more milligrams to reach the same mg/kg dose.
+                            </p>
+                            <table class="zone-mechanism-table" aria-label="Exercise caffeine dose examples">
+                                <thead>
+                                    <tr>
+                                        <th>Body weight</th>
+                                        <th>~3 mg/kg</th>
+                                        <th>~6 mg/kg</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>60 kg (132 lbs)</td><td>~180 mg</td><td>~360 mg</td></tr>
+                                    <tr><td>70 kg (154 lbs)</td><td>~210 mg</td><td>~420 mg</td></tr>
+                                    <tr><td>80 kg (176 lbs)</td><td>~240 mg</td><td>~480 mg</td></tr>
+                                </tbody>
+                            </table>
+                            <p style="margin:14px 0 0;font-size:0.88em;line-height:1.55;color:var(--secondary);">
+                                Very high doses (around 9 mg/kg) tend to add side effects without a clear extra benefit<span data-cite="guest2021"></span>.
+                                Matching intake to your model <strong>Tmax</strong> is a planning shortcut. It is not proof of the best window for everyone.
+                            </p>
+                        </div>
+                    </details>
+
+                    <details class="collapsible-section" id="exerciseLimitsSection">
+                        <summary>What this calculator does not do</summary>
+                        <div class="collapsible-section-body">
+                            <ul style="margin:0;padding-left:1.25em;line-height:1.6;font-size:0.92em;">
+                                <li><strong>No performance zones:</strong> estimated µg/mL at workout is a blood-level guess, not a validated performance cutoff<span data-cite="ganio2009"></span>.</li>
+                                <li><strong>No taurine or energy-drink modeling:</strong> only caffeine pharmacokinetics.</li>
+                                <li><strong>Habitual caffeine:</strong> daily coffee may already cover much of the alertness effect; withdrawal advice is still debated<span data-cite="pickering2019"></span>.</li>
+                                <li><strong>Sleep:</strong> tying intake to bedtime levels is where this tool is most useful for day-to-day choices.</li>
+                            </ul>
+                            <p style="margin:14px 0 0;font-size:0.88em;">
+                                <a href="#" class="tab-jump-link" data-tab="evidence" data-scroll="#citationsContainer">Citations in Evidence →</a>
+                                ·
+                                <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curveChartSection">Workout on 24h curve →</a>
+                            </p>
+                        </div>
+                    </details>
+                </div>
+
                 <!-- TAB: EVIDENCE -->
                 <div id="tab-evidence" class="results-tab-panel" role="tabpanel">
                     <div class="info-box">
@@ -3798,8 +4043,8 @@
     </div>
 
     <!-- SCRIPTS -->
-    <script src="constants.js?v=20260707a"></script>
-    <script src="calculator.js?v=20260707b"></script>
+    <script src="constants.js?v=20260716a"></script>
+    <script src="calculator.js?v=20260716a"></script>
     <script>
         let currentResult = null;
         let timelineChart = null;
@@ -4376,6 +4621,237 @@
             `;
         }
 
+        function updateExercisePlanningPanel(result) {
+            updateExerciseOverviewTeaser(result);
+            updateExerciseTabPanel(result);
+        }
+
+        function formatAbsHourClock(absHour) {
+            if (absHour == null || Number.isNaN(absHour)) return 'n/a';
+            return formatWallClock(((absHour % 24) + 24) % 24);
+        }
+
+        function renderBestWorkoutWindowsHtml(ex) {
+            const bw = ex.bestWindows;
+            if (!bw) return '';
+            if (!ex.hasLoggedCaffeine || !bw.hasSignal) {
+                return `
+                    <p class="how-much-now-summary">
+                        <strong>Best window (no extra caffeine):</strong> log at least one drink, then Calculate. We will show when residual caffeine is highest between now and bedtime.
+                    </p>
+                `;
+            }
+            if (!bw.windows || bw.windows.length === 0) {
+                return `
+                    <p class="how-much-now-summary">
+                        <strong>Best window (no extra caffeine):</strong> levels stay fairly flat from now to bedtime (peak about ${bw.peakConc.toFixed(2)} µg/mL).
+                        Moving the workout alone does not change bedtime caffeine.
+                    </p>
+                `;
+            }
+            const windowBits = bw.windows.slice(0, 2).map(w => {
+                const a = formatAbsHourClock(w.startAbs);
+                const b = formatAbsHourClock(w.endAbs);
+                return a === b ? a : `${a}–${b}`;
+            });
+            const peakStr = bw.peakAbsHour != null ? formatAbsHourClock(bw.peakAbsHour) : '';
+            return `
+                <p class="how-much-now-summary">
+                    <strong>Best window (no extra caffeine):</strong> with drinks already logged, residual caffeine is relatively high around
+                    <strong>${windowBits.join(', ')}</strong>
+                    ${peakStr ? `(near peak ~${peakStr}, ${bw.peakConc.toFixed(2)} µg/mL)` : `(~${bw.peakConc.toFixed(2)} µg/mL)`}.
+                    That is when you already have the most on board. Bedtime caffeine only changes if you change drinks, not if you only move the workout.
+                </p>
+            `;
+        }
+
+        function updateExerciseOverviewTeaser(result) {
+            const container = document.getElementById('exerciseOverviewTeaserContent');
+            if (!container || !result || !result.exercisePlanning) return;
+
+            const ex = result.exercisePlanning;
+            const bw = ex.bestWindows;
+            let windowHint = '';
+            if (bw && bw.hasSignal && bw.windows && bw.windows.length) {
+                const w = bw.windows[0];
+                const a = formatAbsHourClock(w.startAbs);
+                const b = formatAbsHourClock(w.endAbs);
+                windowHint = ` Higher residual ~${a === b ? a : `${a}–${b}`}.`;
+            }
+
+            if (ex.workoutHour == null) {
+                container.innerHTML = `
+                    <p class="how-much-now-summary" style="margin:0;">
+                        Optional workout time. Modest average performance effects; coffee days have also been linked to more daily steps<span data-cite="marcus2023"></span>.
+                        Sleep after late caffeine still matters for recovery.${windowHint}
+                    </p>
+                `;
+                applyInlineCitations(container);
+                return;
+            }
+
+            const concStr = ex.concentrationAtWorkout != null
+                ? `${ex.concentrationAtWorkout.toFixed(2)} µg/mL at workout`
+                : 'workout set';
+            const bedSnippet = result.concentrationAtBedtime != null
+                ? ` · bedtime est. ${result.concentrationAtBedtime.toFixed(2)} µg/mL`
+                : '';
+            container.innerHTML = `
+                <p class="how-much-now-summary" style="margin:0;">
+                    <strong>${formatWallClock(ex.workoutHour)}</strong>: est. ${concStr}${bedSnippet}.${windowHint}
+                    ${result.concentrationAtBedtime >= 0.5 ? ' Watch the sleep tradeoff.' : ''}
+                </p>
+            `;
+        }
+
+        function updateExerciseTabPanel(result) {
+            const container = document.getElementById('exercisePlanningContent');
+            if (!container || !result || !result.exercisePlanning) return;
+
+            const ex = result.exercisePlanning;
+            const dg = ex.doseGuide;
+            const totalMg = ex.totalLoggedMg != null ? ex.totalLoggedMg : result.totalMg;
+            const bedConc = result.concentrationAtBedtime != null
+                ? result.concentrationAtBedtime.toFixed(2)
+                : null;
+            const bedZone = result.zoneAtBedtime && typeof getZoneLabelShort === 'function'
+                ? getZoneLabelShort(result.zoneAtBedtime)
+                : (result.zoneAtBedtime ? result.zoneAtBedtime.label : '');
+            const elevatedBed = result.concentrationAtBedtime != null && result.concentrationAtBedtime >= 0.5;
+            const highBed = result.concentrationAtBedtime != null && result.concentrationAtBedtime >= 1.0;
+            const bedTimeStr = typeof formatWallClock === 'function'
+                ? formatWallClock(result.bedtimeHour)
+                : '';
+
+            const windowsHtml = renderBestWorkoutWindowsHtml(ex);
+
+            let timingHtml = '';
+            if (ex.workoutHour == null) {
+                timingHtml = `
+                    <p class="how-much-now-summary">Optional: set a <strong>Workout time</strong> to see estimated caffeine at that clock time next to bedtime.</p>
+                `;
+            } else {
+                const workoutStr = formatWallClock(ex.workoutHour);
+                const concStr = ex.concentrationAtWorkout != null
+                    ? `${ex.concentrationAtWorkout.toFixed(2)} µg/mL`
+                    : 'n/a';
+                const hoursToBed = ex.hoursWorkoutToBedtime != null
+                    ? `${Math.round(ex.hoursWorkoutToBedtime * 10) / 10} h`
+                    : 'n/a';
+                timingHtml = `
+                    <div class="exercise-stat-row">
+                        <div class="exercise-stat">
+                            <span class="exercise-stat-label">Workout</span>
+                            <span class="exercise-stat-value">${workoutStr}</span>
+                        </div>
+                        <div class="exercise-stat">
+                            <span class="exercise-stat-label">Est. at workout</span>
+                            <span class="exercise-stat-value">${concStr}</span>
+                        </div>
+                        <div class="exercise-stat">
+                            <span class="exercise-stat-label">Est. at bedtime</span>
+                            <span class="exercise-stat-value">${bedConc != null ? `${bedConc} µg/mL` : 'n/a'}</span>
+                        </div>
+                        <div class="exercise-stat">
+                            <span class="exercise-stat-label">Workout → bed</span>
+                            <span class="exercise-stat-value">${hoursToBed}</span>
+                        </div>
+                    </div>
+                    <p class="how-much-now-summary">
+                        <strong>${totalMg} mg</strong> logged today${dg ? ` (many performance studies use about ${dg.lowMg} to ${dg.highMg} mg for your weight)` : ''}<span data-cite="guest2021"></span>.
+                    </p>
+                `;
+            }
+
+            let adviceHtml = '';
+            if (bedConc != null) {
+                if (highBed) {
+                    adviceHtml = `
+                        <div class="exercise-sleep-tradeoff" id="exerciseSleepTradeoff">
+                            <strong>Bedtime looks high.</strong> Estimated <strong>${bedConc} µg/mL</strong> at ${bedTimeStr} (${bedZone}) from drinks already logged.
+                            Skipping extra caffeine helps sleep more than moving the workout alone. Sleep supports recovery and training adaptations (including muscle)<span data-cite="drake2013"></span><span data-cite="gardiner2023"></span>.
+                            <a href="#" class="tab-jump-link" data-tab="sleep" data-scroll="#zoneReferenceSection">Sleep zones →</a>
+                            ·
+                            <a href="#" class="tab-jump-link" data-tab="curve" data-scroll="#curveChartSection">24h curve →</a>
+                        </div>
+                    `;
+                } else if (elevatedBed) {
+                    adviceHtml = `
+                        <div class="exercise-sleep-tradeoff" id="exerciseSleepTradeoff">
+                            <strong>Sleep tradeoff.</strong> Bedtime estimate is <strong>${bedConc} µg/mL</strong> (${bedZone}).
+                            Extra late caffeine for exercise may add only a small average performance edge while leaving more active at night, which can hurt sleep and recovery<span data-cite="southward2018"></span><span data-cite="marcus2023"></span><span data-cite="gardiner2023"></span>.
+                            Changing drinks changes bedtime levels; changing only workout time does not.
+                        </div>
+                    `;
+                } else {
+                    adviceHtml = `
+                        <p class="how-much-now-summary">
+                            Bedtime estimate is <strong>${bedConc} µg/mL</strong> (${bedZone}) with your current log.
+                            If you add caffeine later for a workout, re-check bedtime.
+                        </p>
+                    `;
+                }
+            }
+
+            let doseTimingHtml = '';
+            if (ex.workoutHour != null && !highBed) {
+                const suggestStr = ex.suggestedIntakeHour != null
+                    ? formatWallClock(ex.suggestedIntakeHour)
+                    : null;
+                const lead = ex.suggestedLeadMinutes != null ? ex.suggestedLeadMinutes : ex.literatureLeadMin;
+                const doseHigh = dg && totalMg >= dg.highMg;
+                if (doseHigh) {
+                    doseTimingHtml = `
+                        <p class="how-much-now-summary">
+                            <strong>High daily total:</strong> about ${totalMg} mg logged, near or above many study ranges (${dg.lowMg} to ${dg.highMg} mg for your weight).
+                            Adding a full pre-workout dose could push bedtime higher and affect sleep<span data-cite="guest2021"></span>.
+                        </p>
+                    `;
+                } else if (dg && totalMg > 0) {
+                    doseTimingHtml = `
+                        <p class="how-much-now-summary">
+                            Optional extra dose: studies often use about <strong>${dg.lowMg} to ${dg.highMg} mg</strong> for your weight; you have ${totalMg} mg logged<span data-cite="guest2021"></span>.
+                            ${suggestStr ? `Timing only (if you add more): about <strong>${lead} min</strong> before (${suggestStr}).` : ''}
+                        </p>
+                    `;
+                } else if (dg) {
+                    doseTimingHtml = `
+                        <p class="how-much-now-summary">
+                            If you add caffeine for this workout, many studies use about <strong>${dg.lowMg} to ${dg.highMg} mg</strong> for your weight<span data-cite="guest2021"></span>.
+                            ${suggestStr ? `Timing only: about <strong>${lead} min</strong> before (${suggestStr}).` : ''}
+                        </p>
+                    `;
+                }
+            } else if (ex.workoutHour != null && highBed && dg) {
+                doseTimingHtml = `
+                    <p class="how-much-now-disclaimer">
+                        With ${totalMg} mg logged and a high bedtime estimate, we are not suggesting another pre-workout dose.
+                    </p>
+                `;
+            }
+
+            let ocpNoteHtml = '';
+            if (result.onContraceptives) {
+                ocpNoteHtml = `
+                    <p class="how-much-now-summary">
+                        <strong>Oral contraceptives</strong> slow caffeine clearance in this model (about 1.7× longer half-life), so afternoon caffeine can hang around longer into a late bedtime.
+                    </p>
+                `;
+            }
+
+            const caveat = `Exercise does not speed caffeine clearance here. Population averages only; habits and genetics change response<span data-cite="pickering2019"></span>.`;
+
+            container.innerHTML = `
+                ${windowsHtml}
+                ${timingHtml}
+                ${adviceHtml}
+                ${doseTimingHtml}
+                ${ocpNoteHtml}
+                <p class="how-much-now-disclaimer">${caveat}</p>
+            `;
+            applyInlineCitations(container);
+        }
+
         const OVERVIEW_UNITS_PRIMER_HTML =
             '<p class="units-primer units-primer-inline"><strong>µg/mL</strong> = micrograms of caffeine per milliliter of blood. This calculator estimates that from your dose, weight, and clearance. It is not a lab test.</p>';
 
@@ -4528,7 +5004,12 @@
                 metabolizerType: document.getElementById('metabolizer').value,
                 foodStatus: document.getElementById('food').value,
                 nowHour: parseTime('nowTime'),
-                bedtimeHour: parseTime('bedtime')
+                bedtimeHour: parseTime('bedtime'),
+                workoutHour: (() => {
+                    const raw = document.getElementById('workoutTime')?.value;
+                    if (!raw) return null;
+                    return parseTimeInputValue(raw);
+                })()
             };
         }
 
@@ -4549,6 +5030,7 @@
 
                 updateBedtimeOutcomePanel(currentResult);
                 updateHowMuchNowPanel(currentResult);
+                updateExercisePlanningPanel(currentResult);
                 updateOverviewPlanningTeaser(currentResult);
                 updateEvidenceMathPanel(currentResult);
                 updatePkWarnings(currentResult);
@@ -5015,7 +5497,9 @@
                 <div class="citation-group">
                     <div class="citation-group-title">${group.title}</div>
                     ${group.items.map(c => `
-                        <div class="citation-item"${c.pmid ? ` id="ref-${c.pmid}"` : ''}>
+                        <div class="citation-item"${c.duplicateOf ? '' : ` id="${c.refId}"`}>
+                            ${c.duplicateOf ? `<span class="citation-duplicate-note">Same source as citation [${c.duplicateOf}].</span>` : ''}
+                            <span class="citation-num">[${c.num}]</span>
                             ${formatVancouverCitation(c)}
                             <span class="citation-used"><strong>Used in this calculator:</strong> ${c.usedFor}</span>
                             ${formatCitationLinks(c)}
@@ -5093,6 +5577,8 @@
             renderCitations();
             applyInlineCitations(document.getElementById('tab-curve'));
             applyInlineCitations(document.getElementById('tab-sleep'));
+            applyInlineCitations(document.getElementById('tab-exercise'));
+            applyInlineCitations(document.getElementById('exercisePlanningSection'));
             setupTabJumpLinks();
             initHeaderPourLogo();
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

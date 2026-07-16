@@ -2,15 +2,19 @@
 
 ## Research-Backed Sleep Disruption Zones
 
-Zone boundaries in the calculator align with **Baur et al. (2024)** concentration–EEG findings, **Gardiner et al. (2023)** meta-analysis averages, and **Drake et al. (2013)** dose-timing effects. Adenosine mechanism context draws on **Clark & Landolt (2017)**. These are population research references, not personal sleep guarantees.
+Zone boundaries in the calculator align with **Baur et al. (2024)** [1] concentration–EEG findings, **Gardiner et al. (2023)** [2] meta-analysis averages, and **Drake et al. (2013)** [3] dose-timing effects. Adenosine mechanism context draws on **Clark & Landolt (2017)** [4]. These are population research references, not personal sleep guarantees.
+
+The app chart uses **five** bands (green, yellow, orange, red, dark red); see `constants.js` thresholds at 0.5, 1.0, 1.4, and 2.5 µg/mL.
 
 See `CAFFEINE_SCIENCE.md` for full citations (PubMed links).
 
 ---
 
-## The Four Sleep Disruption Zones
+## The Five Sleep Disruption Zones
 
-### **ZONE 1: SAFE (🟢 Green)**
+The calculator uses **five** bands in `constants.js` (green, yellow, orange, red, dark red). Percent ranges below are **illustrative** population averages from studies, not precise predictions at your exact µg/mL.
+
+### **ZONE 1: LOW (🟢 Green)**
 
 **Concentration Range:** < 0.5 µg/mL
 
@@ -29,31 +33,31 @@ See `CAFFEINE_SCIENCE.md` for full citations (PubMed links).
 - Single low dose (< 50 mg)
 - Empty stomach absorption
 
-**Recommendation:** ✅ **SAFE to sleep**
+**Recommendation:** Lower bedtime residual planning target; may be compatible with sleep for many people
 
 **Associated Dose (approx):**
 - 30 mg caffeine @ 70kg = 0.42 µg/mL ✅
 
 ---
 
-### **ZONE 2: CAUTION (🟡 Yellow)**
+### **ZONE 2: MODERATE (🟡 Yellow)**
 
-**Concentration Range:** 0.5–1.4 µg/mL
+**Concentration Range:** 0.5–1.0 µg/mL
 
-**What Happens:**
-- Subtle sleep architecture changes
-- REM sleep latency: slightly delayed (10-20 min longer)
-- Light sleep (Stage 1-2): increased
-- Deep sleep (Stage 3 delta): slightly reduced
+**What Happens (illustrative averages):**
+- Subtle sleep architecture changes may appear
+- REM sleep latency: may be slightly delayed
+- Light sleep (Stage 1-2): may increase
+- Deep sleep (Stage 3 delta): may be slightly reduced
 
 **Physiological Changes:**
-- Heart rate: +5-10 bpm
-- EEG delta power: minimal reduction
-- Sleep fragmentation: minimal
+- Heart rate: may increase modestly
+- EEG delta power: minimal reduction in some studies
+- Sleep fragmentation: often minimal
 
 **User Perception:**
 - May feel like "lighter sleep"
-- Take slightly longer to fall asleep (5-15 min)
+- May take slightly longer to fall asleep
 - Possible night waking
 - Morning alertness: normal to slightly reduced
 
@@ -62,35 +66,62 @@ See `CAFFEINE_SCIENCE.md` for full citations (PubMed links).
 - Moderate dose (75-150 mg)
 - With food (delayed absorption)
 
-**Recommendation:** ⚠️ **CAUTION — May impact sleep quality**
+**Recommendation:** ⚠️ **CAUTION — May impact sleep quality for some people**
 
 **Associated Doses (approx):**
-- 100 mg caffeine @ 70kg = 1.4 µg/mL (upper limit)
-- 80 mg caffeine @ 70kg = 1.1 µg/mL
+- 80 mg caffeine @ 70kg = 1.1 µg/mL (upper yellow)
 - 50 mg caffeine @ 70kg = 0.7 µg/mL
 
 ---
 
-### **ZONE 3: WARNING (🔴 Red)**
+### **ZONE 3: ELEVATED (🟠 Orange)**
+
+**Concentration Range:** 1.0–1.4 µg/mL
+
+**What Happens (illustrative averages):**
+- More noticeable sleep architecture changes
+- REM sleep latency: may be further delayed
+- Deep sleep (Stage 3): may be more reduced
+- Approaches the Baur et al. (2024) [1] ~1.4 µg/mL research reference line
+
+**Physiological Changes:**
+- EEG delta power: may show clearer reduction approaching ~1.4 µg/mL in controlled protocols
+- Sleep fragmentation: may become more noticeable
+
+**User Perception:**
+- More likely to notice lighter or less restorative sleep
+- Longer sleep onset for some people
+
+**When This Applies:**
+- Caffeine taken 4-10 hours before bed
+- Moderate doses with slower clearance (OCP, slow metabolizer)
+
+**Recommendation:** ⚠️ **ELEVATED — Higher chance of sleep impact**
+
+**Associated Doses (approx):**
+- 100 mg caffeine @ 70kg = 1.4 µg/mL (orange/red boundary; Baur reference)
+
+---
+
+### **ZONE 4: HIGH (🔴 Red)**
 
 **Concentration Range:** 1.4–2.5 µg/mL
 
-**What Happens:**
-- Clear sleep architecture disruption
-- REM sleep latency: delayed 30-60 minutes
-- Total REM sleep: reduced by 20-40%
-- Deep sleep (Stage 3): significantly reduced
+**What Happens (illustrative averages):**
+- Clearer sleep architecture disruption on average
+- REM sleep latency: may be substantially delayed
+- Total REM sleep: may be reduced
+- Deep sleep (Stage 3): may be significantly reduced
 
 **Physiological Changes:**
-- Heart rate: +10-20 bpm
-- EEG delta power: 30-50% reduction
-- Sleep fragmentation: noticeable (2-5 extra arousals)
-- Heart rate variability: altered
+- Heart rate: may be elevated
+- EEG delta power: may show substantial reduction in studies
+- Sleep fragmentation: may be noticeable
 
 **User Perception:**
-- Feel like "tossed and turned"
-- Wake up 2-5 times during night
-- Morning grogginess / reduced alertness
+- May feel like "tossed and turned"
+- May wake multiple times during night
+- Morning grogginess / reduced alertness possible
 - "Didn't feel like I slept well" (even if total sleep time similar)
 - May not realize caffeine is the cause
 
@@ -99,39 +130,38 @@ See `CAFFEINE_SCIENCE.md` for full citations (PubMed links).
 - Moderate to high dose (150-250 mg)
 - On empty stomach (rapid absorption)
 
-**Recommendation:** 🛑 **NOT RECOMMENDED — Will disrupt REM sleep**
+**Recommendation:** 🛑 **HIGH — Stronger average disruption risk in research**
 
 **Associated Doses (approx):**
-- 200 mg caffeine @ 70kg = 2.8 µg/mL (too high)
+- 200 mg caffeine @ 70kg = 2.8 µg/mL (above red band)
 - 150 mg caffeine @ 70kg = 2.1 µg/mL
-- 100 mg caffeine @ 70kg = 1.4 µg/mL (threshold)
+- 100 mg caffeine @ 70kg = 1.4 µg/mL (red threshold)
 
 ---
 
-### **ZONE 4: DANGER (⛔ Dark Red)**
+### **ZONE 5: VERY HIGH (⛔ Dark Red)**
 
 **Concentration Range:** > 2.5 µg/mL
 
-**What Happens:**
-- Severe sleep architecture disruption
-- REM sleep: latency delayed 60+ minutes
-- Total REM sleep: reduced by 40-60%
-- Deep sleep (Stage 3): nearly eliminated
-- Total sleep time: reduced
+**What Happens (illustrative averages):**
+- Severe sleep architecture disruption on average
+- REM sleep: latency may be greatly delayed
+- Total REM sleep: may be substantially reduced
+- Deep sleep (Stage 3): may be nearly eliminated for some
+- Total sleep time: may be reduced
 
 **Physiological Changes:**
-- Heart rate: +20-30 bpm
-- Elevated blood pressure
-- EEG delta power: 50-80% reduction
-- Sleep fragmentation: severe (6+ arousals)
-- Insomnia-like symptoms despite tiredness
+- Heart rate and arousal: may be elevated
+- EEG delta power: may show large reductions in studies
+- Sleep fragmentation: may be severe
+- Insomnia-like symptoms possible despite tiredness
 
 **User Perception:**
-- Cannot fall asleep / severe sleep onset delay
-- Constant waking throughout night
-- No deep sleep / no restorative sleep feeling
-- Morning: exhaustion despite being in bed long hours
-- Jitteriness, anxiety in evening
+- Difficulty falling asleep / severe sleep onset delay
+- Frequent waking throughout night
+- Little deep sleep / little restorative feeling
+- Morning exhaustion despite time in bed
+- Jitteriness, anxiety in evening possible
 
 **When This Applies:**
 - Caffeine taken 2-6 hours before bed
@@ -139,7 +169,7 @@ See `CAFFEINE_SCIENCE.md` for full citations (PubMed links).
 - Multiple caffeine sources combined
 - Fasting state (rapid absorption)
 
-**Recommendation:** ⛔ **AVOID — Severe sleep disruption**
+**Recommendation:** ⛔ **VERY HIGH — Severe average disruption risk in research**
 
 **Associated Doses (approx):**
 - 300 mg caffeine @ 70kg = 4.2 µg/mL
@@ -238,19 +268,22 @@ Your actual threshold may vary based on:
 ## Key Takeaway
 
 **Bottom Line:**
-- **Safe to sleep at < 0.5 µg/mL (green zone)**
-- **Avoid > 1.4 µg/mL (red zone) before bed**
-- **Most people should cut off caffeine 8-10 hours before bed**
-- **Individual response varies by genetics, sex, and sleep sensitivity**
+- **Lower bedtime residual target: < 0.5 µg/mL (green zone)**
+- **Baur research reference: ~1.4 µg/mL (not a personal safe limit)**
+- **Above ~1.4 µg/mL (red zone): stronger average disruption risk in studies**
+- **Many people cut off caffeine 8-10 hours before bed as a planning heuristic**
+- **Individual response varies by genetics, clearance factors, and sleep sensitivity**
 
 ---
 
 ## References (calculator Evidence tab)
 
-| Study | Role in zones |
-|-------|----------------|
-| [Baur et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38221756/) — *J Sleep Res* | ~1.4 µg/mL Baur line; EEG delta-power concentration–effect |
-| [Gardiner et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36870101/) — *Sleep Med Rev* | Meta-analysis: latency, total sleep time, efficiency |
-| [Drake et al. 2013](https://pubmed.ncbi.nlm.nih.gov/24235903/) — *J Clin Sleep Med* | Sleep disruption at 0, 3, and 6 h before bed |
-| [Clark & Landolt 2017](https://pubmed.ncbi.nlm.nih.gov/26899133/) — *Sleep Med Rev* | Adenosine mechanisms and dose–response variability |
-| [Burke et al. 2015](https://pubmed.ncbi.nlm.nih.gov/26378246/) — *Sci Transl Med* | Circadian melatonin delay (separate from plasma zones) |
+Numbering matches the Evidence tab (`constants.js` → `CITATION_GROUPS`).
+
+| Ref | Study | Role in zones |
+|-----|-------|----------------|
+| [1] | [Baur et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38221756/) — *J Sleep Res* | ~1.4 µg/mL Baur line; EEG delta-power concentration–effect |
+| [2] | [Gardiner et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36870101/) — *Sleep Med Rev* | Meta-analysis: latency, total sleep time, efficiency |
+| [3] | [Drake et al. 2013](https://pubmed.ncbi.nlm.nih.gov/24235903/) — *J Clin Sleep Med* | Sleep disruption at 0, 3, and 6 h before bed |
+| [4] | [Clark & Landolt 2017](https://pubmed.ncbi.nlm.nih.gov/26899133/) — *Sleep Med Rev* | Adenosine mechanisms and dose–response variability |
+| [5] | [Burke et al. 2015](https://pubmed.ncbi.nlm.nih.gov/26378246/) — *Sci Transl Med* | Circadian melatonin delay (separate from plasma zones) |

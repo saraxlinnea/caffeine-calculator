@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="The Caffeine Calculator">
   <rect width="32" height="32" rx="6" fill="#faf6f0"/>
   <defs>
-    <clipPath id="fp"><path d="M 5 24 L 5 14 C 5 10, 8 8, 11 8 C 14 8, 17 10, 17 14 L 17 24 Z"/></clipPath>
+    <clipPath id="fp"><path d="M 4 24 L 4 12.5 Q 4 10 6 10 L 15 10 Q 17 10 17 12.5 L 17 24 Z"/></clipPath>
     <clipPath id="fc"><path d="M 20 16 L 20 22 Q 20 24, 23 24 Q 26 24, 26 22 L 26 16 Z"/></clipPath>
   </defs>
-  <path d="M 4 24 L 4 14 C 4 10, 7 8, 10.5 8 C 14 8, 17 10, 17 14 L 17 24 Z" fill="#faf6f0" stroke="#6b5f56" stroke-width="0.9"/>
+  <path d="M 4 24 L 4 12.5 Q 4 10 6 10 L 15 10 Q 17 10 17 12.5 L 17 24 Z" fill="#faf6f0" stroke="#6b5f56" stroke-width="0.9"/>
   <rect x="5" y="16" width="12" height="8" fill="#6b5345" clip-path="url(#fp)"/>
-  <rect x="7" y="7" width="8" height="1.5" fill="#4a4038"/>
-  <polygon points="15,7.5 19,6 19,9" fill="#4a4038"/>
+  <rect x="3.5" y="6.5" width="13" height="3.5" rx="1" fill="#4a4038"/>
+  <polygon points="16,7.3 20.5,9 16,10.7" fill="#4a4038"/>
   <path d="M 19 16 L 19 22 Q 19 24, 23 24 Q 27 24, 27 22 L 27 16" fill="none" stroke="#6b5f56" stroke-width="0.9"/>
   <rect x="20" y="16" width="7" height="8" fill="#6b5345" clip-path="url(#fc)"/>
 </svg>

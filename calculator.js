@@ -165,7 +165,45 @@ function hoursElapsedSameDay(targetHour, intakeHour) {
 }
 
 /**
- * Elapsed wall-clock hours from intake to bedtime (bedtime always forward in the day).
+ * Next bedtime on an extended timeline (may exceed 24 when bedtime is after midnight).
+ * If now is already past tonight's bedtime clock time, bedtime is treated as tomorrow.
+ *
+ * @param {number} nowHour
+ * @param {number} bedtimeHour - Wall-clock hour 0–23.99
+ * @returns {number} Extended hour of the upcoming bedtime
+ */
+function getNextBedtimeHour(nowHour, bedtimeHour) {
+    if (nowHour <= bedtimeHour) return bedtimeHour;
+    return bedtimeHour + 24;
+}
+
+/**
+ * Hours from a reference time until the next bedtime.
+ *
+ * @param {number} fromHour - Usually nowHour
+ * @param {number} bedtimeHour
+ * @returns {number}
+ */
+function hoursUntilNextBedtime(fromHour, bedtimeHour) {
+    return getNextBedtimeHour(fromHour, bedtimeHour) - fromHour;
+}
+
+/**
+ * Chart x-axis offset (hours from curveStartHour) for the next bedtime marker.
+ *
+ * @param {number} curveStartHour
+ * @param {number} nowHour
+ * @param {number} bedtimeHour
+ * @returns {number|null} null if beyond the 24h chart window
+ */
+function getBedtimeChartOffset(curveStartHour, nowHour, bedtimeHour) {
+    const offset = getNextBedtimeHour(nowHour, bedtimeHour) - curveStartHour;
+    if (offset < 0 || offset > 24) return null;
+    return offset;
+}
+
+/**
+ * Elapsed wall-clock hours from intake to the next bedtime (forward on the 24h clock).
  *
  * @param {number} bedtimeHour - Target bedtime (decimal)
  * @param {number} intakeHour  - Wall-clock hour of intake (decimal)
@@ -319,7 +357,7 @@ function findDailyPeak(curve, curveLow, curveHigh, curveStartHour) {
  * @returns {number} Max additional dose (mg)
  */
 function calculateMaxAdditionalDoseNow(intakes, params, concentrationAtBedtime) {
-    const hoursNowToBedtime = (params.bedtimeHour - params.nowHour + 24) % 24;
+    const hoursNowToBedtime = hoursUntilNextBedtime(params.nowHour, params.bedtimeHour);
     const tmaxHours = getTimeToMaxConcentration(params.foodStatus) / 60;
 
     if (hoursNowToBedtime <= tmaxHours) return 0;
@@ -418,7 +456,7 @@ function calculateLastCaffeineCutoff(intakes, pkParams, targetLevel = SAFE_THRES
     const { nowHour, bedtimeHour } = pkParams;
     const stepMin = 15;
     const nowMin = hourToMinutes(nowHour);
-    const hoursNowToBedtime = (bedtimeHour - nowHour + 24) % 24;
+    const hoursNowToBedtime = hoursUntilNextBedtime(nowHour, bedtimeHour);
     const windowMin = hoursNowToBedtime === 0 ? 24 * 60 : Math.round(hoursNowToBedtime * 60);
 
     const atNowConc = bedtimeConcentrationForPastIntakes(intakes, pkParams, nowHour);
@@ -505,7 +543,7 @@ function calculateLatestRepeatDoseTime(intakes, pkParams, referenceMg, targetLev
 
     const stepMin = 15;
     const nowMin = hourToMinutes(nowHour);
-    const hoursNowToBedtime = (bedtimeHour - nowHour + 24) % 24;
+    const hoursNowToBedtime = hoursUntilNextBedtime(nowHour, bedtimeHour);
     const windowMin = hoursNowToBedtime === 0 ? 24 * 60 : Math.round(hoursNowToBedtime * 60);
 
     const hypothetical = { amountMg: referenceMg, hour: nowHour, foodStatus };
@@ -515,7 +553,7 @@ function calculateLatestRepeatDoseTime(intakes, pkParams, referenceMg, targetLev
         pkParams,
         { useBedtimeElapsed: true }
     );
-    const hoursNowIntakeToBed = (bedtimeHour - nowHour + 24) % 24;
+    const hoursNowIntakeToBed = hoursUntilNextBedtime(nowHour, bedtimeHour);
     const fitsAtNow = hoursNowIntakeToBed >= tmaxHours
         && bedtimeIfAddedNow <= targetLevel + 1e-9;
 
@@ -979,7 +1017,8 @@ function generateCaffeineCurve(params) {
         pregnancy = false,
         metabolizerType,
         nowHour,
-        bedtimeHour
+        bedtimeHour,
+        workoutHour = null
     } = params;
 
     const intakes = (params.intakes || [])
@@ -1005,8 +1044,11 @@ function generateCaffeineCurve(params) {
 
     const intakeHours = intakes.map(i => i.hour);
     const curveStartHour = Math.floor(
-        intakeHours.length ? Math.min(...intakeHours, nowHour, bedtimeHour) : Math.min(nowHour, bedtimeHour)
+        intakeHours.length ? Math.min(...intakeHours, nowHour) : nowHour
     );
+    const nextBedtimeHour = getNextBedtimeHour(nowHour, bedtimeHour);
+    const hoursUntilBedtime = hoursUntilNextBedtime(nowHour, bedtimeHour);
+    const bedtimeChartOffset = getBedtimeChartOffset(curveStartHour, nowHour, bedtimeHour);
     const { curve, curveLow, curveHigh } =
         buildConcentrationCurves(intakes, pkParams, curveStartHour);
     const {
@@ -1082,6 +1124,16 @@ function generateCaffeineCurve(params) {
     const bedtimeIfMaxDoseNow = getBedtimeConcentrationIfDoseNow(maxDoseNow, activeIntakes, pkParams);
     const standardDrinkLatestTimes = getStandardDrinkLatestTimes(activeIntakes, pkParams, SAFE_THRESHOLD);
 
+    const exercisePlanning = buildExercisePlanning({
+        workoutHour,
+        intakes: activeIntakes,
+        pkParams,
+        tmax_hours,
+        tmax_minutes,
+        bedtimeHour,
+        nowHour
+    });
+
     return {
         intakes: activeIntakes,
         hasNoLoggedCaffeine,
@@ -1146,6 +1198,225 @@ function generateCaffeineCurve(params) {
         consumptionHour,
         nowHour,
         bedtimeHour,
+        nextBedtimeHour,
+        hoursUntilBedtime,
+        bedtimeChartOffset,
+        workoutHour,
+        exercisePlanning,
+    };
+}
+
+/**
+ * Population dose guide for exercise (mg), from EXERCISE_DOSE_MG_PER_KG × body weight.
+ * Educational range only — not a personal prescription.
+ *
+ * @param {number} bodyWeightKg
+ * @returns {{ lowMg: number, highMg: number, lowPerKg: number, highPerKg: number }}
+ */
+function getExerciseDoseGuide(bodyWeightKg) {
+    const lowPerKg = EXERCISE_DOSE_MG_PER_KG.low;
+    const highPerKg = EXERCISE_DOSE_MG_PER_KG.high;
+    const weight = Math.max(0, Number(bodyWeightKg) || 0);
+    return {
+        lowPerKg,
+        highPerKg,
+        lowMg: Math.round(weight * lowPerKg),
+        highMg: Math.round(weight * highPerKg)
+    };
+}
+
+/**
+ * Suggest a same-day intake time so model Tmax lands near workout start.
+ * Uses the user's food-status Tmax (or EXERCISE_PRE_WORKOUT_MIN as a literature fallback).
+ *
+ * @param {number} workoutHour - Wall-clock hour of workout (decimal)
+ * @param {number} tmaxHours - Model time-to-peak (hours)
+ * @returns {{ suggestedIntakeHour: number, leadMinutes: number } | null}
+ */
+function getSuggestedPreWorkoutIntake(workoutHour, tmaxHours) {
+    if (workoutHour == null || Number.isNaN(workoutHour)) return null;
+    const leadHours = (tmaxHours != null && tmaxHours > 0)
+        ? tmaxHours
+        : EXERCISE_PRE_WORKOUT_MIN / 60;
+    let suggested = workoutHour - leadHours;
+    if (suggested < 0) suggested += 24;
+    return {
+        suggestedIntakeHour: suggested,
+        leadMinutes: Math.round(leadHours * 60)
+    };
+}
+
+/**
+ * Absolute timeline hour for a workout wall-clock time relative to "now".
+ * Later today stays same-day; an earlier clock time within ~12 h is treated as past today;
+ * otherwise it is the upcoming after-midnight occurrence (e.g. 1:00 AM after 10:00 PM).
+ *
+ * @param {number} nowHour
+ * @param {number} workoutHour - Wall-clock 0–23.99
+ * @returns {number} Absolute hour (may exceed 24)
+ */
+function getWorkoutAbsoluteHour(nowHour, workoutHour) {
+    if (workoutHour == null || Number.isNaN(workoutHour)) return null;
+    if (workoutHour >= nowHour) return workoutHour;
+    const hoursBehind = nowHour - workoutHour;
+    if (hoursBehind < 12) return workoutHour;
+    return workoutHour + 24;
+}
+
+/**
+ * Scan now → next bedtime for hours where logged caffeine is relatively elevated.
+ * Does not change bedtime concentration (workout time alone does not alter clearance).
+ *
+ * @param {object} opts
+ * @param {Array} opts.intakes
+ * @param {object} opts.pkParams
+ * @param {number} opts.nowHour
+ * @param {number} opts.bedtimeHour
+ * @param {number} [opts.stepHours=0.5]
+ * @param {number} [opts.minFractionOfPeak=0.7]
+ * @returns {{ peakConc: number, peakAbsHour: number|null, threshold: number, windows: Array<{startAbs:number,endAbs:number,peakConc:number}>, hasSignal: boolean }}
+ */
+function findBestWorkoutWindows({
+    intakes,
+    pkParams,
+    nowHour,
+    bedtimeHour,
+    stepHours = 0.5,
+    minFractionOfPeak = 0.7
+}) {
+    const endAbs = getNextBedtimeHour(nowHour, bedtimeHour);
+    const samples = [];
+    let peakConc = 0;
+    let peakAbsHour = null;
+
+    for (let t = nowHour; t <= endAbs + 1e-9; t += stepHours) {
+        const key = Math.round(t * 100) / 100;
+        const conc = totalConcentrationAt(key, intakes || [], pkParams);
+        samples.push({ absHour: key, conc });
+        if (conc > peakConc) {
+            peakConc = conc;
+            peakAbsHour = key;
+        }
+    }
+
+    const hasSignal = peakConc >= 0.15;
+    const threshold = hasSignal
+        ? Math.max(peakConc * minFractionOfPeak, Math.min(0.5, peakConc * 0.5))
+        : 0;
+
+    const windows = [];
+    if (hasSignal && threshold > 0) {
+        let open = null;
+        let winPeak = 0;
+        for (let i = 0; i < samples.length; i++) {
+            const s = samples[i];
+            const inBand = s.conc + 1e-9 >= threshold;
+            if (inBand) {
+                if (open == null) {
+                    open = s.absHour;
+                    winPeak = s.conc;
+                } else {
+                    winPeak = Math.max(winPeak, s.conc);
+                }
+            } else if (open != null) {
+                const prev = samples[i - 1];
+                windows.push({
+                    startAbs: open,
+                    endAbs: prev.absHour,
+                    peakConc: Math.round(winPeak * 100) / 100
+                });
+                open = null;
+                winPeak = 0;
+            }
+        }
+        if (open != null) {
+            const last = samples[samples.length - 1];
+            windows.push({
+                startAbs: open,
+                endAbs: last.absHour,
+                peakConc: Math.round(winPeak * 100) / 100
+            });
+        }
+    }
+
+    return {
+        peakConc: Math.round(peakConc * 100) / 100,
+        peakAbsHour,
+        threshold: Math.round(threshold * 100) / 100,
+        windows,
+        hasSignal
+    };
+}
+
+/**
+ * Build exercise timing + dose planning fields from PK result inputs.
+ *
+ * @param {object} opts
+ * @param {number|null} opts.workoutHour
+ * @param {Array} opts.intakes
+ * @param {object} opts.pkParams - bodyWeight, sex, food, modifiers, etc.
+ * @param {number} opts.tmax_hours
+ * @param {number} opts.tmax_minutes
+ * @param {number} opts.bedtimeHour
+ * @param {number} opts.nowHour
+ * @returns {object} exercisePlanning payload (always present; workoutHour may be null)
+ */
+function buildExercisePlanning({ workoutHour, intakes, pkParams, tmax_hours, tmax_minutes, bedtimeHour, nowHour }) {
+    const doseGuide = getExerciseDoseGuide(pkParams.bodyWeight);
+    const literatureLeadMin = EXERCISE_PRE_WORKOUT_MIN;
+    const suggested = workoutHour != null
+        ? getSuggestedPreWorkoutIntake(workoutHour, tmax_hours)
+        : null;
+    const totalLoggedMg = (intakes || []).reduce((sum, i) => sum + (i.amountMg || 0), 0);
+    const bestWindows = findBestWorkoutWindows({
+        intakes: intakes || [],
+        pkParams,
+        nowHour,
+        bedtimeHour
+    });
+
+    if (workoutHour == null || Number.isNaN(workoutHour)) {
+        return {
+            workoutHour: null,
+            workoutAbsoluteHour: null,
+            concentrationAtWorkout: null,
+            doseGuide,
+            literatureLeadMin,
+            suggestedIntakeHour: null,
+            suggestedLeadMinutes: null,
+            hoursUntilWorkout: null,
+            hoursWorkoutToBedtime: null,
+            totalLoggedMg,
+            hasLoggedCaffeine: (intakes || []).length > 0,
+            bestWindows
+        };
+    }
+
+    const workoutAbsoluteHour = getWorkoutAbsoluteHour(nowHour, workoutHour);
+    const concentrationAtWorkout = totalConcentrationAt(workoutAbsoluteHour, intakes || [], pkParams);
+    let hoursUntilWorkout = null;
+    if (nowHour != null && !Number.isNaN(nowHour)) {
+        hoursUntilWorkout = workoutAbsoluteHour - nowHour;
+        if (Math.abs(hoursUntilWorkout) < 1e-6) hoursUntilWorkout = 0;
+    }
+    const hoursWorkoutToBedtime = bedtimeHour != null
+        ? hoursElapsedToBedtime(bedtimeHour, workoutHour)
+        : null;
+
+    return {
+        workoutHour,
+        workoutAbsoluteHour,
+        concentrationAtWorkout: Math.round(concentrationAtWorkout * 100) / 100,
+        doseGuide,
+        literatureLeadMin,
+        suggestedIntakeHour: suggested ? suggested.suggestedIntakeHour : null,
+        suggestedLeadMinutes: suggested ? suggested.leadMinutes : null,
+        modelTmaxMinutes: tmax_minutes,
+        hoursUntilWorkout,
+        hoursWorkoutToBedtime,
+        totalLoggedMg,
+        hasLoggedCaffeine: (intakes || []).length > 0,
+        bestWindows
     };
 }
 
@@ -1536,8 +1807,8 @@ function getBedtimeLinePlugin(result) {
             const yScale = chart.scales.y;
             if (!xScale || !yScale) return;
 
-            const offset = (result.bedtimeHour - result.curveStartHour + 24) % 24;
-            if (offset > 24) return;
+            const offset = result.bedtimeChartOffset;
+            if (offset == null || offset < 0 || offset > 24) return;
 
             const xPos = xScale.getPixelForValue(offset);
             if (xPos < xScale.left || xPos > xScale.right) return;
@@ -1670,6 +1941,65 @@ function getPeakMarkerPlugin(result) {
                 ? `Peak · ${peakTime} · ${result.peakConcentration.toFixed(2)} µg/mL`
                 : `Peak · ${result.peakConcentration.toFixed(2)} µg/mL`;
             ctx.fillText(label, xPos, Math.max(yPeak - 12, yScale.top + 10));
+            ctx.restore();
+        }
+    };
+}
+
+/**
+ * Build the Chart.js plugin that draws a vertical line at the optional workout time.
+ *
+ * @param {object} result - Output of generateCaffeineCurve
+ * @returns {object} Chart.js plugin object (id: "workoutLine")
+ */
+function getWorkoutLinePlugin(result) {
+    return {
+        id: 'workoutLine',
+        afterDraw(chart) {
+            if (result.workoutHour == null || Number.isNaN(result.workoutHour)) return;
+
+            const xScale = chart.scales.x;
+            const yScale = chart.scales.y;
+            if (!xScale || !yScale) return;
+
+            const offset = result.exercisePlanning?.workoutAbsoluteHour != null
+                ? result.exercisePlanning.workoutAbsoluteHour - result.curveStartHour
+                : (result.workoutHour - result.curveStartHour + 24) % 24;
+            if (offset < 0 || offset > 24) return;
+
+            const xPos = xScale.getPixelForValue(offset);
+            if (xPos < xScale.left || xPos > xScale.right) return;
+
+            const conc = result.exercisePlanning?.concentrationAtWorkout;
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(xPos, yScale.top);
+            ctx.lineTo(xPos, yScale.bottom);
+            ctx.strokeStyle = '#8b6914';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 3]);
+            ctx.stroke();
+            ctx.fillStyle = '#8b6914';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            const workoutConc = conc != null ? conc.toFixed(2) : '—';
+            const workoutLabel = `Workout · ${workoutConc} µg/mL`;
+            const workoutHalf = ctx.measureText(workoutLabel).width / 2;
+            const workoutX = Math.max(xScale.left + workoutHalf + 4, Math.min(xPos, xScale.right - workoutHalf - 4));
+            ctx.fillText(workoutLabel, workoutX, yScale.top - 16);
+
+            if (conc != null) {
+                const yWorkout = yScale.getPixelForValue(conc);
+                ctx.beginPath();
+                ctx.arc(xPos, yWorkout, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#8b6914';
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
             ctx.restore();
         }
     };
@@ -2268,6 +2598,7 @@ function getTimelineChartConfig(result, chartOptions = {}) {
             getBedtimeLinePlugin(result),
             getNowLinePlugin(result),
             getPeakMarkerPlugin(result),
+            getWorkoutLinePlugin(result),
             getRepeatDoseLinePlugin(result),
             getIntakeMarkersPlugin(result)
         ]
@@ -2751,9 +3082,18 @@ if (typeof module !== 'undefined' && module.exports) {
         getZoneLabelShort,
         hoursElapsedSameDay,
         hoursElapsedToBedtime,
+        getNextBedtimeHour,
+        hoursUntilNextBedtime,
+        getBedtimeChartOffset,
         findDailyPeak,
         buildClearanceCurve,
         getRemainingAfterPeak,
+        getExerciseDoseGuide,
+        getSuggestedPreWorkoutIntake,
+        buildExercisePlanning,
+        getWorkoutAbsoluteHour,
+        findBestWorkoutWindows,
+        formatWallClock,
         getTimelineChartConfig,
         getWeightChartConfig,
         getMetabolizerClearanceChartConfig,

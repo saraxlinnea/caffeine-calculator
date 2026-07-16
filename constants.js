@@ -106,6 +106,11 @@ const CAFFEINE_SOURCES = {
   // Endpoint-specific reference — not a universal personal sleep cutoff.
   const BAUR_DELTA_POWER_THRESHOLD = 1.4;
 
+  // Exercise planning (population guidance from ISSN / meta-analyses — not personal prescriptions)
+  const EXERCISE_DOSE_MG_PER_KG = { low: 3, high: 6 };
+  // Common capsule/coffee pre-exercise timing cited in ISSN position stand (Guest et al. 2021)
+  const EXERCISE_PRE_WORKOUT_MIN = 60;
+
   // SLEEP ZONE THRESHOLDS (for quick lookup)
   const SAFE_THRESHOLD = 0.5;         // Green zone max
   const CAUTION_THRESHOLD = 1.0;      // Yellow zone max
@@ -126,7 +131,7 @@ const CHART_COLORS = {
 };
 
 const ZONE_COLORS_RGBA = {
-    GREEN: 'rgba(122, 155, 142, 0.1)',      // Light green
+    GREEN: 'rgba(150, 168, 130, 0.1)',      // Soft warm green
     YELLOW: 'rgba(201, 165, 112, 0.1)',     // Light tan
     ORANGE: 'rgba(201, 165, 112, 0.15)',    // Light orange
     RED: 'rgba(168, 112, 112, 0.1)',        // Light red
@@ -134,7 +139,7 @@ const ZONE_COLORS_RGBA = {
 };
 
 const ZONE_COLORS_BORDER = {
-    GREEN: '#7a9b8e',
+    GREEN: '#9caf8e',
     YELLOW: '#c9a570',
     ORANGE: '#c9a570',
     RED: '#a87070',
@@ -291,33 +296,13 @@ const FACTOR_EXPLAINERS = {
     }
 };
 
-// Inline citation keys for Overview guides (number maps to Science tab anchors).
-const CITATION_INDEX = {
-    baur2024:     { pmid: '38221756', num: 1, short: 'Baur et al. 2024' },
-    gardiner2023: { pmid: '36870101', num: 2, short: 'Gardiner et al. 2023' },
-    drake2013:    { pmid: '24235903', num: 3, short: 'Drake et al. 2013' },
-    clark2017:    { pmid: '26899133', num: 4, short: 'Clark & Landolt 2017' },
-    burke2015:    { pmid: '26378246', num: 5, short: 'Burke et al. 2015' }
-};
-
-/**
- * Return superscript inline citation link to Science tab reference.
- *
- * @param {string} key - Key in CITATION_INDEX
- * @returns {string} HTML snippet
- */
-function cite(key) {
-    const c = CITATION_INDEX[key];
-    if (!c) return '';
-    return `<sup class="cite-ref"><a href="#ref-${c.pmid}" title="${c.short}">[${c.num}]</a></sup>`;
-}
-
-// Full references (Vancouver-style fields). Rendered in index.html via renderCitations().
+// Inline citation keys live on CITATION_GROUPS items (`citeKey`). Numbers are assigned once below.
 const CITATION_GROUPS = [
     {
         title: 'Sleep Disruption Thresholds',
         items: [
             {
+                citeKey: 'baur2024',
                 authors: 'Baur DM, Dornbierer DA, Landolt HP',
                 title: 'Concentration-effect relationships of plasma caffeine on EEG delta power and cardiac autonomic activity during human sleep',
                 journal: 'J Sleep Res',
@@ -329,6 +314,7 @@ const CITATION_GROUPS = [
                 usedFor: 'Background on concentration–effect relationships in controlled sleep studies. Not used as a universal personal cutoff.'
             },
             {
+                citeKey: 'gardiner2023',
                 authors: 'Gardiner C, Weakley J, Burke LM, Roach GD, Sargent C, Maniar N, et al',
                 title: 'The effect of caffeine on subsequent sleep: A systematic review and meta-analysis',
                 journal: 'Sleep Med Rev',
@@ -339,6 +325,7 @@ const CITATION_GROUPS = [
                 usedFor: 'Mean effects on sleep latency, total sleep time, and sleep efficiency across dose and timing conditions.'
             },
             {
+                citeKey: 'drake2013',
                 authors: 'Drake C, Roehrs T, Shambroom J, Roth T',
                 title: 'Caffeine effects on sleep taken 0, 3, or 6 hours before going to bed',
                 journal: 'J Clin Sleep Med',
@@ -350,6 +337,7 @@ const CITATION_GROUPS = [
                 usedFor: 'Measurable sleep disruption even when caffeine is taken 6 hours before bedtime.'
             },
             {
+                citeKey: 'clark2017',
                 authors: 'Clark I, Landolt HP',
                 title: 'Coffee, caffeine, and sleep: A systematic review of epidemiological studies and randomized controlled trials',
                 journal: 'Sleep Med Rev',
@@ -360,6 +348,7 @@ const CITATION_GROUPS = [
                 usedFor: 'Adenosine receptor mechanisms, dose–response patterns, and individual variability in caffeine–sleep research.'
             },
             {
+                citeKey: 'burke2015',
                 authors: 'Burke TM, Markwald RR, McHill AW, Chinoy ED, Snider JA, Bessman SC, et al',
                 title: 'Effects of caffeine on the human circadian clock in vivo and in vitro',
                 journal: 'Sci Transl Med',
@@ -570,8 +559,239 @@ const CITATION_GROUPS = [
                 usedFor: 'Gastric emptying affects caffeine absorption timing; supports delayed Tmax with slower emptying.'
             }
         ]
+    },
+    {
+        title: 'Exercise & Performance',
+        items: [
+            {
+                citeKey: 'guest2021',
+                shortLabel: 'Guest et al. 2021',
+                authors: 'Guest NS, VanDusseldorp TA, Nelson MT, Grgic J, et al',
+                title: 'International society of sports nutrition position stand: caffeine and exercise performance',
+                journal: 'J Int Soc Sports Nutr',
+                year: 2021,
+                volume: '18',
+                issue: '1',
+                pages: '1',
+                pmid: '33388079',
+                pmcid: 'PMC7777221',
+                doi: '10.1186/s12970-020-00383-4',
+                usedFor: 'Population dose guidance (~3–6 mg/kg), common ~60 min pre-exercise timing, and broad ergogenic consensus framing.'
+            },
+            {
+                citeKey: 'grgic2020',
+                shortLabel: 'Grgic et al. 2020',
+                authors: 'Grgic J, Grgic I, Pickering C, Schoenfeld BJ, et al',
+                title: 'Wake up and smell the coffee: caffeine supplementation and exercise performance—an umbrella review of 21 published meta-analyses',
+                journal: 'Br J Sports Med',
+                year: 2020,
+                volume: '54',
+                issue: '11',
+                pages: '681-688',
+                pmid: '30926628',
+                doi: '10.1136/bjsports-2018-100278',
+                usedFor: 'Umbrella synthesis across endurance, strength, power, and related outcomes; supports cautious population-average language.'
+            },
+            {
+                citeKey: 'southward2018',
+                shortLabel: 'Southward et al. 2018',
+                authors: 'Southward K, Rutherfurd-Markwick KJ, Ali A',
+                title: 'The effect of acute caffeine ingestion on endurance performance: a systematic review and meta-analysis',
+                journal: 'Sports Med',
+                year: 2018,
+                volume: '48',
+                issue: '8',
+                pages: '1913-1928',
+                pmid: '29876876',
+                doi: '10.1007/s40279-018-0939-8',
+                usedFor: 'Endurance time-trial meta-analysis at moderate doses (~3–6 mg/kg); small average improvements.'
+            },
+            {
+                citeKey: 'grgic2018',
+                shortLabel: 'Grgic et al. 2018',
+                authors: 'Grgic J, Trexler ET, Lazinica B, Pedisic Z',
+                title: 'Effects of caffeine intake on muscle strength and power: a systematic review and meta-analysis',
+                journal: 'J Int Soc Sports Nutr',
+                year: 2018,
+                volume: '15',
+                pages: '11',
+                pmid: '29527137',
+                pmcid: 'PMC5839013',
+                doi: '10.1186/s12970-018-0216-0',
+                usedFor: 'Small average effects on maximal strength and power; upper-body strength clearer than lower-body in this analysis.'
+            },
+            {
+                citeKey: 'ganio2009',
+                shortLabel: 'Ganio et al. 2009',
+                authors: 'Ganio MS, Klau JF, Casa DJ, Armstrong LE, et al',
+                title: 'Effect of caffeine on sport-specific endurance performance: a systematic review',
+                journal: 'J Strength Cond Res',
+                year: 2009,
+                volume: '23',
+                issue: '1',
+                pages: '315-24',
+                pmid: '19077738',
+                doi: '10.1519/JSC.0b013e31818b979a',
+                usedFor: 'Sport-specific endurance time-trial review; supports moderate 3–6 mg/kg dosing language.'
+            },
+            {
+                citeKey: 'doherty2004',
+                shortLabel: 'Doherty & Smith 2004',
+                authors: 'Doherty M, Smith PM',
+                title: 'Effects of caffeine ingestion on exercise testing: a meta-analysis',
+                journal: 'Int J Sport Nutr Exerc Metab',
+                year: 2004,
+                volume: '14',
+                issue: '6',
+                pages: '626-46',
+                pmid: '15657469',
+                doi: '10.1123/ijsnem.14.6.626',
+                usedFor: 'Foundational meta-analysis supporting ergogenic effects, especially endurance / time-to-exhaustion protocols.'
+            },
+            {
+                citeKey: 'pickering2019',
+                shortLabel: 'Pickering & Kiely 2019',
+                authors: 'Pickering C, Kiely J',
+                title: 'What should we do about habitual caffeine use in athletes?',
+                journal: 'Sports Med',
+                year: 2019,
+                volume: '49',
+                issue: '6',
+                pages: '833-842',
+                pmid: '30173351',
+                pmcid: 'PMC6548063',
+                doi: '10.1007/s40279-018-0980-7',
+                usedFor: 'Habitual use and response variability caveat; not everyone responds the same way.'
+            },
+            {
+                citeKey: 'grinberg2022',
+                shortLabel: 'Grinberg et al. 2022',
+                authors: 'Grinberg J, Benkhedda K, Barber J, Krahn AD',
+                title: 'Effects of caffeinated energy drinks on cardiovascular responses during exercise in healthy adults: a systematic review and meta-analysis of randomized controlled trials',
+                journal: 'Appl Physiol Nutr Metab',
+                year: 2022,
+                volume: '47',
+                issue: '4',
+                pages: '433-441',
+                pmid: '35358397',
+                doi: '10.1139/apnm-2021-0807',
+                usedFor: 'Higher systolic blood pressure during aerobic exercise after caffeinated energy drinks in healthy adults.'
+            },
+            {
+                citeKey: 'ellermann2022',
+                shortLabel: 'Ellermann et al. 2022',
+                authors: 'Ellermann C, Hakenes S, Wolfes H, Wegner F, et al',
+                title: 'Cardiovascular risk of energy drinks: Caffeine and taurine facilitate ventricular arrhythmias in a sensitive whole-heart model',
+                journal: 'J Cardiovasc Electrophysiol',
+                year: 2022,
+                volume: '33',
+                issue: '4',
+                pages: '820-828',
+                pmid: '35304782',
+                doi: '10.1111/jce.15458',
+                usedFor: 'Experimental arrhythmia susceptibility with caffeine and taurine; shortened repolarization proposed mechanism.'
+            },
+            {
+                citeKey: 'schaffer2014',
+                shortLabel: 'Schaffer et al. 2014',
+                authors: 'Schaffer SW, Shimada-Takaura K, Jong CJ, Ito T, et al',
+                title: 'Effect of taurine and potential interactions with caffeine on cardiovascular function',
+                journal: 'Amino Acids',
+                year: 2014,
+                volume: '46',
+                issue: '5',
+                pages: '1147-1157',
+                pmid: '24615238',
+                pmcid: 'PMC4033538',
+                doi: '10.1007/s00726-014-1708-0',
+                usedFor: 'Review of taurine and possible caffeine interactions; mixed cardiovascular interaction evidence.'
+            },
+            {
+                citeKey: 'gutierrez2021',
+                shortLabel: 'Gutiérrez-Hellín et al. 2021',
+                authors: 'Gutiérrez-Hellín J, Varillas-Delgado D',
+                title: 'Energy drinks and sports performance, cardiovascular risk, and genetic associations; future prospects',
+                journal: 'Nutrients',
+                year: 2021,
+                volume: '13',
+                issue: '3',
+                pages: '715',
+                pmid: '33668219',
+                pmcid: 'PMC7999607',
+                doi: '10.3390/nu13030715',
+                usedFor: 'Energy-drink cardiovascular risk context; multi-ingredient products and adverse reports.'
+            },
+            {
+                citeKey: 'marcus2023',
+                shortLabel: 'Marcus et al. 2023',
+                authors: 'Marcus GM, Rosenthal DG, Nah G, Vittinghoff E, et al',
+                title: 'Acute effects of coffee consumption on health among ambulatory adults',
+                journal: 'N Engl J Med',
+                year: 2023,
+                volume: '388',
+                issue: '12',
+                pages: '1092-1100',
+                pmid: '36947466',
+                doi: '10.1056/NEJMoa2204737',
+                usedFor: 'CRAVE trial: caffeinated coffee days associated with ~1,000 more daily steps vs caffeine-avoidance days; also less sleep.'
+            }
+        ]
     }
 ];
+
+function getCitationRefId(c) {
+    if (c.refId) return c.refId;
+    if (c.pmid) return `ref-${c.pmid}`;
+    if (c.url && c.url.includes('NBK223808')) return 'ref-NBK223808';
+    if (c.doi) return `ref-doi-${c.doi.replace(/[^a-zA-Z0-9]+/g, '-')}`;
+    const slug = (c.authors || 'source').split(/[, ]/).filter(Boolean)[0].toLowerCase();
+    return `ref-${slug}-${c.year || 'undated'}`;
+}
+
+function citationShortLabel(c) {
+    if (c.shortLabel) return c.shortLabel;
+    const lead = (c.authors || '').split(',')[0].trim();
+    const name = lead.includes(' ') ? lead.split(' ').pop() : lead;
+    const etal = (c.authors || '').includes(',') ? ' et al.' : '';
+    return c.year ? `${name}${etal} ${c.year}` : name;
+}
+
+const CITATION_INDEX = {};
+(function assignCitationNumbers() {
+    let n = 0;
+    const refIdAnchor = {};
+    CITATION_GROUPS.forEach(group => {
+        group.items.forEach(c => {
+            c.num = ++n;
+            c.refId = getCitationRefId(c);
+            if (refIdAnchor[c.refId]) {
+                c.duplicateOf = refIdAnchor[c.refId];
+            } else {
+                refIdAnchor[c.refId] = c.num;
+            }
+            if (c.citeKey) {
+                CITATION_INDEX[c.citeKey] = {
+                    pmid: c.pmid || null,
+                    refId: c.refId,
+                    num: c.num,
+                    short: citationShortLabel(c)
+                };
+            }
+        });
+    });
+})();
+
+/**
+ * Return superscript inline citation link to Evidence tab reference.
+ *
+ * @param {string} key - citeKey on a CITATION_GROUPS item
+ * @returns {string} HTML snippet
+ */
+function cite(key) {
+    const c = CITATION_INDEX[key];
+    if (!c) return '';
+    return `<sup class="cite-ref"><a href="#${c.refId}" title="${c.short}">[${c.num}]</a></sup>`;
+}
   
   // Export for use in other files
   if (typeof module !== 'undefined' && module.exports) {
@@ -588,7 +808,13 @@ const CITATION_GROUPS = [
       WARNING_THRESHOLD,
       DANGER_THRESHOLD,
       BAUR_DELTA_POWER_THRESHOLD,
-      CITATION_GROUPS
+      EXERCISE_DOSE_MG_PER_KG,
+      EXERCISE_PRE_WORKOUT_MIN,
+      CITATION_GROUPS,
+      CITATION_INDEX,
+      cite,
+      getCitationRefId,
+      citationShortLabel
     };
   }
 

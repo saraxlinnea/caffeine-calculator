@@ -2,7 +2,7 @@
 
 ## Application overview
 
-Static single-page site (`index.html` + `calculator.js` + `constants.js`) on GitHub Pages. After **Calculate**, results appear in four tabs.
+Static single-page site (`index.html` + `calculator.js` + `constants.js`) on GitHub Pages. After **Calculate**, results appear in five tabs.
 
 ### File roles
 
@@ -11,7 +11,8 @@ Static single-page site (`index.html` + `calculator.js` + `constants.js`) on Git
 | `index.html` | Layout, CSS, form inputs, tab switching, Chart.js lifecycle, inline glue (`calculateCaffeine`, Overview panels, copy summary) |
 | `calculator.js` | PK engine, zone classification, recommendation copy, Chart.js config builders, custom timeline tooltip |
 | `constants.js` | Coefficients, sleep zones, citations, factor explainers |
-| `test/calculator.test.js` | Node unit tests (`npm test`) for core math |
+| `test/calculator.test.js` | Node unit tests for PK math |
+| `test/citations.test.js` | Node integration tests for citation registry + HTML wiring |
 
 ### Result tabs
 
@@ -21,7 +22,8 @@ Static single-page site (`index.html` + `calculator.js` + `constants.js`) on Git
    - **Bedtime recommendation** (`#mainRecommendation`) directly under the cards, from `generateRecommendation()`.
    - **µg/mL primer** and **collapsed explainer** (`<details>`) via `buildOverviewLevelSummary()`.
    - **Plan your next drink** (Overview only; not duplicated on Curve).
-   - Cross-links to Curve chart and Sleep zone reference.
+   - **Exercise teaser** (`#exerciseOverviewTeaser`): compact summary; links to Exercise tab.
+   - Cross-links to Curve chart, Exercise tab, and Sleep zone reference.
 
 2. **Caffeine curve** — 24-hour timeline + educational sub-charts.
    - Compare toolbar **below** the chart title (not overlaid on the plot).
@@ -31,7 +33,36 @@ Static single-page site (`index.html` + `calculator.js` + `constants.js`) on Git
 
 3. **Sleep** — Zone reference, receptor diagram, schematic Chart.js education charts (lazy-drawn).
 
-4. **Evidence** — Citations, model limitations, personalized math walkthrough.
+4. **Exercise** — Workout planning + cited research context.
+   - **Your workout plan** (`#exercisePlanningSection`): optional workout time → estimated plasma at workout, Tmax-based intake tip, 3–6 mg/kg dose range, sleep tradeoff when bedtime ≥ 0.5 µg/mL, OCP clearance note.
+   - **Worth it?** callout: small average benefits; sleep tradeoff often matters more.
+   - **Risks, energy drinks, and other ingredients:** caffeine-only model caveat; taurine/caffeine interaction literature; exercise BP meta-analysis cites.
+   - Collapsible sections: research summary (sport-type table), dose/timing reference, model limits.
+   - `getWorkoutLinePlugin()` draws workout marker on 24h curve when workout time is set.
+
+5. **Evidence** — Numbered citations `[1]`–`[N]`, model limitations, personalized math walkthrough.
+
+### Citation numbering (`constants.js` + `index.html`)
+
+Single source of truth: `CITATION_GROUPS` (~32 items in 7 groups).
+
+```
+CITATION_GROUPS
+  └── items may include citeKey: 'baur2024'
+        ↓
+assignCitationNumbers()  (runs once at load)
+  ├── num: 1, 2, 3… in group order
+  ├── refId: ref-{pmid} | ref-NBK223808 | ref-doi-…
+  ├── duplicateOf: first num when refId repeats (IOM book → [16] points to [8])
+  └── CITATION_INDEX { citeKey → { num, refId, pmid, short } }
+        ↓
+index.html
+  ├── data-cite="baur2024" → applyInlineCitations() → cite() → [N] superscript
+  ├── renderCitations() → Evidence list with [N] prefix + id="{refId}"
+  └── data-scroll="#ref-{pmid}" on input panel (scroll-only; no inline number)
+```
+
+Inline `data-cite` keys today: sleep papers (`baur2024` … `burke2015`) plus exercise papers (`guest2021` … `pickering2019`, `grinberg2022`, `ellermann2022`, `schaffer2014`, `gutierrez2021`). `test/citations.test.js` guards registry ↔ HTML consistency.
 
 ### Calculation flow
 
@@ -59,7 +90,7 @@ User inputs → generateCaffeineCurve(params)
 ### Testing
 
 ```bash
-npm test                        # Node unit tests for calculator.js
+npm test                        # PK + citation tests (includes exercise helpers)
 python3 -m http.server 8080     # manual browser QA
 ```
 
