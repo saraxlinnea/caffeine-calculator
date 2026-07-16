@@ -1823,7 +1823,7 @@ function getBedtimeLinePlugin(result) {
             ctx.setLineDash([6, 4]);
             ctx.stroke();
             ctx.fillStyle = '#d4a574';
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '10px "DM Sans", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             const bedConc = result.concentrationAtBedtime.toFixed(2);
@@ -1875,7 +1875,7 @@ function getNowLinePlugin(result) {
             ctx.setLineDash([]);
             ctx.stroke();
             ctx.fillStyle = '#7a9b8e';
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '10px "DM Sans", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             const nowConc = result.concentrationNow.toFixed(2);
@@ -1932,7 +1932,7 @@ function getPeakMarkerPlugin(result) {
             ctx.stroke();
 
             ctx.fillStyle = '#2c2c2c';
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '10px "DM Sans", sans-serif';
             ctx.textAlign = 'center';
             const peakTime = typeof formatWallClock === 'function'
                 ? formatWallClock(result.peakHour)
@@ -1981,7 +1981,7 @@ function getWorkoutLinePlugin(result) {
             ctx.setLineDash([4, 3]);
             ctx.stroke();
             ctx.fillStyle = '#8b6914';
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '10px "DM Sans", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             const workoutConc = conc != null ? conc.toFixed(2) : '—';
@@ -2107,7 +2107,7 @@ function getTimelineResponsivePlugin(result) {
             layout.padding = {
                 ...padding,
                 bottom: bottomPad,
-                top: 8
+                top: 28
             };
         }
     };
@@ -2165,7 +2165,7 @@ function getIntakeMarkersPlugin(result) {
 
             const ctx = chart.ctx;
             ctx.save();
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '10px "DM Sans", sans-serif';
             ctx.textAlign = 'center';
 
             staggered.forEach(marker => {
@@ -2243,7 +2243,7 @@ function getRepeatDoseLinePlugin(result) {
             ctx.setLineDash([4, 3]);
             ctx.stroke();
             ctx.fillStyle = '#7a9b8e';
-            ctx.font = '10px Inter, sans-serif';
+            ctx.font = '10px "DM Sans", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('Latest repeat', xPos, yScale.top + 12);
             ctx.restore();
@@ -2529,7 +2529,7 @@ function getTimelineChartConfig(result, chartOptions = {}) {
                 duration: 550,
                 easing: 'easeOutQuart'
             } : false,
-            layout: { padding: { left: 2, right: 8, bottom: 36, top: 26 } },
+            layout: { padding: { left: 2, right: 8, bottom: 36, top: 28 } },
             interaction: { mode: 'nearest', intersect: false },
             plugins: {
                 title: {
